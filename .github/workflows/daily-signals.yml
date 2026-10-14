@@ -62,7 +62,7 @@ jobs:
         env:
           TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
           ACCOUNT_EQUITY_CAD: "100"
-        run: python scanner.py
+        run: python rate_limited_scanner.py
 
       - name: Update state and send Telegram notifications
         if: steps.gate.outputs.run_scan == 'true'
