@@ -2,23 +2,27 @@ name: After-Close Stock Signals
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - "scanner.py"
+      - "rate_limited_scanner.py"
   schedule:
-    # Run at both possible UTC equivalents of 16:10 New York time.
+    # Run at both possible UTC equivalents of 16:20 New York time.
     # A New York-time gate below keeps only the correct run across DST changes.
-    - cron: "10 20 * * 1-5"
-    - cron: "10 21 * * 1-5"
+    - cron: "20 20 * * 1-5"
+    - cron: "20 21 * * 1-5"
 
 permissions:
   contents: write
 
 concurrency:
-  group: after-close-stock-signals
+  group: stock-signal-state
   cancel-in-progress: false
 
 jobs:
   scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - name: Check out repository
@@ -41,12 +45,12 @@ jobs:
 
           event_name = os.environ.get("EVENT_NAME", "")
           now_ny = datetime.now(ZoneInfo("America/New_York"))
-          manual = event_name == "workflow_dispatch"
-          after_close_window = now_ny.weekday() < 5 and now_ny.hour == 16 and now_ny.minute >= 5
-          should_run = manual or after_close_window
+          validation_run = event_name in {"workflow_dispatch", "push"}
+          after_close_window = now_ny.weekday() < 5 and now_ny.hour == 16 and now_ny.minute >= 15
+          should_run = validation_run or after_close_window
 
           print(f"New York time: {now_ny.isoformat()}")
-          print(f"Manual run: {manual}")
+          print(f"Event: {event_name}")
           print(f"Run daily scan: {should_run}")
 
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
