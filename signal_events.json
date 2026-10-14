@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at_utc": "2026-10-14T22:05:00+00:00",
+  "updated_at_utc": "2026-10-14T23:44:37.049103+00:00",
   "events": [
     {
       "id": "ENTRY-COST-2026-10-14",
@@ -43,6 +43,20 @@
       "momentum10_pct": 8.77,
       "score": 4.467228,
       "created_at_utc": "2026-10-14T22:05:00+00:00"
+    },
+    {
+      "id": "ENTRY-WMT-2026-10-14",
+      "type": "ENTRY",
+      "symbol": "WMT",
+      "signal_date": "2026-10-14",
+      "effective": "next_market_open",
+      "signal_close_usd": 116.16,
+      "atr14": 2.3092,
+      "stop_usd": 110.3869,
+      "recommended_position_cad": 33.33,
+      "momentum10_pct": 11.778,
+      "score": 5.924787,
+      "created_at_utc": "2026-10-14T23:44:37.049099+00:00"
     }
   ]
 }

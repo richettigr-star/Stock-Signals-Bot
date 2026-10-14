@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-10-14T20:51:32.744120+00:00",
+  "generated_at_utc": "2026-10-14T23:44:36.922327+00:00",
   "latest_bar_date": "2026-10-14",
   "strategy": {
     "universe": [
@@ -34,7 +34,8 @@
     "max_candidates": 3,
     "direction": "long_only",
     "leverage": "none",
-    "entry_timing": "next_market_open"
+    "entry_timing": "next_market_open",
+    "capital_allocation": "equal split across selected candidates, then capped by risk-based size"
   },
   "account_equity_cad": 100.0,
   "risk_profiles": {
@@ -44,99 +45,120 @@
   "candidate_count": 3,
   "candidates": [
     {
-      "symbol": "COST",
+      "symbol": "WMT",
       "bar_date": "2026-10-14",
-      "close_usd": 982.21,
-      "momentum10": 0.078948,
-      "momentum10_pct": 7.895,
-      "ema100": 944.7537,
-      "atr14": 15.4699,
-      "atr_pct": 1.575,
-      "score": 5.012574,
+      "close_usd": 116.16,
+      "momentum10": 0.117783,
+      "momentum10_pct": 11.778,
+      "ema100": 112.1174,
+      "atr14": 2.3092,
+      "atr_pct": 1.988,
+      "score": 5.924787,
       "eligible": true,
       "planned_entry": "next_market_open",
-      "reference_stop_usd": 943.5353,
-      "reference_stop_distance_usd": 38.6747,
-      "reference_stop_pct": 3.938,
+      "reference_stop_usd": 110.3869,
+      "reference_stop_distance_usd": 5.7731,
+      "reference_stop_pct": 4.97,
       "sizing_cad": {
         "LIVE Small": {
           "risk_fraction": 0.075,
           "risk_target_cad": 7.5,
-          "risk_based_position_cad": 190.48,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 150.91,
+          "slot_budget_cad": 33.33,
+          "recommended_position_cad": 33.33,
+          "unused_slot_cash_cad": 0.0
         },
         "LIVE Small Aggressive": {
           "risk_fraction": 0.08,
           "risk_target_cad": 8.0,
-          "risk_based_position_cad": 203.17,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 160.97,
+          "slot_budget_cad": 33.33,
+          "recommended_position_cad": 33.33,
+          "unused_slot_cash_cad": 0.0
         }
+      },
+      "capital_allocation": {
+        "selected_candidates": 3,
+        "slot_budget_cad": 33.33,
+        "allocation_fraction": 0.333333
+      }
+    },
+    {
+      "symbol": "COST",
+      "bar_date": "2026-10-14",
+      "close_usd": 982.0,
+      "momentum10": 0.078718,
+      "momentum10_pct": 7.872,
+      "ema100": 944.7495,
+      "atr14": 15.4756,
+      "atr_pct": 1.576,
+      "score": 4.995013,
+      "eligible": true,
+      "planned_entry": "next_market_open",
+      "reference_stop_usd": 943.311,
+      "reference_stop_distance_usd": 38.689,
+      "reference_stop_pct": 3.94,
+      "sizing_cad": {
+        "LIVE Small": {
+          "risk_fraction": 0.075,
+          "risk_target_cad": 7.5,
+          "risk_based_position_cad": 190.36,
+          "slot_budget_cad": 33.33,
+          "recommended_position_cad": 33.33,
+          "unused_slot_cash_cad": 0.0
+        },
+        "LIVE Small Aggressive": {
+          "risk_fraction": 0.08,
+          "risk_target_cad": 8.0,
+          "risk_based_position_cad": 203.05,
+          "slot_budget_cad": 33.33,
+          "recommended_position_cad": 33.33,
+          "unused_slot_cash_cad": 0.0
+        }
+      },
+      "capital_allocation": {
+        "selected_candidates": 3,
+        "slot_budget_cad": 33.33,
+        "allocation_fraction": 0.333333
       }
     },
     {
       "symbol": "XOM",
       "bar_date": "2026-10-14",
-      "close_usd": 176.99,
-      "momentum10": 0.087496,
-      "momentum10_pct": 8.75,
-      "ema100": 157.9461,
-      "atr14": 3.4547,
+      "close_usd": 177.01,
+      "momentum10": 0.087619,
+      "momentum10_pct": 8.762,
+      "ema100": 157.9465,
+      "atr14": 3.4554,
       "atr_pct": 1.952,
-      "score": 4.482549,
+      "score": 4.488423,
       "eligible": true,
       "planned_entry": "next_market_open",
-      "reference_stop_usd": 168.3532,
-      "reference_stop_distance_usd": 8.6368,
+      "reference_stop_usd": 168.3714,
+      "reference_stop_distance_usd": 8.6386,
       "reference_stop_pct": 4.88,
       "sizing_cad": {
         "LIVE Small": {
           "risk_fraction": 0.075,
           "risk_target_cad": 7.5,
-          "risk_based_position_cad": 153.69,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 153.68,
+          "slot_budget_cad": 33.33,
+          "recommended_position_cad": 33.33,
+          "unused_slot_cash_cad": 0.0
         },
         "LIVE Small Aggressive": {
           "risk_fraction": 0.08,
           "risk_target_cad": 8.0,
-          "risk_based_position_cad": 163.94,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 163.93,
+          "slot_budget_cad": 33.33,
+          "recommended_position_cad": 33.33,
+          "unused_slot_cash_cad": 0.0
         }
-      }
-    },
-    {
-      "symbol": "CVX",
-      "bar_date": "2026-10-14",
-      "close_usd": 222.12,
-      "momentum10": 0.087704,
-      "momentum10_pct": 8.77,
-      "ema100": 198.7867,
-      "atr14": 4.3608,
-      "atr_pct": 1.963,
-      "score": 4.467228,
-      "eligible": true,
-      "planned_entry": "next_market_open",
-      "reference_stop_usd": 211.218,
-      "reference_stop_distance_usd": 10.902,
-      "reference_stop_pct": 4.908,
-      "sizing_cad": {
-        "LIVE Small": {
-          "risk_fraction": 0.075,
-          "risk_target_cad": 7.5,
-          "risk_based_position_cad": 152.81,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
-        },
-        "LIVE Small Aggressive": {
-          "risk_fraction": 0.08,
-          "risk_target_cad": 8.0,
-          "risk_based_position_cad": 162.99,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
-        }
+      },
+      "capital_allocation": {
+        "selected_candidates": 3,
+        "slot_budget_cad": 33.33,
+        "allocation_fraction": 0.333333
       }
     }
   ],
@@ -144,521 +166,597 @@
     {
       "symbol": "AAPL",
       "bar_date": "2026-10-14",
-      "close_usd": 343.05,
-      "momentum10": 0.030118,
-      "momentum10_pct": 3.012,
-      "ema100": 316.1475,
-      "atr14": 6.6781,
+      "close_usd": 342.96,
+      "momentum10": 0.029848,
+      "momentum10_pct": 2.985,
+      "ema100": 316.1457,
+      "atr14": 6.6767,
       "atr_pct": 1.947,
-      "score": 1.547155,
+      "score": 1.533196,
       "eligible": true,
       "planned_entry": "next_market_open",
-      "reference_stop_usd": 326.3547,
-      "reference_stop_distance_usd": 16.6953,
+      "reference_stop_usd": 326.2682,
+      "reference_stop_distance_usd": 16.6917,
       "reference_stop_pct": 4.867,
       "sizing_cad": {
         "LIVE Small": {
           "risk_fraction": 0.075,
           "risk_target_cad": 7.5,
-          "risk_based_position_cad": 154.11,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 154.1
         },
         "LIVE Small Aggressive": {
           "risk_fraction": 0.08,
           "risk_target_cad": 8.0,
-          "risk_based_position_cad": 164.38,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 164.37
         }
       }
     },
     {
       "symbol": "AMD",
       "bar_date": "2026-10-14",
-      "close_usd": 570.81,
-      "momentum10": -0.066938,
-      "momentum10_pct": -6.694,
-      "ema100": 507.0463,
-      "atr14": 25.5587,
+      "close_usd": 570.82,
+      "momentum10": -0.066922,
+      "momentum10_pct": -6.692,
+      "ema100": 507.0465,
+      "atr14": 25.5623,
       "atr_pct": 4.478,
-      "score": -1.494947,
+      "score": -1.494399,
       "eligible": false,
       "planned_entry": "next_market_open",
-      "reference_stop_usd": 506.9133,
-      "reference_stop_distance_usd": 63.8967,
-      "reference_stop_pct": 11.194,
+      "reference_stop_usd": 506.9144,
+      "reference_stop_distance_usd": 63.9057,
+      "reference_stop_pct": 11.195,
       "sizing_cad": {
         "LIVE Small": {
           "risk_fraction": 0.075,
           "risk_target_cad": 7.5,
-          "risk_based_position_cad": 67.0,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 67.0
+          "risk_based_position_cad": 66.99
         },
         "LIVE Small Aggressive": {
           "risk_fraction": 0.08,
           "risk_target_cad": 8.0,
-          "risk_based_position_cad": 71.47,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 71.47
+          "risk_based_position_cad": 71.46
         }
       }
     },
     {
       "symbol": "AMZN",
       "bar_date": "2026-10-14",
-      "close_usd": 254.18,
-      "momentum10": 0.020189,
-      "momentum10_pct": 2.019,
-      "ema100": 252.1524,
+      "close_usd": 254.08,
+      "momentum10": 0.019787,
+      "momentum10_pct": 1.979,
+      "ema100": 252.1505,
       "atr14": 5.7907,
-      "atr_pct": 2.278,
-      "score": 0.886175,
-      "eligible": true,
+      "atr_pct": 2.279,
+      "score": 0.868216,
+      "eligible": false,
       "planned_entry": "next_market_open",
-      "reference_stop_usd": 239.7033,
+      "reference_stop_usd": 239.6033,
       "reference_stop_distance_usd": 14.4767,
-      "reference_stop_pct": 5.695,
+      "reference_stop_pct": 5.698,
       "sizing_cad": {
         "LIVE Small": {
           "risk_fraction": 0.075,
           "risk_target_cad": 7.5,
-          "risk_based_position_cad": 131.68,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 131.63
         },
         "LIVE Small Aggressive": {
           "risk_fraction": 0.08,
           "risk_target_cad": 8.0,
-          "risk_based_position_cad": 140.46,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 140.41
+        }
+      }
+    },
+    {
+      "symbol": "AVGO",
+      "bar_date": "2026-10-14",
+      "close_usd": 346.25,
+      "momentum10": -0.014066,
+      "momentum10_pct": -1.407,
+      "ema100": 371.3316,
+      "atr14": 11.2194,
+      "atr_pct": 3.24,
+      "score": -0.434114,
+      "eligible": false,
+      "planned_entry": "next_market_open",
+      "reference_stop_usd": 318.2015,
+      "reference_stop_distance_usd": 28.0485,
+      "reference_stop_pct": 8.101,
+      "sizing_cad": {
+        "LIVE Small": {
+          "risk_fraction": 0.075,
+          "risk_target_cad": 7.5,
+          "risk_based_position_cad": 92.59
+        },
+        "LIVE Small Aggressive": {
+          "risk_fraction": 0.08,
+          "risk_target_cad": 8.0,
+          "risk_based_position_cad": 98.76
         }
       }
     },
     {
       "symbol": "BAC",
       "bar_date": "2026-10-14",
-      "close_usd": 51.41,
-      "momentum10": -0.055484,
-      "momentum10_pct": -5.548,
-      "ema100": 57.5347,
+      "close_usd": 51.39,
+      "momentum10": -0.055852,
+      "momentum10_pct": -5.585,
+      "ema100": 57.5343,
       "atr14": 1.336,
-      "atr_pct": 2.599,
-      "score": -2.135084,
+      "atr_pct": 2.6,
+      "score": -2.148387,
       "eligible": false,
       "planned_entry": "next_market_open",
-      "reference_stop_usd": 48.07,
+      "reference_stop_usd": 48.05,
       "reference_stop_distance_usd": 3.34,
-      "reference_stop_pct": 6.497,
+      "reference_stop_pct": 6.499,
       "sizing_cad": {
         "LIVE Small": {
           "risk_fraction": 0.075,
           "risk_target_cad": 7.5,
-          "risk_based_position_cad": 115.44,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 115.4
         },
         "LIVE Small Aggressive": {
           "risk_fraction": 0.08,
           "risk_target_cad": 8.0,
-          "risk_based_position_cad": 123.14,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 123.09
+        }
+      }
+    },
+    {
+      "symbol": "COIN",
+      "bar_date": "2026-10-14",
+      "close_usd": 172.89,
+      "momentum10": -0.072528,
+      "momentum10_pct": -7.253,
+      "ema100": 176.9524,
+      "atr14": 10.1612,
+      "atr_pct": 5.877,
+      "score": -1.234047,
+      "eligible": false,
+      "planned_entry": "next_market_open",
+      "reference_stop_usd": 147.487,
+      "reference_stop_distance_usd": 25.403,
+      "reference_stop_pct": 14.693,
+      "sizing_cad": {
+        "LIVE Small": {
+          "risk_fraction": 0.075,
+          "risk_target_cad": 7.5,
+          "risk_based_position_cad": 51.04
+        },
+        "LIVE Small Aggressive": {
+          "risk_fraction": 0.08,
+          "risk_target_cad": 8.0,
+          "risk_based_position_cad": 54.45
         }
       }
     },
     {
       "symbol": "COST",
       "bar_date": "2026-10-14",
-      "close_usd": 982.21,
-      "momentum10": 0.078948,
-      "momentum10_pct": 7.895,
-      "ema100": 944.7537,
-      "atr14": 15.4699,
-      "atr_pct": 1.575,
-      "score": 5.012574,
+      "close_usd": 982.0,
+      "momentum10": 0.078718,
+      "momentum10_pct": 7.872,
+      "ema100": 944.7495,
+      "atr14": 15.4756,
+      "atr_pct": 1.576,
+      "score": 4.995013,
       "eligible": true,
       "planned_entry": "next_market_open",
-      "reference_stop_usd": 943.5353,
-      "reference_stop_distance_usd": 38.6747,
-      "reference_stop_pct": 3.938,
+      "reference_stop_usd": 943.311,
+      "reference_stop_distance_usd": 38.689,
+      "reference_stop_pct": 3.94,
       "sizing_cad": {
         "LIVE Small": {
           "risk_fraction": 0.075,
           "risk_target_cad": 7.5,
-          "risk_based_position_cad": 190.48,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 190.36,
+          "slot_budget_cad": 33.33,
+          "recommended_position_cad": 33.33,
+          "unused_slot_cash_cad": 0.0
         },
         "LIVE Small Aggressive": {
           "risk_fraction": 0.08,
           "risk_target_cad": 8.0,
-          "risk_based_position_cad": 203.17,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 203.05,
+          "slot_budget_cad": 33.33,
+          "recommended_position_cad": 33.33,
+          "unused_slot_cash_cad": 0.0
         }
+      },
+      "capital_allocation": {
+        "selected_candidates": 3,
+        "slot_budget_cad": 33.33,
+        "allocation_fraction": 0.333333
       }
     },
     {
       "symbol": "CVX",
       "bar_date": "2026-10-14",
-      "close_usd": 222.12,
-      "momentum10": 0.087704,
-      "momentum10_pct": 8.77,
-      "ema100": 198.7867,
-      "atr14": 4.3608,
-      "atr_pct": 1.963,
-      "score": 4.467228,
+      "close_usd": 222.04,
+      "momentum10": 0.087312,
+      "momentum10_pct": 8.731,
+      "ema100": 198.7851,
+      "atr14": 4.3605,
+      "atr_pct": 1.964,
+      "score": 4.446034,
       "eligible": true,
       "planned_entry": "next_market_open",
-      "reference_stop_usd": 211.218,
-      "reference_stop_distance_usd": 10.902,
-      "reference_stop_pct": 4.908,
+      "reference_stop_usd": 211.1388,
+      "reference_stop_distance_usd": 10.9012,
+      "reference_stop_pct": 4.91,
       "sizing_cad": {
         "LIVE Small": {
           "risk_fraction": 0.075,
           "risk_target_cad": 7.5,
-          "risk_based_position_cad": 152.81,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 152.76
         },
         "LIVE Small Aggressive": {
           "risk_fraction": 0.08,
           "risk_target_cad": 8.0,
-          "risk_based_position_cad": 162.99,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 162.95
         }
       }
     },
     {
       "symbol": "GOOGL",
       "bar_date": "2026-10-14",
-      "close_usd": 347.78,
-      "momentum10": 0.010753,
-      "momentum10_pct": 1.075,
-      "ema100": 347.1002,
-      "atr14": 8.4782,
-      "atr_pct": 2.438,
-      "score": 0.441106,
+      "close_usd": 347.64,
+      "momentum10": 0.010346,
+      "momentum10_pct": 1.035,
+      "ema100": 347.0975,
+      "atr14": 8.4814,
+      "atr_pct": 2.44,
+      "score": 0.424086,
       "eligible": false,
       "planned_entry": "next_market_open",
-      "reference_stop_usd": 326.5844,
-      "reference_stop_distance_usd": 21.1956,
-      "reference_stop_pct": 6.095,
+      "reference_stop_usd": 326.4364,
+      "reference_stop_distance_usd": 21.2036,
+      "reference_stop_pct": 6.099,
       "sizing_cad": {
         "LIVE Small": {
           "risk_fraction": 0.075,
           "risk_target_cad": 7.5,
-          "risk_based_position_cad": 123.06,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 122.96
         },
         "LIVE Small Aggressive": {
           "risk_fraction": 0.08,
           "risk_target_cad": 8.0,
-          "risk_based_position_cad": 131.27,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 131.16
         }
       }
     },
     {
       "symbol": "JPM",
       "bar_date": "2026-10-14",
-      "close_usd": 335.29,
-      "momentum10": 0.013481,
-      "momentum10_pct": 1.348,
-      "ema100": 337.3989,
-      "atr14": 6.4168,
-      "atr_pct": 1.914,
-      "score": 0.704426,
+      "close_usd": 335.28,
+      "momentum10": 0.013451,
+      "momentum10_pct": 1.345,
+      "ema100": 337.3987,
+      "atr14": 6.4458,
+      "atr_pct": 1.923,
+      "score": 0.699657,
       "eligible": false,
       "planned_entry": "next_market_open",
-      "reference_stop_usd": 319.2481,
-      "reference_stop_distance_usd": 16.0419,
-      "reference_stop_pct": 4.784,
+      "reference_stop_usd": 319.1654,
+      "reference_stop_distance_usd": 16.1146,
+      "reference_stop_pct": 4.806,
       "sizing_cad": {
         "LIVE Small": {
           "risk_fraction": 0.075,
           "risk_target_cad": 7.5,
-          "risk_based_position_cad": 156.76,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 156.05
         },
         "LIVE Small Aggressive": {
           "risk_fraction": 0.08,
           "risk_target_cad": 8.0,
-          "risk_based_position_cad": 167.21,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 166.45
         }
       }
     },
     {
       "symbol": "LLY",
       "bar_date": "2026-10-14",
-      "close_usd": 1211.15,
-      "momentum10": 0.04673,
-      "momentum10_pct": 4.673,
-      "ema100": 1143.2724,
-      "atr14": 34.4244,
-      "atr_pct": 2.842,
-      "score": 1.644088,
+      "close_usd": 1208.74,
+      "momentum10": 0.044647,
+      "momentum10_pct": 4.465,
+      "ema100": 1143.2247,
+      "atr14": 34.4268,
+      "atr_pct": 2.848,
+      "score": 1.567572,
       "eligible": true,
       "planned_entry": "next_market_open",
-      "reference_stop_usd": 1125.0891,
-      "reference_stop_distance_usd": 86.0609,
-      "reference_stop_pct": 7.106,
+      "reference_stop_usd": 1122.673,
+      "reference_stop_distance_usd": 86.067,
+      "reference_stop_pct": 7.12,
       "sizing_cad": {
         "LIVE Small": {
           "risk_fraction": 0.075,
           "risk_target_cad": 7.5,
-          "risk_based_position_cad": 105.55,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 105.33
         },
         "LIVE Small Aggressive": {
           "risk_fraction": 0.08,
           "risk_target_cad": 8.0,
-          "risk_based_position_cad": 112.59,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 112.35
         }
       }
     },
     {
       "symbol": "META",
       "bar_date": "2026-10-14",
-      "close_usd": 738.14,
-      "momentum10": 0.017871,
-      "momentum10_pct": 1.787,
-      "ema100": 649.0095,
-      "atr14": 24.1837,
-      "atr_pct": 3.276,
-      "score": 0.545476,
+      "close_usd": 737.54,
+      "momentum10": 0.017044,
+      "momentum10_pct": 1.704,
+      "ema100": 648.9976,
+      "atr14": 24.1861,
+      "atr_pct": 3.279,
+      "score": 0.519748,
       "eligible": false,
       "planned_entry": "next_market_open",
-      "reference_stop_usd": 677.6808,
-      "reference_stop_distance_usd": 60.4592,
-      "reference_stop_pct": 8.191,
+      "reference_stop_usd": 677.0748,
+      "reference_stop_distance_usd": 60.4652,
+      "reference_stop_pct": 8.198,
       "sizing_cad": {
         "LIVE Small": {
           "risk_fraction": 0.075,
           "risk_target_cad": 7.5,
-          "risk_based_position_cad": 91.57,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 91.57
+          "risk_based_position_cad": 91.48
         },
         "LIVE Small Aggressive": {
           "risk_fraction": 0.08,
           "risk_target_cad": 8.0,
-          "risk_based_position_cad": 97.67,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 97.67
+          "risk_based_position_cad": 97.58
         }
       }
     },
     {
       "symbol": "MSFT",
       "bar_date": "2026-10-14",
-      "close_usd": 534.18,
-      "momentum10": 0.04149,
-      "momentum10_pct": 4.149,
-      "ema100": 471.3695,
-      "atr14": 11.5546,
-      "atr_pct": 2.163,
-      "score": 1.918095,
+      "close_usd": 533.69,
+      "momentum10": 0.040534,
+      "momentum10_pct": 4.053,
+      "ema100": 471.3598,
+      "atr14": 11.5582,
+      "atr_pct": 2.166,
+      "score": 1.871631,
       "eligible": true,
       "planned_entry": "next_market_open",
-      "reference_stop_usd": 505.2934,
-      "reference_stop_distance_usd": 28.8866,
-      "reference_stop_pct": 5.408,
+      "reference_stop_usd": 504.7945,
+      "reference_stop_distance_usd": 28.8955,
+      "reference_stop_pct": 5.414,
       "sizing_cad": {
         "LIVE Small": {
           "risk_fraction": 0.075,
           "risk_target_cad": 7.5,
-          "risk_based_position_cad": 138.69,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 138.52
         },
         "LIVE Small Aggressive": {
           "risk_fraction": 0.08,
           "risk_target_cad": 8.0,
-          "risk_based_position_cad": 147.94,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 147.76
         }
       }
     },
     {
       "symbol": "NFLX",
       "bar_date": "2026-10-14",
-      "close_usd": 70.58,
-      "momentum10": 0.014372,
-      "momentum10_pct": 1.437,
-      "ema100": 76.6358,
-      "atr14": 1.7657,
-      "atr_pct": 2.502,
-      "score": 0.574478,
+      "close_usd": 70.57,
+      "momentum10": 0.014228,
+      "momentum10_pct": 1.423,
+      "ema100": 76.6356,
+      "atr14": 1.7661,
+      "atr_pct": 2.503,
+      "score": 0.568537,
       "eligible": false,
       "planned_entry": "next_market_open",
-      "reference_stop_usd": 66.1657,
-      "reference_stop_distance_usd": 4.4143,
-      "reference_stop_pct": 6.254,
+      "reference_stop_usd": 66.1548,
+      "reference_stop_distance_usd": 4.4152,
+      "reference_stop_pct": 6.257,
       "sizing_cad": {
         "LIVE Small": {
           "risk_fraction": 0.075,
           "risk_target_cad": 7.5,
-          "risk_based_position_cad": 119.92,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 119.88
         },
         "LIVE Small Aggressive": {
           "risk_fraction": 0.08,
           "risk_target_cad": 8.0,
-          "risk_based_position_cad": 127.91,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 127.87
         }
       }
     },
     {
       "symbol": "NVDA",
       "bar_date": "2026-10-14",
-      "close_usd": 221.49,
-      "momentum10": -0.030169,
-      "momentum10_pct": -3.017,
-      "ema100": 216.038,
+      "close_usd": 221.3,
+      "momentum10": -0.031001,
+      "momentum10_pct": -3.1,
+      "ema100": 216.0342,
       "atr14": 5.8278,
-      "atr_pct": 2.631,
-      "score": -1.146588,
+      "atr_pct": 2.633,
+      "score": -1.177196,
       "eligible": false,
       "planned_entry": "next_market_open",
-      "reference_stop_usd": 206.9204,
+      "reference_stop_usd": 206.7304,
       "reference_stop_distance_usd": 14.5696,
-      "reference_stop_pct": 6.578,
+      "reference_stop_pct": 6.584,
       "sizing_cad": {
         "LIVE Small": {
           "risk_fraction": 0.075,
           "risk_target_cad": 7.5,
-          "risk_based_position_cad": 114.02,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 113.92
         },
         "LIVE Small Aggressive": {
           "risk_fraction": 0.08,
           "risk_target_cad": 8.0,
-          "risk_based_position_cad": 121.62,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 121.51
+        }
+      }
+    },
+    {
+      "symbol": "PLTR",
+      "bar_date": "2026-10-14",
+      "close_usd": 200.97,
+      "momentum10": 0.074419,
+      "momentum10_pct": 7.442,
+      "ema100": 166.1012,
+      "atr14": 6.7697,
+      "atr_pct": 3.369,
+      "score": 2.209227,
+      "eligible": true,
+      "planned_entry": "next_market_open",
+      "reference_stop_usd": 184.0456,
+      "reference_stop_distance_usd": 16.9244,
+      "reference_stop_pct": 8.421,
+      "sizing_cad": {
+        "LIVE Small": {
+          "risk_fraction": 0.075,
+          "risk_target_cad": 7.5,
+          "risk_based_position_cad": 89.06
+        },
+        "LIVE Small Aggressive": {
+          "risk_fraction": 0.08,
+          "risk_target_cad": 8.0,
+          "risk_based_position_cad": 95.0
         }
       }
     },
     {
       "symbol": "TSLA",
       "bar_date": "2026-10-14",
-      "close_usd": 367.325,
-      "momentum10": 0.035272,
-      "momentum10_pct": 3.527,
-      "ema100": 371.0592,
-      "atr14": 11.068,
-      "atr_pct": 3.013,
-      "score": 1.170621,
+      "close_usd": 367.16,
+      "momentum10": 0.034807,
+      "momentum10_pct": 3.481,
+      "ema100": 371.0559,
+      "atr14": 11.0694,
+      "atr_pct": 3.015,
+      "score": 1.15452,
       "eligible": false,
       "planned_entry": "next_market_open",
-      "reference_stop_usd": 339.655,
-      "reference_stop_distance_usd": 27.67,
-      "reference_stop_pct": 7.533,
+      "reference_stop_usd": 339.4864,
+      "reference_stop_distance_usd": 27.6736,
+      "reference_stop_pct": 7.537,
       "sizing_cad": {
         "LIVE Small": {
           "risk_fraction": 0.075,
           "risk_target_cad": 7.5,
-          "risk_based_position_cad": 99.56,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 99.56
+          "risk_based_position_cad": 99.51
         },
         "LIVE Small Aggressive": {
           "risk_fraction": 0.08,
           "risk_target_cad": 8.0,
-          "risk_based_position_cad": 106.2,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 106.14
         }
       }
     },
     {
       "symbol": "UNH",
       "bar_date": "2026-10-14",
-      "close_usd": 395.78,
-      "momentum10": 0.078185,
-      "momentum10_pct": 7.818,
-      "ema100": 383.2063,
-      "atr14": 11.1741,
-      "atr_pct": 2.823,
-      "score": 2.769252,
+      "close_usd": 395.62,
+      "momentum10": 0.077749,
+      "momentum10_pct": 7.775,
+      "ema100": 383.2031,
+      "atr14": 11.1748,
+      "atr_pct": 2.825,
+      "score": 2.752524,
       "eligible": true,
       "planned_entry": "next_market_open",
-      "reference_stop_usd": 367.8447,
-      "reference_stop_distance_usd": 27.9353,
-      "reference_stop_pct": 7.058,
+      "reference_stop_usd": 367.6829,
+      "reference_stop_distance_usd": 27.9371,
+      "reference_stop_pct": 7.062,
       "sizing_cad": {
         "LIVE Small": {
           "risk_fraction": 0.075,
           "risk_target_cad": 7.5,
-          "risk_based_position_cad": 106.26,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 106.21
         },
         "LIVE Small Aggressive": {
           "risk_fraction": 0.08,
           "risk_target_cad": 8.0,
-          "risk_based_position_cad": 113.34,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 113.29
         }
+      }
+    },
+    {
+      "symbol": "WMT",
+      "bar_date": "2026-10-14",
+      "close_usd": 116.16,
+      "momentum10": 0.117783,
+      "momentum10_pct": 11.778,
+      "ema100": 112.1174,
+      "atr14": 2.3092,
+      "atr_pct": 1.988,
+      "score": 5.924787,
+      "eligible": true,
+      "planned_entry": "next_market_open",
+      "reference_stop_usd": 110.3869,
+      "reference_stop_distance_usd": 5.7731,
+      "reference_stop_pct": 4.97,
+      "sizing_cad": {
+        "LIVE Small": {
+          "risk_fraction": 0.075,
+          "risk_target_cad": 7.5,
+          "risk_based_position_cad": 150.91,
+          "slot_budget_cad": 33.33,
+          "recommended_position_cad": 33.33,
+          "unused_slot_cash_cad": 0.0
+        },
+        "LIVE Small Aggressive": {
+          "risk_fraction": 0.08,
+          "risk_target_cad": 8.0,
+          "risk_based_position_cad": 160.97,
+          "slot_budget_cad": 33.33,
+          "recommended_position_cad": 33.33,
+          "unused_slot_cash_cad": 0.0
+        }
+      },
+      "capital_allocation": {
+        "selected_candidates": 3,
+        "slot_budget_cad": 33.33,
+        "allocation_fraction": 0.333333
       }
     },
     {
       "symbol": "XOM",
       "bar_date": "2026-10-14",
-      "close_usd": 176.99,
-      "momentum10": 0.087496,
-      "momentum10_pct": 8.75,
-      "ema100": 157.9461,
-      "atr14": 3.4547,
+      "close_usd": 177.01,
+      "momentum10": 0.087619,
+      "momentum10_pct": 8.762,
+      "ema100": 157.9465,
+      "atr14": 3.4554,
       "atr_pct": 1.952,
-      "score": 4.482549,
+      "score": 4.488423,
       "eligible": true,
       "planned_entry": "next_market_open",
-      "reference_stop_usd": 168.3532,
-      "reference_stop_distance_usd": 8.6368,
+      "reference_stop_usd": 168.3714,
+      "reference_stop_distance_usd": 8.6386,
       "reference_stop_pct": 4.88,
       "sizing_cad": {
         "LIVE Small": {
           "risk_fraction": 0.075,
           "risk_target_cad": 7.5,
-          "risk_based_position_cad": 153.69,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 153.68,
+          "slot_budget_cad": 33.33,
+          "recommended_position_cad": 33.33,
+          "unused_slot_cash_cad": 0.0
         },
         "LIVE Small Aggressive": {
           "risk_fraction": 0.08,
           "risk_target_cad": 8.0,
-          "risk_based_position_cad": 163.94,
-          "max_without_leverage_cad": 100.0,
-          "cash_capped_position_cad": 100.0
+          "risk_based_position_cad": 163.93,
+          "slot_budget_cad": 33.33,
+          "recommended_position_cad": 33.33,
+          "unused_slot_cash_cad": 0.0
         }
+      },
+      "capital_allocation": {
+        "selected_candidates": 3,
+        "slot_budget_cad": 33.33,
+        "allocation_fraction": 0.333333
       }
     }
   ],
-  "errors": [
-    "Failed to fetch AVGO: 429 Client Error: Too Many Requests for url: https://api.twelvedata.com/time_series?symbol=AVGO&interval=1day&outputsize=180&adjust=splits&apikey=6377f9dc796e42d7a2886c16388cea19",
-    "Failed to fetch WMT: 429 Client Error: Too Many Requests for url: https://api.twelvedata.com/time_series?symbol=WMT&interval=1day&outputsize=180&adjust=splits&apikey=6377f9dc796e42d7a2886c16388cea19",
-    "Failed to fetch PLTR: 429 Client Error: Too Many Requests for url: https://api.twelvedata.com/time_series?symbol=PLTR&interval=1day&outputsize=180&adjust=splits&apikey=6377f9dc796e42d7a2886c16388cea19",
-    "Failed to fetch COIN: 429 Client Error: Too Many Requests for url: https://api.twelvedata.com/time_series?symbol=COIN&interval=1day&outputsize=180&adjust=splits&apikey=6377f9dc796e42d7a2886c16388cea19"
-  ],
-  "important_note": "This scanner produces nightly candidates only. It does not know your actual Wealthsimple fills, cash balance, or existing open positions unless you manage those separately. Position sizing is an estimate and must be capped by available cash."
+  "errors": [],
+  "important_note": "This scanner produces nightly candidates only. It does not know your actual Wealthsimple fills, cash balance, or existing open positions unless you manage those separately. Capital is split only across the candidates selected in this scan."
 }
