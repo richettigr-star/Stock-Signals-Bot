@@ -45,7 +45,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No exit/state changes to commit."
           else
-            git pull --rebase
             git commit -m "Update intraday signal state"
+            git pull --rebase
             git push
           fi
