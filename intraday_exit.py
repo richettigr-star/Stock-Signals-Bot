@@ -51,11 +51,13 @@ def regular_market_window(now_ny: datetime) -> bool:
     return time(9, 30) <= current <= time(16, 5)
 
 
-def fetch_recent_minute_bars(symbol: str, api_key: str) -> list[dict[str, Any]]:
+def fetch_today_minute_bars(symbol: str, api_key: str) -> list[dict[str, Any]]:
+    # 390 bars covers a full regular US trading session. Each request still
+    # costs one Twelve Data API credit per symbol.
     params = {
         "symbol": symbol,
         "interval": "1min",
-        "outputsize": 60,
+        "outputsize": 390,
         "timezone": "America/New_York",
         "apikey": api_key,
     }
@@ -118,20 +120,23 @@ def main() -> int:
             continue
 
         signal_date = str(pos.get("signal_date") or "")
-        # A nightly signal becomes active only on a later trading day. Fresh
-        # minute bars below ensure a holiday does not activate a stale signal.
         if today <= signal_date:
             continue
 
         try:
-            bars = fetch_recent_minute_bars(symbol, api_key)
+            bars = fetch_today_minute_bars(symbol, api_key)
         except Exception as exc:
             print(f"WARNING: {symbol}: {exc}", file=sys.stderr)
             continue
 
-        today_bars = [b for b in bars if b["datetime"][:10] == today and b["datetime"][11:16] >= "09:30"]
+        today_bars = [
+            b for b in bars
+            if b["datetime"][:10] == today and "09:30" <= b["datetime"][11:16] <= "16:00"
+        ]
         if not today_bars:
-            print(f"{symbol}: no fresh regular-session minute bars today; leaving pending/active state unchanged.")
+            # This also prevents a stale previous-session price from activating
+            # a pending signal on a US market holiday.
+            print(f"{symbol}: no fresh regular-session minute bars today.")
             continue
 
         if status == "pending_entry":
@@ -141,24 +146,17 @@ def main() -> int:
             pos["entry_note"] = (
                 "Signal-only activation at the next regular market session; actual broker fill is not tracked."
             )
+            pos["updated_at_utc"] = utc_now()
             changed = True
 
-        last_seen = str(pos.get("last_intraday_bar_datetime") or "")
-        unseen = [b for b in today_bars if not last_seen or b["datetime"] > last_seen]
-        if not unseen:
-            continue
-
         stop = float(pos["stop_usd"])
-        trigger_bar = next((b for b in unseen if float(b["low"]) <= stop), None)
-        pos["last_intraday_bar_datetime"] = unseen[-1]["datetime"]
-        pos["last_observed_price_usd"] = unseen[-1]["close"]
-        pos["updated_at_utc"] = utc_now()
-        changed = True
+        trigger_bar = next((b for b in today_bars if float(b["low"]) <= stop), None)
 
         if trigger_bar is None:
+            latest = today_bars[-1]
             print(
-                f"{symbol}: monitored through {unseen[-1]['datetime']}; "
-                f"last={unseen[-1]['close']:.4f}, stop={stop:.4f}"
+                f"{symbol}: latest={latest['datetime']} close={latest['close']:.4f}, "
+                f"session_low={min(b['low'] for b in today_bars):.4f}, stop={stop:.4f}"
             )
             continue
 
@@ -171,7 +169,7 @@ def main() -> int:
             "stop_usd": round(stop, 4),
             "trigger_bar_datetime_ny": trigger_bar["datetime"],
             "trigger_bar_low_usd": round(float(trigger_bar["low"]), 4),
-            "last_observed_close_usd": round(float(trigger_bar["close"]), 4),
+            "last_observed_close_usd": round(float(today_bars[-1]["close"]), 4),
             "original_signal_date": signal_date,
             "action": "sell_fractional_position_manually_as_soon_as_practical",
             "created_at_utc": event_time,
