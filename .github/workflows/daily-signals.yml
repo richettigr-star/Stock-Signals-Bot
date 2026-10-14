@@ -33,14 +33,17 @@ jobs:
           ACCOUNT_EQUITY_CAD: "100"
         run: python scanner.py
 
-      - name: Commit updated signals
+      - name: Update strategy signal state
+        run: python manage_state.py
+
+      - name: Commit updated signals and state
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add signals.json report.md
+          git add signals.json report.md signal_state.json signal_events.json
           if git diff --cached --quiet; then
             echo "No signal output changes to commit."
           else
-            git commit -m "Update nightly stock signals"
+            git commit -m "Update nightly stock signals and state"
             git push
           fi
