@@ -1,0 +1,46 @@
+name: Nightly Stock Signals
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 22:30 UTC Monday-Friday.
+    # This is after the regular US market close in both EDT and EST.
+    - cron: "30 22 * * 1-5"
+
+permissions:
+  contents: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run nightly scanner
+        env:
+          TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
+          ACCOUNT_EQUITY_CAD: "100"
+        run: python scanner.py
+
+      - name: Commit updated signals
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add signals.json report.md
+          if git diff --cached --quiet; then
+            echo "No signal output changes to commit."
+          else
+            git commit -m "Update nightly stock signals"
+            git push
+          fi
