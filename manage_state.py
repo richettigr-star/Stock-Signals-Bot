@@ -1,23 +1,32 @@
 #!/usr/bin/env python3
-"""Maintain signal-only state after the nightly scanner runs.
+"""Maintain signal-only state after the daily scanner runs.
 
-This is NOT broker portfolio tracking. It only remembers which strategy signals
-are currently active so the bot can avoid duplicate ENTRY alerts and can later
-produce EXIT alerts when a stop is crossed.
+This is NOT broker portfolio tracking. It only remembers strategy signals so the
+bot can avoid duplicate ENTRY alerts, raise trailing stops once per completed
+daily bar, and support intraday EXIT monitoring.
+
+Operational notifications are sent to Telegram when TELEGRAM_BOT_TOKEN and
+TELEGRAM_CHAT_ID are configured as GitHub Actions secrets.
 """
 
 from __future__ import annotations
 
 import json
+import os
+import time as time_module
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+import requests
 
 STATE_PATH = Path("signal_state.json")
 EVENTS_PATH = Path("signal_events.json")
 SIGNALS_PATH = Path("signals.json")
 ATR_MULTIPLIER = 2.5
 MAX_EVENT_HISTORY = 500
+TELEGRAM_TIMEOUT = 15
+TELEGRAM_RETRIES = 3
 
 
 def utc_now() -> str:
@@ -54,10 +63,118 @@ def get_recommended_position(candidate: dict[str, Any], signals: dict[str, Any])
     if "recommended_position_cad" in live_small:
         return float(live_small["recommended_position_cad"])
 
-    # Backward-compatible fallback for reports generated before slot allocation was added.
     count = max(1, int(signals.get("candidate_count") or 1))
     equity = float(signals.get("account_equity_cad") or 0.0)
     return round(equity / count, 2) if equity > 0 else 0.0
+
+
+def telegram_credentials() -> tuple[str, str]:
+    return (
+        os.getenv("TELEGRAM_BOT_TOKEN", "").strip(),
+        os.getenv("TELEGRAM_CHAT_ID", "").strip(),
+    )
+
+
+def telegram_message(event: dict[str, Any]) -> str:
+    event_type = event.get("type")
+
+    if event_type == "ENTRY":
+        return (
+            "🟢 NOVA ENTRADA — STOCK SIGNALS\n\n"
+            f"Ativo: {event['symbol']}\n"
+            f"Sinal confirmado: {event['signal_date']}\n"
+            "Execução: próxima abertura regular\n"
+            f"Valor sugerido: C${float(event['recommended_position_cad']):.2f}\n"
+            f"Momentum10: {float(event['momentum10_pct']):.3f}%\n"
+            f"ATR14: US${float(event['atr14']):.4f}\n"
+            f"Stop inicial: US${float(event['stop_usd']):.4f}\n\n"
+            "Signal-only: a compra é manual na Wealthsimple."
+        )
+
+    if event_type == "STOP_UPDATE":
+        return (
+            "🟡 TRAILING STOP ATUALIZADO — STOCK SIGNALS\n\n"
+            f"Ativo: {event['symbol']}\n"
+            f"Candle diário: {event['bar_date']}\n"
+            f"Stop anterior: US${float(event['old_stop_usd']):.4f}\n"
+            f"Novo stop: US${float(event['new_stop_usd']):.4f}\n"
+            f"Fechamento: US${float(event['close_usd']):.4f}\n"
+            f"ATR14: US${float(event['atr14']):.4f}\n\n"
+            "Regra: o trailing stop nunca desce."
+        )
+
+    if event_type == "EXIT":
+        return (
+            "🚨 STOP ATINGIDO — STOCK SIGNALS\n\n"
+            f"🔴 SAÍDA: {event['symbol']}\n"
+            f"Stop: US${float(event['stop_usd']):.4f}\n"
+            f"Mínima do candle: US${float(event['trigger_bar_low_usd']):.4f}\n"
+            f"Último preço observado: US${float(event['last_observed_close_usd']):.4f}\n"
+            f"Horário NY: {event['trigger_bar_datetime_ny']}\n\n"
+            "AÇÃO: vender a posição fracionária manualmente na Wealthsimple assim que possível."
+        )
+
+    return f"Stock Signals event: {json.dumps(event, ensure_ascii=False)}"
+
+
+def send_telegram(event: dict[str, Any]) -> bool:
+    token, chat_id = telegram_credentials()
+    if not token or not chat_id:
+        return False
+
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    payload = {
+        "chat_id": chat_id,
+        "text": telegram_message(event),
+        "disable_web_page_preview": True,
+    }
+
+    last_error: Exception | None = None
+    for attempt in range(1, TELEGRAM_RETRIES + 1):
+        try:
+            response = requests.post(url, data=payload, timeout=TELEGRAM_TIMEOUT)
+            response.raise_for_status()
+            body = response.json()
+            if not body.get("ok"):
+                raise RuntimeError(f"Telegram API returned ok=false: {body}")
+
+            event["telegram_alert_status"] = "sent"
+            event["telegram_alert_sent_at_utc"] = utc_now()
+            result = body.get("result") or {}
+            if result.get("message_id") is not None:
+                event["telegram_message_id"] = result["message_id"]
+            print(f"Telegram {event.get('type')} alert sent for {event.get('symbol')}")
+            return True
+        except Exception as exc:
+            last_error = exc
+            if attempt < TELEGRAM_RETRIES:
+                time_module.sleep(attempt * 2)
+
+    event["telegram_alert_status"] = "failed"
+    event["telegram_alert_last_error"] = str(last_error)
+    print(
+        f"WARNING: Telegram {event.get('type')} alert failed for {event.get('symbol')}: {last_error}"
+    )
+    return False
+
+
+def retry_unsent_notifications(events_payload: dict[str, Any]) -> bool:
+    token, chat_id = telegram_credentials()
+    if not token or not chat_id:
+        return False
+
+    changed = False
+    for event in events_payload.get("events", []):
+        if event.get("type") not in {"ENTRY", "STOP_UPDATE", "EXIT"}:
+            continue
+        if event.get("telegram_alert_status") == "sent":
+            continue
+        send_telegram(event)
+        changed = True
+
+    if changed:
+        events_payload["updated_at_utc"] = utc_now()
+    return changed
 
 
 def main() -> int:
@@ -79,8 +196,8 @@ def main() -> int:
     all_symbols = {r["symbol"]: r for r in signals.get("all_symbols", []) if r.get("symbol")}
     latest_bar_date = str(signals["latest_bar_date"])
 
-    # Update trailing stops once per completed daily bar for signals that remain active.
-    # Operational rule for this signal-only pilot:
+    # Update trailing stops once per completed daily bar.
+    # Operational pilot rule:
     # stop_t = max(stop_{t-1}, daily_close_t - 2.5 * ATR14_t)
     for symbol, pos in list(positions.items()):
         if pos.get("status") not in {"pending_entry", "active"}:
@@ -95,13 +212,30 @@ def main() -> int:
         candidate_stop = float(row["close_usd"]) - ATR_MULTIPLIER * float(row["atr14"])
         old_stop = float(pos["stop_usd"])
         new_stop = max(old_stop, candidate_stop)
+
         pos["stop_usd"] = round(new_stop, 4)
         pos["atr14_latest"] = float(row["atr14"])
         pos["last_close_usd"] = float(row["close_usd"])
         pos["last_stop_update_date"] = row_date
         pos["updated_at_utc"] = utc_now()
 
-    # New nightly candidates become pending strategy entries for the next market open.
+        if new_stop > old_stop + 1e-9:
+            append_event(
+                events_payload,
+                {
+                    "id": f"STOP_UPDATE-{symbol}-{row_date}",
+                    "type": "STOP_UPDATE",
+                    "symbol": symbol,
+                    "bar_date": row_date,
+                    "old_stop_usd": round(old_stop, 4),
+                    "new_stop_usd": round(new_stop, 4),
+                    "close_usd": float(row["close_usd"]),
+                    "atr14": float(row["atr14"]),
+                    "created_at_utc": utc_now(),
+                },
+            )
+
+    # New daily candidates become pending entries for the next market open.
     for candidate in signals.get("candidates", []):
         symbol = candidate["symbol"]
         current = positions.get(symbol)
@@ -147,6 +281,10 @@ def main() -> int:
                 "created_at_utc": utc_now(),
             },
         )
+
+    # Send all operational events that have not yet been delivered. This also
+    # retries a previous failed Telegram delivery on the next daily run.
+    retry_unsent_notifications(events_payload)
 
     state["updated_at_utc"] = utc_now()
     state["latest_processed_bar_date"] = latest_bar_date
