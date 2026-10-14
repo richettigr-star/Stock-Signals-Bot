@@ -13,13 +13,18 @@ Strategy:
 - Up to 3 nightly entry candidates
 - Intended execution: next US market open
 
+Capital allocation:
+- 1 selected candidate -> up to 100% of account cash
+- 2 selected candidates -> up to 50% each
+- 3 selected candidates -> up to 33.33% each
+- Each position is also capped by its risk-based size
+
 This script DOES NOT place trades. It only writes signals.json and report.md.
 """
 
 from __future__ import annotations
 
 import json
-import math
 import os
 import sys
 import time
@@ -183,8 +188,6 @@ def analyze_symbol(symbol: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
             "risk_fraction": round(risk_fraction, 4),
             "risk_target_cad": round(risk_cad, 2),
             "risk_based_position_cad": round(risk_based_position_cad, 2),
-            "max_without_leverage_cad": round(ACCOUNT_EQUITY_CAD, 2),
-            "cash_capped_position_cad": round(min(risk_based_position_cad, ACCOUNT_EQUITY_CAD), 2),
         }
 
     return {
@@ -206,6 +209,28 @@ def analyze_symbol(symbol: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def apply_slot_allocation(candidates: list[dict[str, Any]]) -> None:
+    if not candidates:
+        return
+
+    selected_count = len(candidates)
+    slot_budget_cad = ACCOUNT_EQUITY_CAD / selected_count
+
+    for candidate in candidates:
+        candidate["capital_allocation"] = {
+            "selected_candidates": selected_count,
+            "slot_budget_cad": round(slot_budget_cad, 2),
+            "allocation_fraction": round(1.0 / selected_count, 6),
+        }
+
+        for sizing in candidate["sizing_cad"].values():
+            risk_based = float(sizing["risk_based_position_cad"])
+            final_position = min(risk_based, slot_budget_cad)
+            sizing["slot_budget_cad"] = round(slot_budget_cad, 2)
+            sizing["recommended_position_cad"] = round(final_position, 2)
+            sizing["unused_slot_cash_cad"] = round(max(0.0, slot_budget_cad - final_position), 2)
+
+
 def write_outputs(results: list[dict[str, Any]], errors: list[str]) -> None:
     ranked = sorted(
         [r for r in results if r["eligible"]],
@@ -213,6 +238,7 @@ def write_outputs(results: list[dict[str, Any]], errors: list[str]) -> None:
         reverse=True,
     )
     candidates = ranked[:MAX_CANDIDATES]
+    apply_slot_allocation(candidates)
 
     bar_dates = sorted({r["bar_date"] for r in results})
     latest_bar_date = bar_dates[-1] if bar_dates else None
@@ -233,6 +259,7 @@ def write_outputs(results: list[dict[str, Any]], errors: list[str]) -> None:
             "direction": "long_only",
             "leverage": "none",
             "entry_timing": "next_market_open",
+            "capital_allocation": "equal split across selected candidates, then capped by risk-based size",
         },
         "account_equity_cad": ACCOUNT_EQUITY_CAD,
         "risk_profiles": RISK_PROFILES,
@@ -243,7 +270,7 @@ def write_outputs(results: list[dict[str, Any]], errors: list[str]) -> None:
         "important_note": (
             "This scanner produces nightly candidates only. It does not know your actual "
             "Wealthsimple fills, cash balance, or existing open positions unless you manage "
-            "those separately. Position sizing is an estimate and must be capped by available cash."
+            "those separately. Capital is split only across the candidates selected in this scan."
         ),
     }
 
@@ -262,8 +289,11 @@ def write_outputs(results: list[dict[str, Any]], errors: list[str]) -> None:
     ]
 
     if candidates:
+        slot_budget = ACCOUNT_EQUITY_CAD / len(candidates)
         lines += [
             f"## {len(candidates)} candidate(s) for the next market open",
+            "",
+            f"Capital split: approximately C${slot_budget:.2f} per selected candidate.",
             "",
         ]
         for rank, c in enumerate(candidates, 1):
@@ -284,7 +314,8 @@ def write_outputs(results: list[dict[str, Any]], errors: list[str]) -> None:
                     f"**{profile}**",
                     f"- Target risk: C${sizing['risk_target_cad']:.2f}",
                     f"- Risk-based position: C${sizing['risk_based_position_cad']:.2f}",
-                    f"- Cash-capped position (no leverage): C${sizing['cash_capped_position_cad']:.2f}",
+                    f"- Slot budget: C${sizing['slot_budget_cad']:.2f}",
+                    f"- Recommended position: C${sizing['recommended_position_cad']:.2f}",
                     "",
                 ]
     else:
