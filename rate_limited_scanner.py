@@ -36,6 +36,13 @@ def _wait_for_pacing() -> None:
     _last_request_started = time.monotonic()
 
 
+def _redact_error_url(response):
+    """Prevent requests exceptions from embedding the API key in logs/reports."""
+    if response.status_code >= 400:
+        response.url = scanner.API_URL
+    return response
+
+
 def paced_get(*args, **kwargs):
     """Pace every GET and recover from Twelve Data HTTP 429 responses."""
     global _last_request_started
@@ -45,10 +52,10 @@ def paced_get(*args, **kwargs):
         response = _original_get(*args, **kwargs)
 
         if response.status_code != 429:
-            return response
+            return _redact_error_url(response)
 
         if attempt >= MAX_RATE_LIMIT_RETRIES:
-            return response
+            return _redact_error_url(response)
 
         print(
             "Rate limiter: Twelve Data returned HTTP 429; "
@@ -56,8 +63,6 @@ def paced_get(*args, **kwargs):
             f"(retry {attempt}/{MAX_RATE_LIMIT_RETRIES - 1})"
         )
         time.sleep(RATE_LIMIT_COOLDOWN_SECONDS)
-        # The cooldown itself satisfies normal pacing; reset the timestamp so
-        # the next request does not add an unnecessary extra delay.
         _last_request_started = None
 
     raise RuntimeError("Unexpected rate limiter state")
