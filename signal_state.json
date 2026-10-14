@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "updated_at_utc": "2026-10-14T23:44:37.049127+00:00",
+  "updated_at_utc": "2026-10-14T23:50:06.035347+00:00",
   "latest_processed_bar_date": "2026-10-14",
-  "state_note": "Signal-only strategy state. Pending entries reconciled to the final complete scan for 2026-10-14; this does not represent actual Wealthsimple fills or holdings.",
+  "state_note": "Signal-only strategy state. This does not represent actual broker fills or holdings.",
   "positions": {
     "WMT": {
       "symbol": "WMT",
@@ -20,7 +20,7 @@
       "momentum10_pct": 11.778,
       "stop_rule": "max(previous_stop, completed_daily_close - 2.5 * ATR14)",
       "created_at_utc": "2026-10-14T23:44:37.049085+00:00",
-      "updated_at_utc": "2026-10-14T23:44:37.049096+00:00"
+      "updated_at_utc": "2026-10-14T23:50:06.035311+00:00"
     },
     "COST": {
       "symbol": "COST",
@@ -38,7 +38,7 @@
       "momentum10_pct": 7.872,
       "stop_rule": "max(previous_stop, completed_daily_close - 2.5 * ATR14)",
       "created_at_utc": "2026-10-14T22:05:00+00:00",
-      "updated_at_utc": "2026-10-14T23:44:37.049127+00:00"
+      "updated_at_utc": "2026-10-14T23:50:06.035325+00:00"
     },
     "XOM": {
       "symbol": "XOM",
@@ -56,8 +56,12 @@
       "momentum10_pct": 8.762,
       "stop_rule": "max(previous_stop, completed_daily_close - 2.5 * ATR14)",
       "created_at_utc": "2026-10-14T22:05:00+00:00",
-      "updated_at_utc": "2026-10-14T23:44:37.049127+00:00"
+      "updated_at_utc": "2026-10-14T23:50:06.035332+00:00"
     }
   },
-  "closed_signals": []
+  "closed_signals": [],
+  "scan_validation": {
+    "accepted": true,
+    "reason": "complete"
+  }
 }
