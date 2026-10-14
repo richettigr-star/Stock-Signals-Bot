@@ -11,8 +11,10 @@ on:
 permissions:
   contents: write
 
+# Share one lock with the after-close scanner so both workflows cannot consume
+# the same market-data quota or edit signal state at the same time.
 concurrency:
-  group: intraday-exit-signals
+  group: stock-signal-state
   cancel-in-progress: false
 
 jobs:
