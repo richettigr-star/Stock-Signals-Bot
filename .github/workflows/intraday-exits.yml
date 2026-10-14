@@ -1,0 +1,51 @@
+name: Intraday Exit Signals
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Every 15 minutes during a UTC window that covers the regular US session
+    # in both daylight-saving and standard time. The Python script itself
+    # exits immediately when New York is outside 09:30-16:05.
+    - cron: "*/15 13-21 * * 1-5"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: intraday-exit-signals
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Check active signal stops
+        env:
+          TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
+        run: python intraday_exit.py
+
+      - name: Commit exit state if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add signal_state.json signal_events.json
+          if git diff --cached --quiet; then
+            echo "No exit/state changes to commit."
+          else
+            git pull --rebase
+            git commit -m "Update intraday signal state"
+            git push
+          fi
