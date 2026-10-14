@@ -3,48 +3,6 @@
   "updated_at_utc": "2026-10-14T23:44:37.049103+00:00",
   "events": [
     {
-      "id": "ENTRY-COST-2026-10-14",
-      "type": "ENTRY",
-      "symbol": "COST",
-      "signal_date": "2026-10-14",
-      "effective": "next_market_open",
-      "signal_close_usd": 982.21,
-      "atr14": 15.4699,
-      "stop_usd": 943.5353,
-      "recommended_position_cad": 33.33,
-      "momentum10_pct": 7.895,
-      "score": 5.012574,
-      "created_at_utc": "2026-10-14T22:05:00+00:00"
-    },
-    {
-      "id": "ENTRY-XOM-2026-10-14",
-      "type": "ENTRY",
-      "symbol": "XOM",
-      "signal_date": "2026-10-14",
-      "effective": "next_market_open",
-      "signal_close_usd": 176.99,
-      "atr14": 3.4547,
-      "stop_usd": 168.3532,
-      "recommended_position_cad": 33.33,
-      "momentum10_pct": 8.75,
-      "score": 4.482549,
-      "created_at_utc": "2026-10-14T22:05:00+00:00"
-    },
-    {
-      "id": "ENTRY-CVX-2026-10-14",
-      "type": "ENTRY",
-      "symbol": "CVX",
-      "signal_date": "2026-10-14",
-      "effective": "next_market_open",
-      "signal_close_usd": 222.12,
-      "atr14": 4.3608,
-      "stop_usd": 211.218,
-      "recommended_position_cad": 33.33,
-      "momentum10_pct": 8.77,
-      "score": 4.467228,
-      "created_at_utc": "2026-10-14T22:05:00+00:00"
-    },
-    {
       "id": "ENTRY-WMT-2026-10-14",
       "type": "ENTRY",
       "symbol": "WMT",
@@ -57,6 +15,34 @@
       "momentum10_pct": 11.778,
       "score": 5.924787,
       "created_at_utc": "2026-10-14T23:44:37.049099+00:00"
+    },
+    {
+      "id": "ENTRY-COST-2026-10-14",
+      "type": "ENTRY",
+      "symbol": "COST",
+      "signal_date": "2026-10-14",
+      "effective": "next_market_open",
+      "signal_close_usd": 982.0,
+      "atr14": 15.4756,
+      "stop_usd": 943.311,
+      "recommended_position_cad": 33.33,
+      "momentum10_pct": 7.872,
+      "score": 4.995013,
+      "created_at_utc": "2026-10-14T22:05:00+00:00"
+    },
+    {
+      "id": "ENTRY-XOM-2026-10-14",
+      "type": "ENTRY",
+      "symbol": "XOM",
+      "signal_date": "2026-10-14",
+      "effective": "next_market_open",
+      "signal_close_usd": 177.01,
+      "atr14": 3.4554,
+      "stop_usd": 168.3714,
+      "recommended_position_cad": 33.33,
+      "momentum10_pct": 8.762,
+      "score": 4.488423,
+      "created_at_utc": "2026-10-14T22:05:00+00:00"
     }
   ]
 }
