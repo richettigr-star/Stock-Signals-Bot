@@ -3,10 +3,10 @@ name: Intraday Exit Signals
 on:
   workflow_dispatch:
   schedule:
-    # Every 15 minutes during a UTC window that covers the regular US session
+    # Every 5 minutes during a UTC window that covers the regular US session
     # in both daylight-saving and standard time. The Python script itself
     # exits immediately when New York is outside 09:30-16:05.
-    - cron: "*/15 13-21 * * 1-5"
+    - cron: "*/5 13-21 * * 1-5"
 
 permissions:
   contents: write
@@ -35,6 +35,8 @@ jobs:
       - name: Check active signal stops
         env:
           TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python intraday_exit.py
 
       - name: Commit exit state if changed
