@@ -1,333 +1,197 @@
 #!/usr/bin/env python3
-"""Intraday EXIT signal monitor with emergency Telegram alerts.
-
-Checks strategy signals remembered in signal_state.json. It does not place broker
-orders. When a 1-minute bar trades at or below the stored stop, the signal is
-closed in strategy state, an EXIT event is appended to signal_events.json, and
-an emergency Telegram alert is sent when Telegram secrets are configured.
-"""
-
-from __future__ import annotations
-
-import json
-import os
+"""Stop monitoring with dated stop levels, recovery window and one notification outbox."""
 import sys
-import time as time_module
-from datetime import datetime, time, timezone
+import time
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any
-from zoneinfo import ZoneInfo
-
 import requests
+from common import (NY, append_event, completed_scan_day, load_json, monitor_window, next_open, now_utc,
+                    parse_time, regular_bar, save_json, session_bounds, utc_now, validate_ohlc)
+from notifications import credentials, deliver
 
 API_URL = "https://api.twelvedata.com/time_series"
-STATE_PATH = Path("signal_state.json")
-EVENTS_PATH = Path("signal_events.json")
-NY = ZoneInfo("America/New_York")
-MAX_EVENT_HISTORY = 500
-REQUEST_TIMEOUT = 30
-TELEGRAM_TIMEOUT = 15
-TELEGRAM_RETRIES = 3
-HEALTH_PATH = Path("monitor_health.json")
-HEALTH: dict[str, Any] = {}
+HEALTH = {}
 
-
-def utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat()
-
-
-def load_json(path: Path, default: Any) -> Any:
-    if not path.exists():
-        return default
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except Exception as exc:
-        raise RuntimeError(f"Invalid JSON in {path.name}") from exc
-
-
-def save_json(path: Path, payload: Any) -> None:
-    path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-
-
-def regular_market_window(now_ny: datetime) -> bool:
-    if now_ny.weekday() >= 5:
-        return False
-    current = now_ny.time().replace(tzinfo=None)
-    return time(9, 30) <= current <= time(16, 5)
-
-
-def fetch_today_minute_bars(symbol: str, api_key: str) -> list[dict[str, Any]]:
-    params = {
-        "symbol": symbol,
-        "interval": "1min",
-        "outputsize": 390,
-        "timezone": "America/New_York",
-        "apikey": api_key,
-    }
-    response = requests.get(API_URL, params=params, timeout=REQUEST_TIMEOUT)
-    response.raise_for_status()
-    data = response.json()
-    if data.get("status") == "error":
-        raise RuntimeError(
-            f"Twelve Data error for {symbol}: {data.get('code', '')} {data.get('message', 'unknown error')}"
-        )
-    values = data.get("values") or []
-    bars: list[dict[str, Any]] = []
-    for row in values:
-        bars.append(
-            {
-                "datetime": str(row["datetime"]),
-                "open": float(row["open"]),
-                "high": float(row["high"]),
-                "low": float(row["low"]),
-                "close": float(row["close"]),
-            }
-        )
-    bars.sort(key=lambda x: x["datetime"])
-    return bars
-
-
-def append_event(events_payload: dict[str, Any], event: dict[str, Any]) -> None:
-    events = events_payload.setdefault("events", [])
-    events.append(event)
-    events_payload["events"] = events[-MAX_EVENT_HISTORY:]
-    events_payload["updated_at_utc"] = utc_now()
-
-
-def telegram_credentials() -> tuple[str, str]:
-    return (
-        os.getenv("TELEGRAM_BOT_TOKEN", "").strip(),
-        os.getenv("TELEGRAM_CHAT_ID", "").strip(),
-    )
-
-
-def telegram_message(event: dict[str, Any]) -> str:
-    symbol = event["symbol"]
-    stop = float(event["stop_usd"])
-    low = float(event["trigger_bar_low_usd"])
-    last = float(event["last_observed_close_usd"])
-    bar_time = event["trigger_bar_datetime_ny"]
-    return (
-        "🚨 STOP ATINGIDO — STOCK SIGNALS\n\n"
-        f"🔴 SAÍDA: {symbol}\n"
-        f"Stop: US${stop:.4f}\n"
-        f"Mínima do candle: US${low:.4f}\n"
-        f"Último preço observado: US${last:.4f}\n"
-        f"Horário NY: {bar_time}\n\n"
-        "AÇÃO: vender a posição fracionária manualmente na Wealthsimple assim que possível.\n\n"
-        "Signal-only: confirme a execução manual no broker."
-    )
-
-
-def send_telegram(event: dict[str, Any]) -> bool:
-    token, chat_id = telegram_credentials()
-    if not token or not chat_id:
-        event["telegram_alert_status"] = "not_configured"
-        return False
-
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
-    payload = {
-        "chat_id": chat_id,
-        "text": telegram_message(event),
-        "disable_web_page_preview": True,
-    }
-
-    last_error: str | None = None
-    for attempt in range(1, TELEGRAM_RETRIES + 1):
+def fetch_today_minute_bars(symbol, api_key):
+    # Recover ~2 regular sessions after a delayed scheduler, instead of discarding yesterday.
+    params = {"symbol":symbol,"interval":"1min","outputsize":1000,"timezone":"America/New_York",
+              "prepost":"false","adjust":"splits","apikey":api_key}
+    for attempt in range(3):
         try:
-            response = requests.post(url, data=payload, timeout=TELEGRAM_TIMEOUT)
-            response.raise_for_status()
-            body = response.json()
-            if not body.get("ok"):
-                raise RuntimeError(f"Telegram API returned ok=false: {body}")
-            event["telegram_alert_status"] = "sent"
-            event["telegram_alert_sent_at_utc"] = utc_now()
-            result = body.get("result") or {}
-            if result.get("message_id") is not None:
-                event["telegram_message_id"] = result["message_id"]
-            print(f"Telegram emergency alert sent for {event['symbol']}")
-            return True
+            response = requests.get(API_URL,params=params,timeout=25)
+            if response.status_code != 200:
+                raise RuntimeError("Market-data HTTP " + str(response.status_code))
+            data = response.json()
+            if data.get("status") == "error" or not data.get("values"):
+                raise RuntimeError("No valid market-data result")
+            if str(data.get("meta",{}).get("symbol",symbol)).upper() != symbol:
+                raise ValueError("Symbol mismatch")
+            bars = []
+            seen = set()
+            for raw in data["values"]:
+                stamp = raw["datetime"]
+                if stamp in seen:
+                    raise ValueError("Duplicate minute bar")
+                seen.add(stamp)
+                row = {k:float(raw[k]) for k in ("open","high","low","close")}
+                row["datetime"] = stamp
+                validate_ohlc(row)
+                bars.append(row)
+            return sorted(bars,key=lambda r:r["datetime"])
         except Exception as exc:
-            last_error = type(exc).__name__
-            if attempt < TELEGRAM_RETRIES:
-                time_module.sleep(attempt * 2)
+            safe_error = type(exc).__name__ + ": market data unavailable or invalid"
+            if attempt < 2:
+                time.sleep(10 if getattr(locals().get("response"),"status_code",0) != 429 else 65)
+    raise RuntimeError(safe_error) from None
 
-    event["telegram_alert_status"] = "failed"
-    event["telegram_alert_last_error"] = f"{last_error}: delivery failed"
-    print(f"WARNING: Telegram alert failed for {event['symbol']}", file=sys.stderr)
-    return False
+def bar_time(bar):
+    value = datetime.fromisoformat(bar["datetime"])
+    return value.replace(tzinfo=NY) if value.tzinfo is None else value
 
+def dated_stops(pos):
+    first = next_open(pos["signal_date"])
+    history = [{"stop_usd":float(pos.get("initial_stop_usd",pos["stop_usd"])),
+                "effective_from_utc":first.isoformat()}]
+    history.extend(pos.get("stop_history",[]))
+    if not pos.get("stop_history") and float(pos["stop_usd"]) != history[0]["stop_usd"]:
+        history.append({"stop_usd":float(pos["stop_usd"]),
+                        "effective_from_utc":next_open(pos["last_stop_update_date"]).isoformat()})
+    return sorted(history,key=lambda h:parse_time(h["effective_from_utc"]))
 
-def retry_unsent_exit_alerts(events_payload: dict[str, Any]) -> bool:
-    token, chat_id = telegram_credentials()
-    if not token or not chat_id:
-        return False
+def applicable_stop(pos, stamp):
+    history = [h for h in dated_stops(pos) if parse_time(h["effective_from_utc"]) <= stamp]
+    return float(history[-1]["stop_usd"]) if history else None
 
+def main(catch_up=False):
+    now = now_utc()
+    previous = load_json("monitor_health.json",{})
+    HEALTH.clear()
+    HEALTH.update(started_at_utc=utc_now(),status="running",symbols={},
+                  telegram_configured=all(credentials()),target_interval_seconds=300)
+    state = load_json("signal_state.json",required=True)
+    portfolio = load_json("portfolio_state.json",required=True)
+    events = load_json("signal_events.json",{"version":1,"events":[]})
+    positions = state.setdefault("positions",{})
+    api_key = __import__("os").getenv("TWELVE_DATA_API_KEY","").strip()
+    in_session = monitor_window(now) or (catch_up and completed_scan_day(now) is not None)
+    errors = []
+    for symbol,holding in portfolio.get("holdings",{}).items():
+        if holding.get("status") not in {"closed","exit_alert_awaiting_manual_sale"} and symbol not in positions:
+            errors.append(symbol + ":confirmed_holding_not_monitored")
+    if in_session and not all(credentials()):
+        errors.append("telegram_not_configured")
     changed = False
-    for event in events_payload.get("events", []):
-        if event.get("type") != "EXIT":
-            continue
-        if event.get("telegram_alert_status") == "sent":
-            continue
-        send_telegram(event)
-        changed = True
-    if changed:
-        events_payload["updated_at_utc"] = utc_now()
-    return changed
-
-
-def main() -> int:
-    HEALTH.update({"started_at_utc": utc_now(), "status": "running", "symbols": {},
-                   "telegram_configured": all(telegram_credentials()),
-                   "target_interval_seconds": 300})
-    api_key = os.getenv("TWELVE_DATA_API_KEY")
-    if not api_key:
-        HEALTH.update({"status": "error", "error": "missing_market_data_key"})
-        print("ERROR: TWELVE_DATA_API_KEY is missing", file=sys.stderr)
-        return 2
-
-    if not STATE_PATH.exists():
-        raise RuntimeError("signal_state.json missing")
-    state = load_json(STATE_PATH, {"version": 1, "positions": {}, "closed_signals": []})
-    events_payload = load_json(EVENTS_PATH, {"version": 1, "events": []})
-
-    # Retry any previous EXIT alert that was committed but could not be delivered.
-    retry_changed = retry_unsent_exit_alerts(events_payload)
-
-    now_ny = datetime.now(NY)
-    if not regular_market_window(now_ny):
-        HEALTH["status"] = "outside_session"
-        if retry_changed:
-            save_json(EVENTS_PATH, events_payload)
-        print(f"Outside regular US market window: {now_ny.isoformat()}")
-        return 0
-
-    positions: dict[str, dict[str, Any]] = state.setdefault("positions", {})
-    closed = state.setdefault("closed_signals", [])
-
-    if not positions:
-        HEALTH["status"] = "no_signals"
-        if retry_changed:
-            save_json(EVENTS_PATH, events_payload)
-        print("No active or pending strategy signals to monitor.")
-        return 0
-
-    today = now_ny.date().isoformat()
-    changed = retry_changed
-    new_exit_events: list[dict[str, Any]] = []
-
-    for symbol, pos in list(positions.items()):
-        status = pos.get("status")
-        if status not in {"pending_entry", "active"}:
-            continue
-
-        signal_date = str(pos.get("signal_date") or "")
-        if today <= signal_date:
-            continue
-
-        try:
-            bars = fetch_today_minute_bars(symbol, api_key)
-        except Exception as exc:
-            HEALTH["symbols"][symbol] = {"status": "error", "error": type(exc).__name__}
-            print(f"WARNING: {symbol}: market data request failed", file=sys.stderr)
-            continue
-
-        today_bars = [
-            b for b in bars
-            if b["datetime"][:10] == today and "09:30" <= b["datetime"][11:16] <= "16:00"
-        ]
-        if not today_bars:
-            HEALTH["symbols"][symbol] = {"status": "no_fresh_data"}
-            print(f"{symbol}: no fresh regular-session minute bars today.")
-            continue
-
-        latest_time = datetime.fromisoformat(today_bars[-1]["datetime"]).replace(tzinfo=NY)
-        age_seconds = (now_ny - latest_time).total_seconds()
-        HEALTH["symbols"][symbol] = {
-            "status": "ok" if -60 <= age_seconds <= 600 else "stale",
-            "checked_at_utc": utc_now(), "bar_datetime_ny": today_bars[-1]["datetime"],
-            "bar_age_seconds": round(age_seconds), "last_price_usd": today_bars[-1]["close"],
-            "stop_usd": pos["stop_usd"],
-        }
-
-        if status == "pending_entry":
-            pos["status"] = "active"
-            pos["activated_date"] = today
-            pos["activated_at_utc"] = utc_now()
-            pos["entry_note"] = (
-                "Signal-only activation at the next regular market session; actual broker fill is not tracked."
-            )
-            pos["updated_at_utc"] = utc_now()
-            changed = True
-
-        stop = float(pos["stop_usd"])
-        trigger_bar = next((b for b in today_bars if float(b["low"]) <= stop), None)
-
-        if trigger_bar is None:
-            latest = today_bars[-1]
-            print(
-                f"{symbol}: latest={latest['datetime']} close={latest['close']:.4f}, "
-                f"session_low={min(b['low'] for b in today_bars):.4f}, stop={stop:.4f}"
-            )
-            continue
-
-        event_time = utc_now()
-        exit_event = {
-            "id": f"EXIT-{symbol}-{event_time}",
-            "type": "EXIT",
-            "symbol": symbol,
-            "reason": "stop_crossed_intraday",
-            "stop_usd": round(stop, 4),
-            "trigger_bar_datetime_ny": trigger_bar["datetime"],
-            "trigger_bar_low_usd": round(float(trigger_bar["low"]), 4),
-            "last_observed_close_usd": round(float(today_bars[-1]["close"]), 4),
-            "original_signal_date": signal_date,
-            "action": "sell_fractional_position_manually_as_soon_as_practical",
-            "created_at_utc": event_time,
-            "telegram_alert_status": "pending",
-        }
-        append_event(events_payload, exit_event)
-        new_exit_events.append(exit_event)
-
-        closed_record = dict(pos)
-        closed_record["status"] = "exit_triggered"
-        closed_record["exit_triggered_at_utc"] = event_time
-        closed_record["exit_stop_usd"] = round(stop, 4)
-        closed_record["exit_trigger_bar_datetime_ny"] = trigger_bar["datetime"]
-        closed.append(closed_record)
-        del positions[symbol]
-        changed = True
-        print(f"EXIT {symbol}: low={trigger_bar['low']:.4f} <= stop={stop:.4f}")
-
-    # Send emergency alerts immediately after exit events are created. The EXIT
-    # remains recorded even if Telegram is temporarily unavailable; failed alerts
-    # are retried on the next workflow run.
-    for event in new_exit_events:
-        send_telegram(event)
-        changed = True
-
+    if in_session and not api_key:
+        errors.append("market_data_key_missing")
+    if in_session and api_key:
+        for index,(symbol,pos) in enumerate(list(positions.items())):
+            if pos.get("status") not in {"active","pending_entry"}:
+                continue
+            effective_open = next_open(pos["signal_date"])
+            if now < effective_open:
+                continue
+            if index:
+                time.sleep(9.5)
+            try:
+                bars = fetch_today_minute_bars(symbol,api_key)
+                valid = [b for b in bars if regular_bar(b["datetime"])
+                         and effective_open <= bar_time(b) <= now]
+                if not valid:
+                    raise ValueError("no_fresh_regular_session_bars")
+                latest = valid[-1]
+                bounds = session_bounds(now.astimezone(NY).date())
+                expected = min(now,bounds[1])
+                age = (expected - bar_time(latest)).total_seconds()
+                cursor = parse_time(pos.get("last_checked_bar_utc"))
+                if cursor and bar_time(latest) < cursor:
+                    raise ValueError("Market data went backwards")
+                start = cursor or effective_open
+                missing_start = (bar_time(valid[0]) - start).total_seconds() > 600
+                # Ignore overnight/weekend minutes; identify long holes within a regular session.
+                recent = [b for b in valid if bar_time(b) >= start]
+                long_hole = any(bar_time(a).date() == bar_time(b).date()
+                                and (bar_time(b)-bar_time(a)).total_seconds() > 600
+                                for a,b in zip(recent,recent[1:]))
+                today_bars = [b for b in recent if bar_time(b).astimezone(NY).date() == now.astimezone(NY).date()]
+                if today_bars and start < bounds[0] and (bar_time(today_bars[0])-bounds[0]).total_seconds() > 600:
+                    long_hole = True
+                quote_status = "ok" if 0 <= age <= 600 and not missing_start and not long_hole else "stale_or_gap"
+                HEALTH["symbols"][symbol] = {"status":quote_status,"checked_at_utc":utc_now(),
+                    "bar_datetime_ny":latest["datetime"],"bar_age_seconds":round(age),
+                    "last_price_usd":latest["close"],"stop_usd":float(pos["stop_usd"]),
+                    "recovery_gap_detected":missing_start or long_hole}
+                if quote_status != "ok":
+                    errors.append(symbol + ":stale_or_gap")
+                if pos["status"] == "pending_entry":
+                    pos.update(status="active",activated_date=now.astimezone(NY).date().isoformat(),
+                               activated_at_utc=utc_now(),entry_note="Strategy signal active; broker fill is not presumed.")
+                trigger = None
+                fill_time = parse_time(pos.get("actual_fill",{}).get("execution_time"))
+                for bar in recent:
+                    stamp = bar_time(bar)
+                    if fill_time and stamp < fill_time:
+                        continue
+                    stop = applicable_stop(pos,stamp)
+                    if stop is not None and bar["low"] <= stop:
+                        trigger = (bar,stop)
+                        break
+                # Repeat the last (possibly unclosed) bar on the next pass.
+                pos["last_checked_bar_utc"] = bar_time(latest).astimezone(timezone.utc).isoformat()
+                pos["updated_at_utc"] = utc_now()
+                changed = True
+                if trigger:
+                    bar,stop = trigger
+                    holding = portfolio.get("holdings",{}).get(symbol,{})
+                    confirmed = bool(holding and holding.get("status") != "closed"
+                                     and holding.get("entry_date","9999") <= bar["datetime"][:10])
+                    signal_id = pos.get("signal_id",f"ENTRY-{symbol}-{pos['signal_date']}")
+                    event = {"id":f"EXIT-{signal_id}-{bar['datetime']}","type":"EXIT","symbol":symbol,
+                        "signal_id":signal_id,"holding_confirmed":confirmed,
+                        "entry_time_known":fill_time is not None,"stop_usd":round(stop,4),
+                        "trigger_bar_datetime_ny":bar["datetime"],"trigger_bar_low_usd":bar["low"],
+                        "last_observed_close_usd":latest["close"],"original_signal_date":pos["signal_date"],
+                        "created_at_utc":utc_now(),"telegram_alert_status":"pending"}
+                    append_event(events,event)
+                    record = dict(pos)
+                    record.update(status="exit_triggered",exit_stop_usd=stop,
+                                  exit_triggered_at_utc=utc_now(),exit_event_id=event["id"],
+                                  exit_trigger_bar_datetime_ny=bar["datetime"])
+                    state.setdefault("closed_signals",[]).append(record)
+                    del positions[symbol]
+                print(symbol + ": data=" + quote_status + "; exit=" + str(trigger is not None))
+            except Exception as exc:
+                HEALTH["symbols"][symbol] = {"status":"error","error":type(exc).__name__}
+                errors.append(symbol + ":data_error")
+                print(symbol + ": market data unavailable",file=sys.stderr)
+    status = ("degraded" if errors else ("ok" if positions or changed else "no_signals")) if in_session else "outside_session"
+    HEALTH["status"] = status
+    if errors and previous.get("status") != "degraded":
+        append_event(events,{"id":"MONITOR-HEALTH-"+utc_now(),"type":"MONITOR_HEALTH",
+                     "component":"monitor","detail":"Leitura incompleta ou atrasada: " + ", ".join(errors),
+                     "created_at_utc":utc_now(),"telegram_alert_status":"pending"})
     if changed:
         state["updated_at_utc"] = utc_now()
-        state["closed_signals"] = closed[-200:]
-        events_payload["updated_at_utc"] = utc_now()
-        save_json(STATE_PATH, state)
-        save_json(EVENTS_PATH, events_payload)
-        print("Updated signal_state.json and signal_events.json")
-    else:
-        print("No state changes.")
+        save_json("signal_state.json",state)
+    # Retry ENTRY/STOP_UPDATE too; do not wait until the next daily run.
+    save_json("signal_events.json",events)
+    delivered = deliver(events)
+    save_json("signal_events.json",events)
+    HEALTH["notifications_ok"] = delivered
+    if not delivered and in_session:
+        HEALTH["status"] = "degraded"
+    return 0 if not errors and delivered else 1
 
-    unhealthy = any(v["status"] != "ok" for v in HEALTH["symbols"].values())
-    HEALTH["status"] = "degraded" if unhealthy else "ok"
-    return 1 if unhealthy else 0
-
-
-if __name__ == "__main__":
+def run(catch_up=False):
+    result = 1
     try:
-        result = main()
+        result = main(catch_up=catch_up)
     except Exception as exc:
-        HEALTH.update({"status": "error", "error": type(exc).__name__})
-        result = 1
+        HEALTH.update(status="error",error=type(exc).__name__)
+        print("Monitor failed: " + type(exc).__name__,file=sys.stderr)
     finally:
         HEALTH["completed_at_utc"] = utc_now()
-        save_json(HEALTH_PATH, HEALTH)
-    raise SystemExit(result)
+        save_json("monitor_health.json",HEALTH)
+    return result
+
+if __name__ == "__main__":
+    raise SystemExit(run())

@@ -1,80 +1,93 @@
 #!/usr/bin/env python3
-"""Reconcile confirmed holdings with signals; never infer a broker sale."""
-import json
-from datetime import datetime, timezone
+"""Build a dated dashboard from actual holdings, signal state and delivery receipts."""
+from datetime import timedelta
 from pathlib import Path
-
-def read(name, default):
-    p = Path(name)
-    return json.loads(p.read_text()) if p.exists() else default
-
-def write(name, value):
-    Path(name).write_text(json.dumps(value, indent=2, ensure_ascii=False) + "\n")
+from common import NY, load_json, monitor_window, now_utc, parse_time, save_json, utc_now
 
 def main():
-    portfolio = read("portfolio_state.json", {})
-    state = read("signal_state.json", {})
-    health = read("monitor_health.json", {})
-    events = read("signal_events.json", {"events": []}).get("events", [])
-    now = datetime.now(timezone.utc)
-    last = health.get("completed_at_utc")
-    stale = not last or (now - datetime.fromisoformat(last.replace("Z", "+00:00"))).total_seconds() > 600
-    status = health.get("status", "not_verified")
-    if stale and status != "outside_session":
-        status = "stale_or_unverified"
-    portfolio["updated_at_utc"] = now.isoformat()
-    portfolio["exit_monitor_status"] = status
-    portfolio["monitor_last_completed_at_utc"] = last
-    portfolio["telegram_status"] = "configured_delivery_unverified" if health.get("telegram_configured") else "not_configured"
+    portfolio = load_json("portfolio_state.json",required=True)
+    state = load_json("signal_state.json",required=True)
+    health = load_json("monitor_health.json",{})
+    daily = load_json("daily_health.json",{})
+    events = load_json("signal_events.json",{"events":[]}).get("events",[])
+    now = now_utc()
+    last = parse_time(health.get("completed_at_utc"))
+    status = health.get("status","unverified")
+    if monitor_window(now) and (not last or now-last > timedelta(minutes=10)):
+        status = "STALE — monitoring unavailable"
+    holdings = portfolio.get("holdings",{})
+    open_holdings = {s:h for s,h in holdings.items() if h.get("status") != "closed"}
+    invested = round(sum(float(h["invested_cad"]) for h in open_holdings.values()),2)
+    initial = float(portfolio.get("initial_capital_cad",0))
+    realized = float(portfolio.get("realized_pnl_cad",0))
+    cash = round(initial+realized+float(portfolio.get("net_deposits_cad",0))-invested,2)
+    portfolio.update(updated_at_utc=utc_now(),exit_monitor_status=status,
+                     source="User-confirmed transactions with observed provider quotes; no broker synchronization.",
+                     monitor_last_completed_at_utc=health.get("completed_at_utc"),
+                     invested_cost_cad=invested,unallocated_capital_cad=cash)
+    pending = [e for e in events if e.get("telegram_alert_status") in {"pending","failed","not_configured"}]
+    sent = [e for e in events if e.get("telegram_alert_status") == "sent"]
+    telegram = "not_configured" if not health.get("telegram_configured") else ("delivery_pending_or_failed" if pending else "configured")
+    portfolio["telegram_status"] = telegram
+    portfolio["last_telegram_delivery_at_utc"] = max((e.get("telegram_alert_sent_at_utc","") for e in sent),default=None)
     rows = []
-    for symbol, holding in portfolio.get("holdings", {}).items():
-        signal = state.get("positions", {}).get(symbol, {})
-        closed = [p for p in state.get("closed_signals", []) if p.get("symbol") == symbol]
-        matching = [e for e in events if e.get("symbol") == symbol and e.get("type") == "EXIT"
-                    and str(e.get("created_at_utc", ""))[:10] >= holding["entry_date"]]
-        event = matching[-1] if matching else None
-        if holding.get("status") != "closed":
-            holding["status"] = "exit_alert_awaiting_manual_sale" if event else "active"
-        stop = signal.get("stop_usd")
-        if stop is None and closed:
-            stop = closed[-1].get("exit_stop_usd")
-        if stop is not None:
-            holding["strategy_stop_usd"] = stop
-        quote = health.get("symbols", {}).get(symbol, {})
-        holding["latest_price_usd"] = quote.get("last_price_usd")
-        holding["quote_datetime_ny"] = quote.get("bar_datetime_ny")
-        holding["quote_status"] = quote.get("status", "unavailable")
-        holding["exit_alert"] = event
-        if event:
-            portfolio["telegram_status"] = event.get("telegram_alert_status", "pending")
-        price = holding["latest_price_usd"]
-        pct = (price / holding["entry_price_usd"] - 1) * 100 if price is not None else None
-        holding["price_return_since_entry_pct"] = round(pct, 4) if pct is not None else None
-        display_price = f'{price:.4f}' if price is not None else "Unavailable"
-        display_return = f'{pct:+.2f}%' if pct is not None else "Unavailable"
-        rows.append(f'| {symbol} | {holding["status"]} | {holding["entry_price_usd"]:.2f} | {display_price} | {holding["strategy_stop_usd"]:.4f} | {display_return} |')
-    write("portfolio_state.json", portfolio)
-    lines = [
-        "# Stock Signals — Dashboard", "",
-        f'Generated UTC: {now.isoformat()}', "",
-        f'**Monitor: {status}**. Last completed check UTC: {last or "NEVER VERIFIED"}.',
-        "Target interval: 5 minutes during regular US trading. If the last check is older than 10 minutes during the session, treat monitoring as unavailable.",
-        f'Notifications: **{portfolio["telegram_status"]}**.', "",
-        f'Capital: C$100.00 · Invested cost: C$33.33 · Unallocated: C$66.67',
-        f'Realized P&L: C$0.00 · Closed trades: 0 · Wins: 0 · Losses: 0', "",
-        "| Holding | Status | Entry USD | Last observed USD | Strategy stop USD | Price return since entry |",
-        "|---|---|---:|---:|---:|---:|",
-        *rows, "",
-        "WMT/XOM: unexecuted strategy signals; no confirmed holdings.", "",
-        "An EXIT alert is not a confirmed sale. Holdings, cash and realized P&L change only after the user confirms execution.",
-        "Return is the USD stock-price change, not exact CAD account P&L. Quote time/status are stored in portfolio_state.json.",
-        "Today’s return: unavailable without a verified previous close.", "",
-        "## Latest EXIT alerts", "",
-    ]
-    exits = [e for e in events if e.get("type") == "EXIT"][-10:]
-    lines += [f'- {e["symbol"]}: stop USD {e["stop_usd"]:.4f}; NY {e["trigger_bar_datetime_ny"]}; notification: {e.get("telegram_alert_status", "pending")}.' for e in reversed(exits)] or ["No recorded EXIT alerts."]
-    lines += ["", "This file refreshes when a workflow completes. Reload the page to see the saved result; this chat is not a live display.", ""]
-    Path("dashboard.md").write_text("\n".join(lines))
-
+    for symbol,h in open_holdings.items():
+        pos = state.get("positions",{}).get(symbol,{})
+        if pos and not h.get("signal_id"):
+            h["signal_id"] = pos.get("signal_id",f"ENTRY-{symbol}-{pos['signal_date']}")
+        related = [e for e in events if e.get("type") == "EXIT" and e.get("symbol") == symbol
+                   and (e.get("signal_id") == h.get("signal_id") if h.get("signal_id") else
+                        str(e.get("created_at_utc",""))[:10] >= h["entry_date"])]
+        event = related[-1] if related else None
+        h["status"] = "exit_alert_awaiting_manual_sale" if event else "active"
+        if pos:
+            h["strategy_stop_usd"] = pos["stop_usd"]
+        elif event:
+            h["strategy_stop_usd"] = event["stop_usd"]
+        elif not event:
+            status = "DEGRADED — confirmed holding lacks monitoring signal"
+            portfolio["exit_monitor_status"] = status
+        quote = health.get("symbols",{}).get(symbol,{})
+        if quote.get("last_price_usd") is not None:
+            h["latest_price_usd"] = quote["last_price_usd"]
+            h["quote_datetime_ny"] = quote["bar_datetime_ny"]
+        h["quote_status"] = quote.get("status","unavailable")
+        h["exit_alert"] = event
+        price = h.get("latest_price_usd")
+        pct = 100*(price/h["entry_price_usd"]-1) if price is not None else None
+        h["price_return_since_entry_pct"] = round(pct,4) if pct is not None else None
+        price_text = f"{price:.4f}" if price is not None else "unavailable"
+        pct_text = f"{pct:+.2f}%" if pct is not None else "unavailable"
+        rows.append(f'| {symbol} | {h["status"]} | {h["entry_price_usd"]:.2f} | {price_text} | {h["strategy_stop_usd"]:.4f} | {pct_text} | {h.get("quote_datetime_ny","unknown")} ({h["quote_status"]}) |')
+    portfolio["unexecuted_signals"] = sorted(set(state.get("positions",{}))-set(open_holdings))
+    save_json("portfolio_state.json",portfolio)
+    lines = ["# Stock Signals — Dashboard","",f"Snapshot UTC: {utc_now()}","",
+             f"**Monitor as of this snapshot: {status}**",
+             f'Last check UTC: {health.get("completed_at_utc","NEVER VERIFIED")}.',
+             "During the session, a last check older than 10 minutes means monitoring is unavailable, even if this saved snapshot says OK.",
+             f"Telegram: **{telegram}** · Undelivered events: {len(pending)}.",
+             f'Daily scan: {daily.get("status","unverified")} · Last processed bar: {state.get("latest_processed_bar_date","unknown")}.',"",
+             f"Initial capital: C$ {initial:.2f} · Invested cost: C$ {invested:.2f} · Unallocated cash: C$ {cash:.2f}",
+             f'Realized P&L: C$ {realized:.2f} · Closed trades: {portfolio.get("closed_trades",0)} · Wins: {portfolio.get("winning_trades",0)} · Losses: {portfolio.get("losing_trades",0)}',"",
+             "| Holding | Status | Entry USD | Last observed USD | Strategy stop USD | USD return since entry | Quote NY (status) |",
+             "|---|---|---:|---:|---:|---:|---|",*rows,"",
+             "EXIT is an alert, not a broker sale. Cash and realized P&L change only after confirmed execution.",
+             "USD price return is not exact CAD P&L; share quantity, FX and fees are not yet recorded.",
+             "This chat is not continuously updating. Reload this GitHub page for the latest saved snapshot.","",
+             "## Strategy signals without confirmed purchases",""]
+    for s in portfolio["unexecuted_signals"]:
+        p=state["positions"][s]
+        lines.append(f'- {s}: {p["status"]}; strategy stop USD {p["stop_usd"]:.4f}. No real holding confirmed.')
+    lines += ["","## Recent alerts",""]
+    for e in events[-15:][::-1]:
+        lines.append(f'- {e.get("type")} {e.get("symbol","")}: {e.get("created_at_utc","unknown")} · delivery {e.get("telegram_alert_status","pending")} · ID {e.get("id")}.')
+    if not events:
+        lines.append("No recorded alerts.")
+    lines += ["","## Operational limits","",
+              "Polling target: 5 minutes during the regular exchange session. GitHub schedules and upstream data can be delayed.",
+              "Holidays and early closes use the XNYS calendar. Stops only rise from completed daily bars.",
+              "Entry execution time is unknown for legacy fills; first-day monitoring assumes session open unless a precise execution timestamp is recorded.",
+              "Corporate actions, trading halts and missing provider trades require reconciliation; a notification system is not a broker stop order.",""]
+    Path("dashboard.md").write_text("\n".join(lines),encoding="utf-8")
 if __name__ == "__main__":
     main()
