@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at_utc": "2026-10-15T14:21:27.673879+00:00",
+  "updated_at_utc": "2026-10-15T14:46:17.974805+00:00",
   "events": [
     {
       "id": "ENTRY-WMT-2026-10-14",
@@ -14,7 +14,8 @@
       "recommended_position_cad": 33.33,
       "momentum10_pct": 11.778,
       "score": 5.924787,
-      "created_at_utc": "2026-10-14T23:44:37.049099+00:00"
+      "created_at_utc": "2026-10-14T23:44:37.049099+00:00",
+      "telegram_alert_status": "skipped_stale"
     },
     {
       "id": "ENTRY-COST-2026-10-14",
@@ -28,7 +29,8 @@
       "recommended_position_cad": 33.33,
       "momentum10_pct": 7.872,
       "score": 4.995013,
-      "created_at_utc": "2026-10-14T22:05:00+00:00"
+      "created_at_utc": "2026-10-14T22:05:00+00:00",
+      "telegram_alert_status": "skipped_stale"
     },
     {
       "id": "ENTRY-XOM-2026-10-14",
@@ -42,7 +44,8 @@
       "recommended_position_cad": 33.33,
       "momentum10_pct": 8.762,
       "score": 4.488423,
-      "created_at_utc": "2026-10-14T22:05:00+00:00"
+      "created_at_utc": "2026-10-14T22:05:00+00:00",
+      "telegram_alert_status": "skipped_stale"
     }
   ]
 }

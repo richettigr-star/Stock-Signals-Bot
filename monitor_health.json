@@ -1,33 +1,37 @@
 {
-  "started_at_utc": "2026-10-15T14:30:47.064266+00:00",
+  "started_at_utc": "2026-10-15T14:45:57.465988+00:00",
   "status": "ok",
   "symbols": {
     "WMT": {
       "status": "ok",
-      "checked_at_utc": "2026-10-15T14:30:47.164640+00:00",
-      "bar_datetime_ny": "2026-10-15 10:29:00",
-      "bar_age_seconds": 107,
-      "last_price_usd": 120.53,
-      "stop_usd": 110.3869
+      "checked_at_utc": "2026-10-15T14:45:58.401731+00:00",
+      "bar_datetime_ny": "2026-10-15 10:44:00",
+      "bar_age_seconds": 117,
+      "last_price_usd": 119.43,
+      "stop_usd": 110.3869,
+      "recovery_gap_detected": false
     },
     "COST": {
       "status": "ok",
-      "checked_at_utc": "2026-10-15T14:30:47.221377+00:00",
-      "bar_datetime_ny": "2026-10-15 10:29:00",
-      "bar_age_seconds": 107,
-      "last_price_usd": 1000.71,
-      "stop_usd": 943.311
+      "checked_at_utc": "2026-10-15T14:46:08.206838+00:00",
+      "bar_datetime_ny": "2026-10-15 10:44:00",
+      "bar_age_seconds": 117,
+      "last_price_usd": 990.54,
+      "stop_usd": 943.311,
+      "recovery_gap_detected": false
     },
     "XOM": {
       "status": "ok",
-      "checked_at_utc": "2026-10-15T14:30:47.273834+00:00",
-      "bar_datetime_ny": "2026-10-15 10:29:00",
-      "bar_age_seconds": 107,
-      "last_price_usd": 175.38,
-      "stop_usd": 168.3714
+      "checked_at_utc": "2026-10-15T14:46:17.964948+00:00",
+      "bar_datetime_ny": "2026-10-15 10:45:00",
+      "bar_age_seconds": 57,
+      "last_price_usd": 175.15,
+      "stop_usd": 168.3714,
+      "recovery_gap_detected": false
     }
   },
   "telegram_configured": true,
   "target_interval_seconds": 300,
-  "completed_at_utc": "2026-10-15T14:30:47.274122+00:00"
+  "notifications_ok": true,
+  "completed_at_utc": "2026-10-15T14:46:17.975336+00:00"
 }
