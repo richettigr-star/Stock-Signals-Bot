@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at_utc": "2026-10-15T15:04:42.874220+00:00",
+  "updated_at_utc": "2026-10-15T19:05:21.452474+00:00",
   "latest_processed_bar_date": "2026-10-14",
   "state_note": "Signal-only strategy state. This does not represent actual broker fills or holdings.",
   "positions": {
@@ -20,11 +20,11 @@
       "momentum10_pct": 11.778,
       "stop_rule": "max(previous_stop, completed_daily_close - 2.5 * ATR14)",
       "created_at_utc": "2026-10-14T23:44:37.049085+00:00",
-      "updated_at_utc": "2026-10-15T15:04:23.387055+00:00",
+      "updated_at_utc": "2026-10-15T19:05:00.716860+00:00",
       "activated_date": "2026-10-15",
       "activated_at_utc": "2026-10-15T14:21:27.526627+00:00",
       "entry_note": "Signal-only activation at the next regular market session; actual broker fill is not tracked.",
-      "last_checked_bar_utc": "2026-10-15T15:03:00+00:00"
+      "last_checked_bar_utc": "2026-10-15T19:03:00+00:00"
     },
     "COST": {
       "symbol": "COST",
@@ -42,7 +42,7 @@
       "momentum10_pct": 7.872,
       "stop_rule": "max(previous_stop, completed_daily_close - 2.5 * ATR14)",
       "created_at_utc": "2026-10-14T22:05:00+00:00",
-      "updated_at_utc": "2026-10-15T15:04:33.138808+00:00",
+      "updated_at_utc": "2026-10-15T19:05:11.107967+00:00",
       "actual_fill": {
         "confirmed_by": "user",
         "trade_date": "2026-10-15",
@@ -52,7 +52,7 @@
         "execution_time": null,
         "note": "User-confirmed purchase; share quantity and exact execution time not supplied."
       },
-      "last_checked_bar_utc": "2026-10-15T15:03:00+00:00"
+      "last_checked_bar_utc": "2026-10-15T19:03:00+00:00"
     },
     "XOM": {
       "symbol": "XOM",
@@ -70,11 +70,11 @@
       "momentum10_pct": 8.762,
       "stop_rule": "max(previous_stop, completed_daily_close - 2.5 * ATR14)",
       "created_at_utc": "2026-10-14T22:05:00+00:00",
-      "updated_at_utc": "2026-10-15T15:04:42.874211+00:00",
+      "updated_at_utc": "2026-10-15T19:05:21.452461+00:00",
       "activated_date": "2026-10-15",
       "activated_at_utc": "2026-10-15T14:21:27.673851+00:00",
       "entry_note": "Signal-only activation at the next regular market session; actual broker fill is not tracked.",
-      "last_checked_bar_utc": "2026-10-15T15:03:00+00:00"
+      "last_checked_bar_utc": "2026-10-15T19:03:00+00:00"
     }
   },
   "closed_signals": [],

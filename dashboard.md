@@ -1,11 +1,9 @@
 # Stock Signals — Dashboard
 
-> **Automatic five-minute schedule: NOT WORKING in the observed test window.** At 11:14 Toronto, no scheduled runs appeared for 11:08 or 11:13. The last successful read at 11:04 was triggered by a push. See [verification evidence](SCHEDULE_VERIFICATION.md).
-
-Snapshot UTC: 2026-10-15T15:04:43.279102+00:00
+Snapshot UTC: 2026-10-15T19:05:22.208645+00:00
 
 **Monitor as of this snapshot: ok**
-Last check UTC: 2026-10-15T15:04:42.875316+00:00.
+Last check UTC: 2026-10-15T19:05:21.453922+00:00.
 During the session, a last check older than 10 minutes means monitoring is unavailable, even if this saved snapshot says OK.
 Telegram: **configured** · Undelivered events: 0.
 Daily scan: unverified · Last processed bar: 2026-10-14.
@@ -15,7 +13,7 @@ Realized P&L: C$ 0.00 · Closed trades: 0 · Wins: 0 · Losses: 0
 
 | Holding | Status | Entry USD | Last observed USD | Strategy stop USD | USD return since entry | Quote NY (status) |
 |---|---|---:|---:|---:|---:|---|
-| COST | active | 985.40 | 986.8550 | 943.3110 | +0.15% | 2026-10-15 11:03:00 (ok) |
+| COST | active | 985.40 | 984.5800 | 943.3110 | -0.08% | 2026-10-15 15:03:00 (ok) |
 
 EXIT is an alert, not a broker sale. Cash and realized P&L change only after confirmed execution.
 USD price return is not exact CAD P&L; share quantity, FX and fees are not yet recorded.
