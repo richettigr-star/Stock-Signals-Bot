@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths: ["*.py", "requirements.txt", ".github/workflows/intraday-exits.yml"]
   schedule:
-    - cron: "2-57/5 13-22 * * 1-5"
+    - cron: "3-58/5 13-22 * * 1-5"
 permissions:
   contents: write
 concurrency:
