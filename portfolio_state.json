@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "updated_at_utc": "2026-10-15T14:30:47.336374+00:00",
+  "updated_at_utc": "2026-10-15T14:45:34.717489+00:00",
   "as_of_trade_date": "2026-10-15",
-  "source": "User-confirmed transactions; no brokerage connection or live quotes.",
+  "source": "User-confirmed transactions with observed provider quotes; no broker synchronization.",
   "account_currency": "CAD",
   "initial_capital_cad": 100,
   "invested_cost_cad": 33.33,
@@ -26,14 +26,16 @@
       "quote_datetime_ny": "2026-10-15 10:29:00",
       "quote_status": "ok",
       "exit_alert": null,
-      "price_return_since_entry_pct": 1.5537
+      "price_return_since_entry_pct": 1.5537,
+      "signal_id": "ENTRY-COST-2026-10-14"
     }
   },
   "unexecuted_signals": [
     "WMT",
     "XOM"
   ],
-  "telegram_status": "configured_delivery_unverified",
-  "exit_monitor_status": "ok",
-  "monitor_last_completed_at_utc": "2026-10-15T14:30:47.274122+00:00"
+  "telegram_status": "configured",
+  "exit_monitor_status": "STALE — monitoring unavailable",
+  "monitor_last_completed_at_utc": "2026-10-15T14:30:47.274122+00:00",
+  "last_telegram_delivery_at_utc": null
 }
