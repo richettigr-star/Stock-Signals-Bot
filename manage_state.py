@@ -27,7 +27,7 @@ def scan_is_complete_and_fresh(signals):
     if [r["symbol"] for r in candidates] != [r["symbol"] for r in expected]:
         return False, "candidate ranking mismatch"
     for row in rows:
-        if row["close_usd"] <= 0 or row["atr14"] <= 0 or row["reference_stop_usd"] <= 0:
+        if not all(math.isfinite(float(row[key])) and row[key] > 0 for key in ("close_usd","atr14","reference_stop_usd")):
             return False, "invalid daily prices/ATR"
     return True, "complete closed-session scan"
 

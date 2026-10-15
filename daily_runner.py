@@ -18,12 +18,19 @@ def main():
         return 0
     # Check old stops before raising them from today's close.
     # During a late run outside the grace window, the next monitor still recovers old bars using stop_history.
-    intraday_exit.run()
     try:
+        intraday_exit.run(catch_up=True)
+        if intraday_exit.HEALTH.get("status") == "error" or any(
+            value.get("status") != "ok" for value in intraday_exit.HEALTH.get("symbols",{}).values()
+        ):
+            raise RuntimeError("Cannot reconcile old stops before daily update")
         code = rate_limited_scanner.scanner.main()
         if code:
             raise RuntimeError("Incomplete daily market data")
-        return manage_state.main()
+        state_code = manage_state.main()
+        if state_code and not load_json("daily_health.json",{}).get("scan_accepted"):
+            raise RuntimeError("Daily scan validation failed")
+        return state_code
     except Exception as exc:
         save_json("daily_health.json",{"completed_at_utc":utc_now(),"status":"error",
                    "scan_accepted":False,"bar_date":day,"reason":type(exc).__name__})

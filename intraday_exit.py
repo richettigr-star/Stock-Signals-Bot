@@ -5,7 +5,7 @@ import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import requests
-from common import (NY, append_event, load_json, monitor_window, next_open, now_utc,
+from common import (NY, append_event, completed_scan_day, load_json, monitor_window, next_open, now_utc,
                     parse_time, regular_bar, save_json, session_bounds, utc_now, validate_ohlc)
 from notifications import credentials, deliver
 
@@ -62,7 +62,7 @@ def applicable_stop(pos, stamp):
     history = [h for h in dated_stops(pos) if parse_time(h["effective_from_utc"]) <= stamp]
     return float(history[-1]["stop_usd"]) if history else None
 
-def main():
+def main(catch_up=False):
     now = now_utc()
     previous = load_json("monitor_health.json",{})
     HEALTH.clear()
@@ -73,7 +73,7 @@ def main():
     events = load_json("signal_events.json",{"version":1,"events":[]})
     positions = state.setdefault("positions",{})
     api_key = __import__("os").getenv("TWELVE_DATA_API_KEY","").strip()
-    in_session = monitor_window(now)
+    in_session = monitor_window(now) or (catch_up and completed_scan_day(now) is not None)
     errors = []
     for symbol,holding in portfolio.get("holdings",{}).items():
         if holding.get("status") not in {"closed","exit_alert_awaiting_manual_sale"} and symbol not in positions:
@@ -181,10 +181,10 @@ def main():
         HEALTH["status"] = "degraded"
     return 0 if not errors and delivered else 1
 
-def run():
+def run(catch_up=False):
     result = 1
     try:
-        result = main()
+        result = main(catch_up=catch_up)
     except Exception as exc:
         HEALTH.update(status="error",error=type(exc).__name__)
         print("Monitor failed: " + type(exc).__name__,file=sys.stderr)

@@ -1,9 +1,9 @@
 """One Telegram outbox for entry, stop, exit and monitor health alerts."""
 import os
 import time
-from datetime import timedelta
+from datetime import datetime, timedelta
 import requests
-from common import next_open, now_utc, parse_time, utc_now
+from common import NY, next_open, now_utc, parse_time, utc_now
 
 def credentials():
     return (os.getenv("TELEGRAM_BOT_TOKEN", "").strip(), os.getenv("TELEGRAM_CHAT_ID", "").strip())
@@ -76,7 +76,10 @@ def deliver(payload):
             event["telegram_alert_status"] = "skipped_superseded"
             continue
         if kind == "EXIT":
-            event["delivery_delayed"] = created is None or now - created > timedelta(minutes=10)
+            trigger = datetime.fromisoformat(event["trigger_bar_datetime_ny"])
+            if trigger.tzinfo is None:
+                trigger = trigger.replace(tzinfo=NY)
+            event["delivery_delayed"] = created is None or now - min(created, trigger) > timedelta(minutes=10)
         last_attempt = parse_time(event.get("telegram_last_attempt_at_utc"))
         if last_attempt and now - last_attempt < timedelta(minutes=2):
             continue

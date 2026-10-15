@@ -260,6 +260,48 @@ class DailyTests(Base):
         with self.assertRaises(ValueError):
             common.validate_ohlc({"open":10,"high":float("nan"),"low":8,"close":10})
 
+class ExtraRegressionTests(Base):
+    def test_wilder_atr_reference_vector(self):
+        self.assertEqual(scanner.wilder_atr([12,13,15,14],[10,11,11,10],[11,12,14,11],3),
+                         [None,None,8/3,(8/3*2+4)/3])
+    def test_ema_reference_vector(self):
+        self.assertEqual(scanner.ema([10,12,14],3),[10,11,12.5])
+    def test_failed_exit_stays_in_outbox(self):
+        self.post.side_effect=RuntimeError("secret-token-url")
+        self.assertEqual(self.run_monitor(bars(True)),1)
+        events=common.load_json("signal_events.json")["events"]
+        self.assertEqual(events[0]["telegram_alert_status"],"failed")
+        self.assertNotIn("secret-token-url",Path("signal_events.json").read_text())
+    def test_http_errors_do_not_expose_market_key(self):
+        response=Mock(status_code=401)
+        with patch.object(monitor.requests,"get",return_value=response):
+            with self.assertRaises(RuntimeError) as captured:
+                monitor.fetch_today_minute_bars("COST","private-key")
+        self.assertNotIn("private-key",str(captured.exception))
+    def test_duplicate_minutes_rejected(self):
+        value={"datetime":"2026-10-15 10:19:00","open":"980","high":"982","low":"978","close":"981"}
+        response=Mock(status_code=200,json=lambda:{"meta":{"symbol":"COST"},"values":[value,value]})
+        with patch.object(monitor.requests,"get",return_value=response):
+            with self.assertRaises(RuntimeError):
+                monitor.fetch_today_minute_bars("COST","private-key")
+    def test_historical_exit_recovery_is_labeled_delayed(self):
+        later=NOW+timedelta(hours=3)
+        with patch.object(monitor,"now_utc",return_value=later),patch.object(notifications,"now_utc",return_value=later):
+            self.run_monitor(bars(True))
+        event=next(e for e in common.load_json("signal_events.json")["events"] if e["type"]=="EXIT")
+        self.assertTrue(event["delivery_delayed"])
+    def test_daily_runner_does_not_scan_intraday(self):
+        import daily_runner
+        with patch.object(daily_runner,"now_utc",return_value=NOW),patch.object(daily_runner.rate_limited_scanner.scanner,"main") as scan:
+            self.assertEqual(daily_runner.main(),0)
+            scan.assert_not_called()
+    def test_after_close_recovery_checks_stop_before_raising(self):
+        later=datetime(2026,10,15,23,tzinfo=timezone.utc)
+        data=bars(True)
+        with patch.object(monitor,"now_utc",return_value=later),patch.object(monitor,"fetch_today_minute_bars",return_value=data):
+            monitor.run(catch_up=True)
+        self.assertNotIn("COST",common.load_json("signal_state.json")["positions"])
+
 @unittest.skipUnless(importlib.util.find_spec("exchange_calendars"),"calendar package runs in GitHub CI")
 class RealCalendarTests(unittest.TestCase):
     def test_thanksgiving_closed(self):
