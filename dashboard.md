@@ -1,9 +1,9 @@
 # Stock Signals — Dashboard
 
-Snapshot UTC: 2026-10-15T23:33:33.335119+00:00
+Snapshot UTC: 2026-10-15T23:33:58.697244+00:00
 
 **Monitor as of this snapshot: outside_session**
-Last check UTC: 2026-10-15T23:33:32.609858+00:00.
+Last check UTC: 2026-10-15T23:33:57.959078+00:00.
 During the session, a last check older than 10 minutes means monitoring is unavailable, even if this saved snapshot says OK.
 Telegram: **configured** · Undelivered events: 0.
 Daily scan: ok · Last processed bar: 2026-10-15.

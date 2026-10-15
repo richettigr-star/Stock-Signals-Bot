@@ -1,9 +1,9 @@
 {
-  "started_at_utc": "2026-10-15T23:33:32.031175+00:00",
+  "started_at_utc": "2026-10-15T23:33:57.377913+00:00",
   "status": "outside_session",
   "symbols": {},
   "telegram_configured": true,
   "target_interval_seconds": 300,
   "notifications_ok": true,
-  "completed_at_utc": "2026-10-15T23:33:32.609858+00:00"
+  "completed_at_utc": "2026-10-15T23:33:57.959078+00:00"
 }
