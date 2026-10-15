@@ -72,10 +72,11 @@ def main(catch_up=False):
     portfolio = load_json("portfolio_state.json",required=True)
     events = load_json("signal_events.json",{"version":1,"events":[]})
     positions = state.setdefault("positions",{})
+    holdings = portfolio.get("holdings",{})
     api_key = __import__("os").getenv("TWELVE_DATA_API_KEY","").strip()
     in_session = monitor_window(now) or (catch_up and completed_scan_day(now) is not None)
     errors = []
-    for symbol,holding in portfolio.get("holdings",{}).items():
+    for symbol,holding in holdings.items():
         if holding.get("status") not in {"closed","exit_alert_awaiting_manual_sale"} and symbol not in positions:
             errors.append(symbol + ":confirmed_holding_not_monitored")
     if in_session and not all(credentials()):
@@ -84,14 +85,20 @@ def main(catch_up=False):
     if in_session and not api_key:
         errors.append("market_data_key_missing")
     if in_session and api_key:
-        for index,(symbol,pos) in enumerate(list(positions.items())):
+        checked_count = 0
+        for symbol,pos in list(positions.items()):
+            holding = holdings.get(symbol)
+            confirmed = bool(holding and holding.get("status") not in {"closed","exit_alert_awaiting_manual_sale"})
+            # A strategy signal is not a holding. It may be monitored theoretically,
+            # but it must never become an active holding without user confirmation.
             if pos.get("status") not in {"active","pending_entry"}:
                 continue
             effective_open = next_open(pos["signal_date"])
             if now < effective_open:
                 continue
-            if index:
+            if checked_count:
                 time.sleep(9.5)
+            checked_count += 1
             try:
                 bars = fetch_today_minute_bars(symbol,api_key)
                 valid = [b for b in bars if regular_bar(b["datetime"])
@@ -122,9 +129,10 @@ def main(catch_up=False):
                     "recovery_gap_detected":missing_start or long_hole}
                 if quote_status != "ok":
                     errors.append(symbol + ":stale_or_gap")
-                if pos["status"] == "pending_entry":
-                    pos.update(status="active",activated_date=now.astimezone(NY).date().isoformat(),
-                               activated_at_utc=utc_now(),entry_note="Strategy signal active; broker fill is not presumed.")
+                if pos["status"] == "pending_entry" and confirmed:
+                    pos.update(status="active",activated_date=holding.get("entry_date"),
+                               activated_at_utc=utc_now(),
+                               entry_note="User-confirmed holding; broker fill is tracked from portfolio_state.json.")
                 trigger = None
                 fill_time = parse_time(pos.get("actual_fill",{}).get("execution_time"))
                 for bar in recent:
@@ -141,9 +149,6 @@ def main(catch_up=False):
                 changed = True
                 if trigger:
                     bar,stop = trigger
-                    holding = portfolio.get("holdings",{}).get(symbol,{})
-                    confirmed = bool(holding and holding.get("status") != "closed"
-                                     and holding.get("entry_date","9999") <= bar["datetime"][:10])
                     signal_id = pos.get("signal_id",f"ENTRY-{symbol}-{pos['signal_date']}")
                     event = {"id":f"EXIT-{signal_id}-{bar['datetime']}","type":"EXIT","symbol":symbol,
                         "signal_id":signal_id,"holding_confirmed":confirmed,
