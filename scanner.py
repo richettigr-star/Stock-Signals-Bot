@@ -25,6 +25,7 @@ This script DOES NOT place trades. It only writes signals.json and report.md.
 from __future__ import annotations
 
 import json
+import math
 import os
 import sys
 import time
@@ -33,6 +34,7 @@ from pathlib import Path
 from typing import Any
 
 import requests
+from common import load_json, validate_ohlc
 
 API_URL = "https://api.twelvedata.com/time_series"
 
@@ -116,21 +118,29 @@ def fetch_symbol(symbol: str, api_key: str) -> list[dict[str, Any]]:
     for attempt in range(1, MAX_RETRIES + 1):
         try:
             response = requests.get(API_URL, params=params, timeout=REQUEST_TIMEOUT)
-            response.raise_for_status()
+            if response.status_code != 200:
+                raise RuntimeError("Market-data HTTP " + str(response.status_code))
             data = response.json()
 
             if data.get("status") == "error":
                 raise RuntimeError(
                     f"Twelve Data error for {symbol}: "
-                    f"{data.get('code', '')} {data.get('message', 'unknown error')}"
+                    f"{data.get('code', '')}: request rejected"
                 )
 
             values = data.get("values")
             if not values:
                 raise RuntimeError(f"No daily data returned for {symbol}")
 
+            if str(data.get("meta", {}).get("symbol", symbol)).upper() != symbol:
+                raise ValueError("Market-data symbol mismatch")
             rows = []
+            seen = set()
             for row in values:
+                if row["datetime"][:10] in seen:
+                    raise ValueError("Duplicate daily bar")
+                seen.add(row["datetime"][:10])
+                validate_ohlc(row)
                 rows.append({
                     "date": row["datetime"][:10],
                     "open": float(row["open"]),
@@ -144,11 +154,11 @@ def fetch_symbol(symbol: str, api_key: str) -> list[dict[str, Any]]:
             return rows
 
         except Exception as exc:
-            last_error = exc
+            last_error = type(exc).__name__
             if attempt < MAX_RETRIES:
                 time.sleep(RETRY_SLEEP_SECONDS * attempt)
 
-    raise RuntimeError(f"Failed to fetch {symbol}: {last_error}")
+    raise RuntimeError(f"Failed to fetch {symbol}: {last_error}") from None
 
 
 def analyze_symbol(symbol: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
@@ -214,7 +224,9 @@ def apply_slot_allocation(candidates: list[dict[str, Any]]) -> None:
         return
 
     selected_count = len(candidates)
-    slot_budget_cad = ACCOUNT_EQUITY_CAD / selected_count
+    portfolio = load_json("portfolio_state.json", {})
+    available = max(0.0, float(portfolio.get("unallocated_capital_cad", ACCOUNT_EQUITY_CAD)))
+    slot_budget_cad = math.floor(available * 100 / selected_count + 1e-8) / 100
 
     for candidate in candidates:
         candidate["capital_allocation"] = {
@@ -234,8 +246,7 @@ def apply_slot_allocation(candidates: list[dict[str, Any]]) -> None:
 def write_outputs(results: list[dict[str, Any]], errors: list[str]) -> None:
     ranked = sorted(
         [r for r in results if r["eligible"]],
-        key=lambda x: x["score"],
-        reverse=True,
+        key=lambda x: (-x["score"], x["symbol"]),
     )
     candidates = ranked[:MAX_CANDIDATES]
     apply_slot_allocation(candidates)
@@ -338,7 +349,7 @@ def write_outputs(results: list[dict[str, Any]], errors: list[str]) -> None:
         "## Execution note",
         "",
         "The signal is calculated after the daily bar is complete. Intended entry is the next market open.",
-        "The stop shown is a reference based on the signal close. After a real fill, the practical stop reference is fill price minus 2.5×ATR from the signal bar.",
+        "The monitored stop comes from the signal close and only rises after completed daily bars. A different fill price does not silently change the stop rule.",
         "",
         "This is a signal tool, not an automated broker connection.",
         "",
@@ -377,7 +388,7 @@ def main() -> int:
 
     write_outputs(results, errors)
     print("Wrote signals.json and report.md")
-    return 0
+    return 0 if not errors and len(results) == len(SYMBOLS) else 1
 
 
 if __name__ == "__main__":

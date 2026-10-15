@@ -1,94 +1,54 @@
 name: After-Close Stock Signals
-
 on:
   workflow_dispatch:
   push:
-    paths:
-      - "scanner.py"
-      - "rate_limited_scanner.py"
+    branches: [main]
+    paths: ["scanner.py", "manage_state.py", "daily_runner.py", ".github/workflows/daily-signals.yml"]
   schedule:
-    # Run at both possible UTC equivalents of 16:20 New York time.
-    # A New York-time gate below keeps only the correct run across DST changes.
-    - cron: "20 20 * * 1-5"
-    - cron: "20 21 * * 1-5"
-
+    - cron: "20 20,21 * * 1-5"
+    # Early-close support and retry windows; successful session scans are deduplicated.
+    - cron: "37 17-23 * * 1-5"
 permissions:
   contents: write
-
 concurrency:
   group: stock-signal-state
   cancel-in-progress: false
-
 jobs:
   scan:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
-      - name: Check New York market-close window
-        id: gate
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-        run: |
-          python - <<'PY'
-          import os
-          from datetime import datetime
-          from zoneinfo import ZoneInfo
-
-          event_name = os.environ.get("EVENT_NAME", "")
-          now_ny = datetime.now(ZoneInfo("America/New_York"))
-          validation_run = event_name in {"workflow_dispatch", "push"}
-          after_close_window = now_ny.weekday() < 5 and now_ny.hour == 16 and now_ny.minute >= 15
-          should_run = validation_run or after_close_window
-
-          print(f"New York time: {now_ny.isoformat()}")
-          print(f"Event: {event_name}")
-          print(f"Run daily scan: {should_run}")
-
-          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
-              fh.write(f"run_scan={'true' if should_run else 'false'}\n")
-          PY
-
+          cache: pip
       - name: Install dependencies
-        if: steps.gate.outputs.run_scan == 'true'
         run: pip install -r requirements.txt
-
-      - name: Run after-close scanner
-        if: steps.gate.outputs.run_scan == 'true'
+      - name: Run offline regression tests
+        run: python -m unittest -q test_monitor.py
+      - name: Process completed exchange session
         env:
           TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
-          ACCOUNT_EQUITY_CAD: "100"
-        run: python rate_limited_scanner.py
-
-      - name: Update state and send Telegram notifications
-        if: steps.gate.outputs.run_scan == 'true'
-        env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python manage_state.py
-
-      - name: Rebuild dashboard after trailing stop changes
-        if: steps.gate.outputs.run_scan == 'true'
+          ACCOUNT_EQUITY_CAD: "100"
+        run: python daily_runner.py
+      - name: Rebuild dashboard
+        if: always()
         run: python build_dashboard.py
-
-      - name: Commit updated signals and state
-        if: steps.gate.outputs.run_scan == 'true'
+      - name: Persist daily state and health
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add signals.json report.md signal_state.json signal_events.json portfolio_state.json dashboard.md
-          if git diff --cached --quiet; then
-            echo "No signal output changes to commit."
-          else
-            git commit -m "Update after-close stock signals and state"
+          for file in signals.json report.md signal_state.json signal_events.json portfolio_state.json dashboard.md monitor_health.json daily_health.json; do
+            if [ -f "$file" ]; then git add "$file"; fi
+          done
+          if ! git diff --cached --quiet; then
+            git commit -m "Update completed daily signals and dashboard"
             git pull --rebase
             git push
           fi

@@ -1,0 +1,20 @@
+name: Signal Regression Tests
+on:
+  push:
+    paths: ["*.py", "requirements.txt", ".github/workflows/*.yml"]
+  pull_request:
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python -m unittest -v test_monitor.py
+      - run: python -m compileall -q .

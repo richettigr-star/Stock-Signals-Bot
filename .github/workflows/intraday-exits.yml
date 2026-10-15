@@ -1,68 +1,51 @@
 name: Intraday Exit Signals
-
 on:
   workflow_dispatch:
   push:
-    paths:
-      - "intraday_exit.py"
-      - "build_dashboard.py"
-      - ".github/workflows/intraday-exits.yml"
+    branches: [main]
+    paths: ["*.py", "requirements.txt", ".github/workflows/intraday-exits.yml"]
   schedule:
-    # Every 5 minutes during a UTC window that covers the regular US session
-    # in both daylight-saving and standard time. The Python script itself
-    # exits immediately when New York is outside 09:30-16:05.
-    - cron: "*/5 13-21 * * 1-5"
-
+    - cron: "2-57/5 13-22 * * 1-5"
 permissions:
   contents: write
-
-# Share one lock with the after-close scanner so both workflows cannot consume
-# the same market-data quota or edit signal state at the same time.
 concurrency:
   group: stock-signal-state
   cancel-in-progress: false
-
 jobs:
   monitor:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-
+    timeout-minutes: 15
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: main
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
+          cache: pip
       - name: Install dependencies
         run: pip install -r requirements.txt
-
-      - name: Check active signal stops
+      - name: Run offline regression tests
+        run: python -m unittest -q test_monitor.py
+      - name: Monitor stops and deliver pending alerts
         env:
           TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python intraday_exit.py
-
       - name: Rebuild dashboard
         if: always()
         run: python build_dashboard.py
-
-      - name: Commit exit state and dashboard even after monitor failure
+      - name: Persist state, delivery receipts and health
         if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add signal_state.json signal_events.json portfolio_state.json dashboard.md
-          if [ -f monitor_health.json ]; then git add monitor_health.json; fi
-          if git diff --cached --quiet; then
-            echo "No exit/state changes to commit."
-          else
-            git commit -m "Update intraday signal state"
+          for file in signal_state.json signal_events.json portfolio_state.json dashboard.md monitor_health.json; do
+            if [ -f "$file" ]; then git add "$file"; fi
+          done
+          if ! git diff --cached --quiet; then
+            git commit -m "Update stop monitor and dashboard"
             git pull --rebase
             git push
           fi
