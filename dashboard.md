@@ -1,5 +1,7 @@
 # Stock Signals — Dashboard
 
+> **Automatic five-minute schedule: NOT WORKING in the observed test window.** At 11:14 Toronto, no scheduled runs appeared for 11:08 or 11:13. The last successful read at 11:04 was triggered by a push. See [verification evidence](SCHEDULE_VERIFICATION.md).
+
 Snapshot UTC: 2026-10-15T15:04:43.279102+00:00
 
 **Monitor as of this snapshot: ok**

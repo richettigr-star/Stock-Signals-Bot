@@ -1,0 +1,16 @@
+{
+  "verified_at_utc": "2026-10-15T15:14:21.540Z",
+  "status": "five_minute_schedule_not_working_in_observation_window",
+  "scheduled_runs_observed": 0,
+  "workflow": ".github/workflows/intraday-exits.yml",
+  "cron": "3-58/5 13-22 * * 1-5",
+  "registration_commit": "7642623ffe59c569a0b0f4ecf64f656e5d17ba47",
+  "expected_runs_utc": [
+    "2026-10-15T15:08:00Z",
+    "2026-10-15T15:13:00Z"
+  ],
+  "last_successful_monitor_completed_at_utc": "2026-10-15T15:04:42.875316+00:00",
+  "last_successful_monitor_trigger": "push",
+  "conclusion": "Manual/push execution works. No schedule-triggered runs observed. Five-minute unattended reads are not established.",
+  "permanent_outage_claim": false
+}
