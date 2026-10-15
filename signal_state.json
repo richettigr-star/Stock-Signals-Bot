@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at_utc": "2026-10-14T23:50:06.035347+00:00",
+  "updated_at_utc": "2026-10-15T14:16:16.512Z",
   "latest_processed_bar_date": "2026-10-14",
   "state_note": "Signal-only strategy state. This does not represent actual broker fills or holdings.",
   "positions": {
@@ -24,10 +24,10 @@
     },
     "COST": {
       "symbol": "COST",
-      "status": "pending_entry",
+      "status": "active",
       "signal_date": "2026-10-14",
       "planned_entry": "next_market_open",
-      "signal_close_usd": 982.0,
+      "signal_close_usd": 982,
       "atr14_at_signal": 15.4756,
       "atr14_latest": 15.4756,
       "stop_usd": 943.311,
@@ -38,7 +38,16 @@
       "momentum10_pct": 7.872,
       "stop_rule": "max(previous_stop, completed_daily_close - 2.5 * ATR14)",
       "created_at_utc": "2026-10-14T22:05:00+00:00",
-      "updated_at_utc": "2026-10-14T23:50:06.035325+00:00"
+      "updated_at_utc": "2026-10-15T14:16:16.512Z",
+      "actual_fill": {
+        "confirmed_by": "user",
+        "trade_date": "2026-10-15",
+        "price_usd": 985.4,
+        "invested_cad": 33.33,
+        "quantity": null,
+        "execution_time": null,
+        "note": "User-confirmed purchase; share quantity and exact execution time not supplied."
+      }
     },
     "XOM": {
       "symbol": "XOM",

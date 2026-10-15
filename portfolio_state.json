@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "updated_at_utc": "2026-10-15T14:16:16.512Z",
+  "as_of_trade_date": "2026-10-15",
+  "source": "User-confirmed transactions; no brokerage connection or live quotes.",
+  "account_currency": "CAD",
+  "initial_capital_cad": 100,
+  "invested_cost_cad": 33.33,
+  "unallocated_capital_cad": 66.67,
+  "realized_pnl_cad": 0,
+  "closed_trades": 0,
+  "winning_trades": 0,
+  "losing_trades": 0,
+  "unrealized_pnl_cad": null,
+  "holdings": {
+    "COST": {
+      "status": "active",
+      "entry_date": "2026-10-15",
+      "entry_price_usd": 985.4,
+      "invested_cad": 33.33,
+      "quantity": null,
+      "latest_price_usd": null,
+      "strategy_stop_usd": 943.311,
+      "fill_based_reference_stop_usd": 946.711,
+      "reference_note": "Fill-based value is informational, not an activated broker stop."
+    }
+  },
+  "unexecuted_signals": [
+    "WMT",
+    "XOM"
+  ],
+  "telegram_status": "setup_deferred",
+  "exit_monitor_status": "No run observed at reconciliation; operation not verified"
+}
