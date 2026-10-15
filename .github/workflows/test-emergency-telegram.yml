@@ -2,26 +2,45 @@ name: Test Emergency Telegram
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/test-emergency-telegram.yml"
+
+permissions:
+  contents: read
 
 jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 5
-
     steps:
-      - name: Send test emergency alert
+      - name: Send and validate test alert
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
-            echo "Telegram secrets are missing."
-            exit 2
-          fi
-
-          curl --fail --silent --show-error \
-            -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-            --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
-            --data-urlencode $'text=🚨 TESTE — STOCK SIGNALS\n\nCanal de emergência Telegram funcionando.\n\nEste é apenas um teste, não é uma saída real.'
-
-          echo "Telegram test sent."
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.parse
+          import urllib.request
+          token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+          chat = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+          if not token or not chat:
+              raise SystemExit("Telegram secrets are missing.")
+          data = urllib.parse.urlencode({
+              "chat_id": chat,
+              "text": "✅ TESTE — STOCK SIGNALS\n\nConexão Telegram confirmada.\nVocê receberá sinais de entrada, atualização de stop e saída.\n\nEste é apenas um teste; não é uma ordem de compra ou venda."
+          }).encode()
+          try:
+              with urllib.request.urlopen(
+                  "https://api.telegram.org/bot" + token + "/sendMessage",
+                  data=data, timeout=20
+              ) as response:
+                  result = json.load(response)
+          except Exception as exc:
+              raise SystemExit("Telegram test failed: " + type(exc).__name__) from None
+          if not result.get("ok"):
+              raise SystemExit("Telegram rejected the test message.")
+          print("Telegram API confirmed successful test delivery.")
+          PY
