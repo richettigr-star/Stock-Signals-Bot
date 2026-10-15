@@ -1,34 +1,26 @@
-# Dashboard — Stock Signals
+# Stock Signals — Dashboard
 
-Snapshot reconciled on 2026-10-15 from user-confirmed transactions. No live brokerage or price connection.
+Generated UTC: 2026-10-15T14:19:58.669140+00:00
 
-| Account | CAD |
-|---|---:|
-| Initial capital | 100.00 |
-| Invested at cost | 33.33 |
-| Unallocated capital | 66.67 |
-| Realized P&L | 0.00 |
-| Unrealized P&L | Not available |
+**Monitor: stale_or_unverified**. Last completed check UTC: NEVER VERIFIED.
+Target interval: 5 minutes during regular US trading. If the last check is older than 10 minutes during the session, treat monitoring as unavailable.
+Notifications: **not_configured**.
 
-| Holding | Status | Entry date | Entry USD | Invested CAD | Strategy stop USD |
-|---|---|---|---:|---:|---:|
-| COST | ACTIVE — user-confirmed fill | 2026-10-15 | 985.40 | 33.33 | 943.3110 |
+Capital: C$100.00 · Invested cost: C$33.33 · Unallocated: C$66.67
+Realized P&L: C$0.00 · Closed trades: 0 · Wins: 0 · Losses: 0
 
-WMT and XOM are unexecuted strategy signals, not account holdings.
+| Holding | Status | Entry USD | Last observed USD | Strategy stop USD | Price return since entry |
+|---|---|---:|---:|---:|---:|
+| COST | active | 985.40 | Unavailable | 943.3110 | Unavailable |
 
-The strategy stop comes from signal close minus 2.5 × ATR14. The previous dashboard's 946.7110 value comes from actual fill minus 2.5 × ATR14; it is a reference calculation only. No broker stop order is confirmed.
+WMT/XOM: unexecuted strategy signals; no confirmed holdings.
 
-## Performance
+An EXIT alert is not a confirmed sale. Holdings, cash and realized P&L change only after the user confirms execution.
+Return is the USD stock-price change, not exact CAD account P&L. Quote time/status are stored in portfolio_state.json.
+Today’s return: unavailable without a verified previous close.
 
-- Today: unavailable without a current quote and previous close.
-- Since entry: unavailable without a current quote; exact CAD P&L also requires quantity, FX and fees.
-- Closed trades: 0. Winners: 0. Losers: 0. Win rate: not applicable.
+## Latest EXIT alerts
 
-## Operations
+No recorded EXIT alerts.
 
-- Telegram: setup deferred by user.
-- EXIT monitor: no run observed during reconciliation; operation not verified.
-- Actual holdings: portfolio_state.json.
-- Strategy signals and stops: signal_state.json.
-
-This dashboard is a saved snapshot, not a continuously updating display. Future transactions and quotes must be reconciled before performance changes are reported.
+This file refreshes when a workflow completes. Reload the page to see the saved result; this chat is not a live display.

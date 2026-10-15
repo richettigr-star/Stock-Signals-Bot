@@ -75,12 +75,16 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python manage_state.py
 
+      - name: Rebuild dashboard after trailing stop changes
+        if: steps.gate.outputs.run_scan == 'true'
+        run: python build_dashboard.py
+
       - name: Commit updated signals and state
         if: steps.gate.outputs.run_scan == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add signals.json report.md signal_state.json signal_events.json
+          git add signals.json report.md signal_state.json signal_events.json portfolio_state.json dashboard.md
           if git diff --cached --quiet; then
             echo "No signal output changes to commit."
           else

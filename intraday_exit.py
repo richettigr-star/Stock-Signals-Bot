@@ -28,6 +28,8 @@ MAX_EVENT_HISTORY = 500
 REQUEST_TIMEOUT = 30
 TELEGRAM_TIMEOUT = 15
 TELEGRAM_RETRIES = 3
+HEALTH_PATH = Path("monitor_health.json")
+HEALTH: dict[str, Any] = {}
 
 
 def utc_now() -> str:
@@ -39,8 +41,8 @@ def load_json(path: Path, default: Any) -> Any:
         return default
     try:
         return json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
-        return default
+    except Exception as exc:
+        raise RuntimeError(f"Invalid JSON in {path.name}") from exc
 
 
 def save_json(path: Path, payload: Any) -> None:
@@ -130,7 +132,7 @@ def send_telegram(event: dict[str, Any]) -> bool:
         "disable_web_page_preview": True,
     }
 
-    last_error: Exception | None = None
+    last_error: str | None = None
     for attempt in range(1, TELEGRAM_RETRIES + 1):
         try:
             response = requests.post(url, data=payload, timeout=TELEGRAM_TIMEOUT)
@@ -146,13 +148,13 @@ def send_telegram(event: dict[str, Any]) -> bool:
             print(f"Telegram emergency alert sent for {event['symbol']}")
             return True
         except Exception as exc:
-            last_error = exc
+            last_error = type(exc).__name__
             if attempt < TELEGRAM_RETRIES:
                 time_module.sleep(attempt * 2)
 
     event["telegram_alert_status"] = "failed"
-    event["telegram_alert_last_error"] = str(last_error)
-    print(f"WARNING: Telegram alert failed for {event['symbol']}: {last_error}", file=sys.stderr)
+    event["telegram_alert_last_error"] = f"{last_error}: delivery failed"
+    print(f"WARNING: Telegram alert failed for {event['symbol']}", file=sys.stderr)
     return False
 
 
@@ -175,11 +177,17 @@ def retry_unsent_exit_alerts(events_payload: dict[str, Any]) -> bool:
 
 
 def main() -> int:
+    HEALTH.update({"started_at_utc": utc_now(), "status": "running", "symbols": {},
+                   "telegram_configured": all(telegram_credentials()),
+                   "target_interval_seconds": 300})
     api_key = os.getenv("TWELVE_DATA_API_KEY")
     if not api_key:
+        HEALTH.update({"status": "error", "error": "missing_market_data_key"})
         print("ERROR: TWELVE_DATA_API_KEY is missing", file=sys.stderr)
         return 2
 
+    if not STATE_PATH.exists():
+        raise RuntimeError("signal_state.json missing")
     state = load_json(STATE_PATH, {"version": 1, "positions": {}, "closed_signals": []})
     events_payload = load_json(EVENTS_PATH, {"version": 1, "events": []})
 
@@ -188,6 +196,7 @@ def main() -> int:
 
     now_ny = datetime.now(NY)
     if not regular_market_window(now_ny):
+        HEALTH["status"] = "outside_session"
         if retry_changed:
             save_json(EVENTS_PATH, events_payload)
         print(f"Outside regular US market window: {now_ny.isoformat()}")
@@ -197,6 +206,7 @@ def main() -> int:
     closed = state.setdefault("closed_signals", [])
 
     if not positions:
+        HEALTH["status"] = "no_signals"
         if retry_changed:
             save_json(EVENTS_PATH, events_payload)
         print("No active or pending strategy signals to monitor.")
@@ -218,7 +228,8 @@ def main() -> int:
         try:
             bars = fetch_today_minute_bars(symbol, api_key)
         except Exception as exc:
-            print(f"WARNING: {symbol}: {exc}", file=sys.stderr)
+            HEALTH["symbols"][symbol] = {"status": "error", "error": type(exc).__name__}
+            print(f"WARNING: {symbol}: market data request failed", file=sys.stderr)
             continue
 
         today_bars = [
@@ -226,8 +237,18 @@ def main() -> int:
             if b["datetime"][:10] == today and "09:30" <= b["datetime"][11:16] <= "16:00"
         ]
         if not today_bars:
+            HEALTH["symbols"][symbol] = {"status": "no_fresh_data"}
             print(f"{symbol}: no fresh regular-session minute bars today.")
             continue
+
+        latest_time = datetime.fromisoformat(today_bars[-1]["datetime"]).replace(tzinfo=NY)
+        age_seconds = (now_ny - latest_time).total_seconds()
+        HEALTH["symbols"][symbol] = {
+            "status": "ok" if -60 <= age_seconds <= 600 else "stale",
+            "checked_at_utc": utc_now(), "bar_datetime_ny": today_bars[-1]["datetime"],
+            "bar_age_seconds": round(age_seconds), "last_price_usd": today_bars[-1]["close"],
+            "stop_usd": pos["stop_usd"],
+        }
 
         if status == "pending_entry":
             pos["status"] = "active"
@@ -295,8 +316,18 @@ def main() -> int:
     else:
         print("No state changes.")
 
-    return 0
+    unhealthy = any(v["status"] != "ok" for v in HEALTH["symbols"].values())
+    HEALTH["status"] = "degraded" if unhealthy else "ok"
+    return 1 if unhealthy else 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        result = main()
+    except Exception as exc:
+        HEALTH.update({"status": "error", "error": type(exc).__name__})
+        result = 1
+    finally:
+        HEALTH["completed_at_utc"] = utc_now()
+        save_json(HEALTH_PATH, HEALTH)
+    raise SystemExit(result)

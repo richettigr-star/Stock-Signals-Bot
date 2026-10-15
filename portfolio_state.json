@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at_utc": "2026-10-15T14:16:16.512Z",
+  "updated_at_utc": "2026-10-15T14:19:58.669140+00:00",
   "as_of_trade_date": "2026-10-15",
   "source": "User-confirmed transactions; no brokerage connection or live quotes.",
   "account_currency": "CAD",
@@ -22,13 +22,18 @@
       "latest_price_usd": null,
       "strategy_stop_usd": 943.311,
       "fill_based_reference_stop_usd": 946.711,
-      "reference_note": "Fill-based value is informational, not an activated broker stop."
+      "reference_note": "Fill-based value is informational, not an activated broker stop.",
+      "quote_datetime_ny": null,
+      "quote_status": "unavailable",
+      "exit_alert": null,
+      "price_return_since_entry_pct": null
     }
   },
   "unexecuted_signals": [
     "WMT",
     "XOM"
   ],
-  "telegram_status": "setup_deferred",
-  "exit_monitor_status": "No run observed at reconciliation; operation not verified"
+  "telegram_status": "not_configured",
+  "exit_monitor_status": "stale_or_unverified",
+  "monitor_last_completed_at_utc": null
 }
