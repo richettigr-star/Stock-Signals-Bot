@@ -1,46 +1,40 @@
 name: Test Emergency Telegram
-
 on:
   workflow_dispatch:
   push:
-    paths:
-      - ".github/workflows/test-emergency-telegram.yml"
-
+    branches: [main]
+    paths: [".github/workflows/test-emergency-telegram.yml"]
 permissions:
   contents: read
-
 jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Send and validate test alert
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Verify the production Telegram sender
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          python3 - <<'PY'
-          import json
-          import os
-          import urllib.parse
-          import urllib.request
-          token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
-          chat = os.getenv("TELEGRAM_CHAT_ID", "").strip()
-          if not token or not chat:
-              raise SystemExit("Telegram secrets are missing.")
-          data = urllib.parse.urlencode({
-              "chat_id": chat,
-              "text": "✅ TESTE — STOCK SIGNALS\n\nConexão Telegram confirmada.\nVocê receberá sinais de entrada, atualização de stop e saída.\n\nEste é apenas um teste; não é uma ordem de compra ou venda."
-          }).encode()
-          try:
-              with urllib.request.urlopen(
-                  "https://api.telegram.org/bot" + token + "/sendMessage",
-                  data=data, timeout=20
-              ) as response:
-                  result = json.load(response)
-          except Exception as exc:
-              raise SystemExit("Telegram test failed: " + type(exc).__name__) from None
-          if not result.get("ok"):
-              raise SystemExit("Telegram rejected the test message.")
-          print("Telegram API confirmed successful test delivery.")
+          python - <<'PY'
+          from common import utc_now
+          from notifications import send
+          event = {
+              "id": "AUDIT-TEST-" + utc_now(),
+              "type": "MONITOR_HEALTH",
+              "component": "TESTE CONTROLADO DA AUDITORIA",
+              "detail": "Teste do mesmo código que envia entradas, stops e saídas. Esta mensagem não é um sinal de trade.",
+              "created_at_utc": utc_now(),
+          }
+          if not send(event):
+              raise SystemExit("Production Telegram sender test failed.")
+          print("Production sender: Telegram accepted the audit test message.")
           PY
