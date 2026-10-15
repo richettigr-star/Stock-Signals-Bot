@@ -1,8 +1,8 @@
 # Stock Signals — Dashboard
 
-Generated UTC: 2026-10-15T14:19:58.669140+00:00
+Generated UTC: 2026-10-15T14:21:27.739046+00:00
 
-**Monitor: stale_or_unverified**. Last completed check UTC: NEVER VERIFIED.
+**Monitor: ok**. Last completed check UTC: 2026-10-15T14:21:27.674409+00:00.
 Target interval: 5 minutes during regular US trading. If the last check is older than 10 minutes during the session, treat monitoring as unavailable.
 Notifications: **not_configured**.
 
@@ -11,7 +11,7 @@ Realized P&L: C$0.00 · Closed trades: 0 · Wins: 0 · Losses: 0
 
 | Holding | Status | Entry USD | Last observed USD | Strategy stop USD | Price return since entry |
 |---|---|---:|---:|---:|---:|
-| COST | active | 985.40 | Unavailable | 943.3110 | Unavailable |
+| COST | active | 985.40 | 1001.6600 | 943.3110 | +1.65% |
 
 WMT/XOM: unexecuted strategy signals; no confirmed holdings.
 

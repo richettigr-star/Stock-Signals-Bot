@@ -1,0 +1,33 @@
+{
+  "started_at_utc": "2026-10-15T14:21:27.429268+00:00",
+  "status": "ok",
+  "symbols": {
+    "WMT": {
+      "status": "ok",
+      "checked_at_utc": "2026-10-15T14:21:27.526590+00:00",
+      "bar_datetime_ny": "2026-10-15 10:20:00",
+      "bar_age_seconds": 87,
+      "last_price_usd": 120.055,
+      "stop_usd": 110.3869
+    },
+    "COST": {
+      "status": "ok",
+      "checked_at_utc": "2026-10-15T14:21:27.610716+00:00",
+      "bar_datetime_ny": "2026-10-15 10:20:00",
+      "bar_age_seconds": 87,
+      "last_price_usd": 1001.66,
+      "stop_usd": 943.311
+    },
+    "XOM": {
+      "status": "ok",
+      "checked_at_utc": "2026-10-15T14:21:27.673835+00:00",
+      "bar_datetime_ny": "2026-10-15 10:20:00",
+      "bar_age_seconds": 87,
+      "last_price_usd": 175.58,
+      "stop_usd": 168.3714
+    }
+  },
+  "telegram_configured": false,
+  "target_interval_seconds": 300,
+  "completed_at_utc": "2026-10-15T14:21:27.674409+00:00"
+}
