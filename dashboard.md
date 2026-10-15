@@ -1,9 +1,9 @@
 # Stock Signals — Dashboard
 
-Snapshot UTC: 2026-10-15T23:33:58.697244+00:00
+Snapshot UTC: 2026-10-15T23:35:36.559592+00:00
 
 **Monitor as of this snapshot: outside_session**
-Last check UTC: 2026-10-15T23:33:57.959078+00:00.
+Last check UTC: 2026-10-15T23:35:35.938317+00:00.
 During the session, a last check older than 10 minutes means monitoring is unavailable, even if this saved snapshot says OK.
 Telegram: **configured** · Undelivered events: 0.
 Daily scan: ok · Last processed bar: 2026-10-15.
@@ -13,7 +13,7 @@ Realized P&L: C$ 0.00 · Closed trades: 0 · Wins: 0 · Losses: 0
 
 | Holding | Status | Entry USD | Last observed USD | Strategy stop USD | USD return since entry | Quote NY (status) |
 |---|---|---:|---:|---:|---:|---|
-| COST | active | 985.40 | 977.8900 | 943.3110 | -0.76% | 2026-10-15 15:59:00 (unavailable) |
+| COST | active | 985.40 | 977.8900 | 946.7110 | -0.76% | 2026-10-15 15:59:00 (unavailable) |
 
 EXIT is an alert, not a broker sale. Cash and realized P&L change only after confirmed execution.
 USD price return is not exact CAD P&L; share quantity, FX and fees are not yet recorded.
@@ -21,11 +21,13 @@ This chat is not continuously updating. Reload this GitHub page for the latest s
 
 ## Strategy signals without confirmed purchases
 
-- WMT: active; strategy stop USD 111.5490. No real holding confirmed.
-- XOM: active; strategy stop USD 168.3714. No real holding confirmed.
+- UNH: pending_entry; strategy stop USD 377.4134. No real holding confirmed.
+- WMT: pending_entry; strategy stop USD 111.5489. No real holding confirmed.
 
 ## Recent alerts
 
+- ENTRY UNH: 2026-10-15T23:33:41.532260+00:00 · delivery sent · ID ENTRY-UNH-2026-10-15.
+- ENTRY WMT: 2026-10-15T23:33:41.532260+00:00 · delivery sent · ID ENTRY-WMT-2026-10-15.
 - STOP_UPDATE WMT: 2026-10-15T20:35:06.747285+00:00 · delivery sent · ID STOP_UPDATE-WMT-2026-10-15.
 - ENTRY WMT: 2026-10-14T23:44:37.049099+00:00 · delivery skipped_stale · ID ENTRY-WMT-2026-10-14.
 - ENTRY XOM: 2026-10-14T22:05:00+00:00 · delivery skipped_stale · ID ENTRY-XOM-2026-10-14.
