@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at_utc": "2026-10-15T23:33:58.696832+00:00",
+  "updated_at_utc": "2026-10-15T23:35:00+00:00",
   "as_of_trade_date": "2026-10-15",
   "source": "User-confirmed transactions with observed provider quotes; no broker synchronization.",
   "account_currency": "CAD",
@@ -20,9 +20,9 @@
       "invested_cad": 33.33,
       "quantity": null,
       "latest_price_usd": 977.89,
-      "strategy_stop_usd": 943.311,
+      "strategy_stop_usd": 946.711,
       "fill_based_reference_stop_usd": 946.711,
-      "reference_note": "Fill-based value is informational, not an activated broker stop.",
+      "reference_note": "Active strategy stop initialized from the user-confirmed fill minus 2.5×ATR14.",
       "quote_datetime_ny": "2026-10-15 15:59:00",
       "quote_status": "unavailable",
       "exit_alert": null,
@@ -31,8 +31,8 @@
     }
   },
   "unexecuted_signals": [
-    "WMT",
-    "XOM"
+    "UNH",
+    "WMT"
   ],
   "telegram_status": "configured",
   "exit_monitor_status": "outside_session",
