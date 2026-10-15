@@ -1,22 +1,7 @@
 {
   "version": 1,
-  "updated_at_utc": "2026-10-15T19:05:21.453412+00:00",
+  "updated_at_utc": "2026-10-15T20:35:07.279505+00:00",
   "events": [
-    {
-      "id": "ENTRY-WMT-2026-10-14",
-      "type": "ENTRY",
-      "symbol": "WMT",
-      "signal_date": "2026-10-14",
-      "effective": "next_market_open",
-      "signal_close_usd": 116.16,
-      "atr14": 2.3092,
-      "stop_usd": 110.3869,
-      "recommended_position_cad": 33.33,
-      "momentum10_pct": 11.778,
-      "score": 5.924787,
-      "created_at_utc": "2026-10-14T23:44:37.049099+00:00",
-      "telegram_alert_status": "skipped_stale"
-    },
     {
       "id": "ENTRY-COST-2026-10-14",
       "type": "ENTRY",
@@ -46,6 +31,37 @@
       "score": 4.488423,
       "created_at_utc": "2026-10-14T22:05:00+00:00",
       "telegram_alert_status": "skipped_stale"
+    },
+    {
+      "id": "ENTRY-WMT-2026-10-14",
+      "type": "ENTRY",
+      "symbol": "WMT",
+      "signal_date": "2026-10-14",
+      "effective": "next_market_open",
+      "signal_close_usd": 116.16,
+      "atr14": 2.3092,
+      "stop_usd": 110.3869,
+      "recommended_position_cad": 33.33,
+      "momentum10_pct": 11.778,
+      "score": 5.924787,
+      "created_at_utc": "2026-10-14T23:44:37.049099+00:00",
+      "telegram_alert_status": "skipped_stale"
+    },
+    {
+      "id": "STOP_UPDATE-WMT-2026-10-15",
+      "type": "STOP_UPDATE",
+      "symbol": "WMT",
+      "bar_date": "2026-10-15",
+      "old_stop_usd": 110.3869,
+      "new_stop_usd": 111.549,
+      "close_usd": 117.84,
+      "atr14": 2.5164,
+      "holding_confirmed": false,
+      "created_at_utc": "2026-10-15T20:35:06.747285+00:00",
+      "telegram_alert_status": "sent",
+      "telegram_last_attempt_at_utc": "2026-10-15T20:35:06.748015+00:00",
+      "telegram_alert_sent_at_utc": "2026-10-15T20:35:07.278699+00:00",
+      "telegram_message_id": 7
     }
   ]
 }

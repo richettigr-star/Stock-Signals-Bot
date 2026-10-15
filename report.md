@@ -1,82 +1,82 @@
 # Stock Signals Bot — Daily Report
 
-Generated: 2026-10-14T23:50:05.856916+00:00
-Latest market bar: 2026-10-14
+Generated: 2026-10-15T20:35:06.744898+00:00
+Latest market bar: 2026-10-15
 Account reference: C$100.00
 
 ## 3 candidate(s) for the next market open
 
-Capital split: approximately C$33.33 per selected candidate.
+Capital split: approximately C$22.22 per selected candidate.
 
 ### 1. WMT
-- Momentum10: 11.778%
-- Close: US$116.1600
-- EMA100: US$112.1174
-- ATR14 (Wilder): US$2.3092
-- Score: 5.924787
+- Momentum10: 13.025%
+- Close: US$117.8400
+- EMA100: US$112.2537
+- ATR14 (Wilder): US$2.5164
+- Score: 6.099456
 - Entry: next market open
-- Reference stop from signal close: US$110.3869
-- Stop distance: 4.970% (= 2.5×ATR)
+- Reference stop from signal close: US$111.5489
+- Stop distance: 5.339% (= 2.5×ATR)
 
 **LIVE Small**
 - Target risk: C$7.50
-- Risk-based position: C$150.91
-- Slot budget: C$33.33
-- Recommended position: C$33.33
+- Risk-based position: C$140.49
+- Slot budget: C$22.22
+- Recommended position: C$22.22
 
 **LIVE Small Aggressive**
 - Target risk: C$8.00
-- Risk-based position: C$160.97
-- Slot budget: C$33.33
-- Recommended position: C$33.33
+- Risk-based position: C$149.85
+- Slot budget: C$22.22
+- Recommended position: C$22.22
 
 ### 2. COST
-- Momentum10: 7.872%
-- Close: US$982.0000
-- EMA100: US$944.7495
-- ATR14 (Wilder): US$15.4756
-- Score: 4.995013
+- Momentum10: 6.880%
+- Close: US$977.8900
+- EMA100: US$945.1902
+- ATR14 (Wilder): US$16.5802
+- Score: 4.057916
 - Entry: next market open
-- Reference stop from signal close: US$943.3110
-- Stop distance: 3.940% (= 2.5×ATR)
+- Reference stop from signal close: US$936.4395
+- Stop distance: 4.239% (= 2.5×ATR)
 
 **LIVE Small**
 - Target risk: C$7.50
-- Risk-based position: C$190.36
-- Slot budget: C$33.33
-- Recommended position: C$33.33
+- Risk-based position: C$176.94
+- Slot budget: C$22.22
+- Recommended position: C$22.22
 
 **LIVE Small Aggressive**
 - Target risk: C$8.00
-- Risk-based position: C$203.05
-- Slot budget: C$33.33
-- Recommended position: C$33.33
+- Risk-based position: C$188.73
+- Slot budget: C$22.22
+- Recommended position: C$22.22
 
-### 3. XOM
-- Momentum10: 8.762%
-- Close: US$177.0100
-- EMA100: US$157.9465
-- ATR14 (Wilder): US$3.4554
-- Score: 4.488423
+### 3. UNH
+- Momentum10: 11.353%
+- Close: US$406.6600
+- EMA100: US$383.6204
+- ATR14 (Wilder): US$11.6987
+- Score: 3.946333
 - Entry: next market open
-- Reference stop from signal close: US$168.3714
-- Stop distance: 4.880% (= 2.5×ATR)
+- Reference stop from signal close: US$377.4134
+- Stop distance: 7.192% (= 2.5×ATR)
 
 **LIVE Small**
 - Target risk: C$7.50
-- Risk-based position: C$153.68
-- Slot budget: C$33.33
-- Recommended position: C$33.33
+- Risk-based position: C$104.28
+- Slot budget: C$22.22
+- Recommended position: C$22.22
 
 **LIVE Small Aggressive**
 - Target risk: C$8.00
-- Risk-based position: C$163.93
-- Slot budget: C$33.33
-- Recommended position: C$33.33
+- Risk-based position: C$111.24
+- Slot budget: C$22.22
+- Recommended position: C$22.22
 
 ## Execution note
 
 The signal is calculated after the daily bar is complete. Intended entry is the next market open.
-The stop shown is a reference based on the signal close. After a real fill, the practical stop reference is fill price minus 2.5×ATR from the signal bar.
+The monitored stop comes from the signal close and only rises after completed daily bars. A different fill price does not silently change the stop rule.
 
 This is a signal tool, not an automated broker connection.
