@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at_utc": "2026-10-15T23:33:57.958736+00:00",
+  "updated_at_utc": "2026-10-15T23:35:00+00:00",
   "events": [
     {
       "id": "ENTRY-COST-2026-10-14",
@@ -62,6 +62,36 @@
       "telegram_last_attempt_at_utc": "2026-10-15T20:35:06.748015+00:00",
       "telegram_alert_sent_at_utc": "2026-10-15T20:35:07.278699+00:00",
       "telegram_message_id": 7
+    },
+    {
+      "id": "ENTRY-WMT-2026-10-15",
+      "type": "ENTRY",
+      "symbol": "WMT",
+      "signal_date": "2026-10-15",
+      "effective": "next_market_open",
+      "signal_close_usd": 117.84,
+      "atr14": 2.5164,
+      "stop_usd": 111.5489,
+      "recommended_position_cad": 33.33,
+      "momentum10_pct": 13.025,
+      "score": 6.099456,
+      "created_at_utc": "2026-10-15T23:33:41.532260+00:00",
+      "telegram_alert_status": "pending"
+    },
+    {
+      "id": "ENTRY-UNH-2026-10-15",
+      "type": "ENTRY",
+      "symbol": "UNH",
+      "signal_date": "2026-10-15",
+      "effective": "next_market_open",
+      "signal_close_usd": 406.66,
+      "atr14": 11.6987,
+      "stop_usd": 377.4134,
+      "recommended_position_cad": 33.33,
+      "momentum10_pct": 11.353,
+      "score": 3.946333,
+      "created_at_utc": "2026-10-15T23:33:41.532260+00:00",
+      "telegram_alert_status": "pending"
     }
   ]
 }
