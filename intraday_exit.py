@@ -93,7 +93,10 @@ def main(catch_up=False):
     if in_session and not all(credentials()):
         errors.append("telegram_not_configured")
     changed = False
-    if in_session and confirmed_symbols and not api_key:
+    # An inconsistent legacy active signal may still be checked as a fail-safe, so keep the
+    # market-data dependency while any active strategy state exists.
+    active_strategy_symbols = [s for s,p in positions.items() if p.get("status") == "active"]
+    if in_session and (confirmed_symbols or active_strategy_symbols) and not api_key:
         errors.append("market_data_key_missing")
     if in_session and api_key:
         checked_count = 0
@@ -102,12 +105,14 @@ def main(catch_up=False):
                 continue
             holding = holdings.get(symbol)
             confirmed = bool(holding and holding.get("status") not in {"closed","exit_alert_awaiting_manual_sale"})
-            # Pending strategy signals are not positions. Never fetch/trigger stop data for them
-            # until the user confirms the purchase in portfolio_state.json.
-            if not confirmed:
+            # Pending strategy signals are recommendations, not positions. Never fetch/trigger
+            # stop data for them until the user confirms the purchase.
+            if pos.get("status") == "pending_entry" and not confirmed:
                 HEALTH["unconfirmed_signals_skipped"].append(symbol)
                 continue
-            if pos["status"] == "pending_entry":
+            # A legacy/inconsistent active signal without a holding is checked only as a
+            # theoretical fail-safe; notifications must never tell the user to sell it.
+            if pos["status"] == "pending_entry" and confirmed:
                 pos.update(status="active",activated_date=holding.get("entry_date"),
                            activated_at_utc=utc_now(),
                            entry_note="User-confirmed holding; broker fill is tracked from portfolio_state.json.")
@@ -145,6 +150,7 @@ def main(catch_up=False):
                 HEALTH["symbols"][symbol] = {"status":quote_status,"checked_at_utc":utc_now(),
                     "bar_datetime_ny":latest["datetime"],"bar_age_seconds":round(age),
                     "last_price_usd":latest["close"],"stop_usd":float(pos["stop_usd"]),
+                    "holding_confirmed":confirmed,
                     "recovery_gap_detected":missing_start or long_hole}
                 if quote_status != "ok":
                     errors.append(symbol + ":stale_or_gap")
@@ -166,7 +172,7 @@ def main(catch_up=False):
                     bar,stop = trigger
                     signal_id = pos.get("signal_id",f"ENTRY-{symbol}-{pos['signal_date']}")
                     event = {"id":f"EXIT-{signal_id}-{bar['datetime']}","type":"EXIT","symbol":symbol,
-                        "signal_id":signal_id,"holding_confirmed":True,
+                        "signal_id":signal_id,"holding_confirmed":confirmed,
                         "entry_time_known":fill_time is not None,"stop_usd":round(stop,4),
                         "trigger_bar_datetime_ny":bar["datetime"],"trigger_bar_low_usd":bar["low"],
                         "last_observed_close_usd":latest["close"],"original_signal_date":pos["signal_date"],
@@ -180,7 +186,8 @@ def main(catch_up=False):
                     del positions[symbol]
                 print(symbol + ": data=" + quote_status + "; exit=" + str(trigger is not None))
             except Exception as exc:
-                HEALTH["symbols"][symbol] = {"status":"error","error":type(exc).__name__}
+                HEALTH["symbols"][symbol] = {"status":"error","error":type(exc).__name__,
+                                             "holding_confirmed":confirmed}
                 errors.append(symbol + ":data_error")
                 print(symbol + ": market data unavailable",file=sys.stderr)
     HEALTH["unconfirmed_signals_skipped"] = sorted(set(HEALTH["unconfirmed_signals_skipped"]))
