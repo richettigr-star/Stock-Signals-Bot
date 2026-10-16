@@ -1,8 +1,8 @@
 # Stock Signals — Dashboard
 
-Snapshot UTC: 2026-10-16T15:15:43.956814+00:00
+Snapshot UTC: 2026-10-16T17:01:41.214180+00:00
 
-**Monitor as of this snapshot: ok**
+**Monitor as of this snapshot: STALE — monitoring unavailable**
 Last check UTC: 2026-10-16T15:15:43.400326+00:00.
 During the session, a last check older than 10 minutes means monitoring is unavailable, even if this saved snapshot says OK.
 Telegram: **configured** · Undelivered events: 0.
@@ -35,7 +35,7 @@ This chat is not continuously updating. Reload this GitHub page for the latest s
 
 ## Operational limits
 
-Polling target: 5 minutes during the regular exchange session. GitHub schedules and upstream data can be delayed.
+Polling target: 5 minutes inside an allocated GitHub session runner. Startup, handover and upstream data can fail or be delayed; inspect monitor_cadence.json for effective readings.
 Holidays and early closes use the XNYS calendar. Stops only rise from completed daily bars.
 Entry execution time is unknown for legacy fills; first-day monitoring assumes session open unless a precise execution timestamp is recorded.
 Corporate actions, trading halts and missing provider trades require reconciliation; a notification system is not a broker stop order.

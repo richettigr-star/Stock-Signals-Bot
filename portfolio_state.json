@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at_utc": "2026-10-16T15:15:43.956277+00:00",
+  "updated_at_utc": "2026-10-16T17:01:41.213817+00:00",
   "as_of_trade_date": "2026-10-15",
   "source": "User-confirmed transactions with observed provider quotes; no broker synchronization.",
   "account_currency": "CAD",
@@ -35,7 +35,7 @@
     "WMT"
   ],
   "telegram_status": "configured",
-  "exit_monitor_status": "ok",
+  "exit_monitor_status": "STALE — monitoring unavailable",
   "monitor_last_completed_at_utc": "2026-10-16T15:15:43.400326+00:00",
   "last_telegram_delivery_at_utc": "2026-10-15T23:35:35.935582+00:00"
 }
