@@ -1,13 +1,13 @@
 {
-  "started_at_utc": "2026-10-16T15:15:42.606430+00:00",
+  "started_at_utc": "2026-10-16T17:02:06.521644+00:00",
   "status": "ok",
   "symbols": {
     "COST": {
       "status": "ok",
-      "checked_at_utc": "2026-10-16T15:15:43.397706+00:00",
-      "bar_datetime_ny": "2026-10-16 11:14:00",
-      "bar_age_seconds": 103,
-      "last_price_usd": 989.23,
+      "checked_at_utc": "2026-10-16T17:02:07.529268+00:00",
+      "bar_datetime_ny": "2026-10-16 13:00:00",
+      "bar_age_seconds": 127,
+      "last_price_usd": 990.01,
       "stop_usd": 946.711,
       "holding_confirmed": true,
       "recovery_gap_detected": false
@@ -23,5 +23,7 @@
     "WMT"
   ],
   "notifications_ok": true,
-  "completed_at_utc": "2026-10-16T15:15:43.400326+00:00"
+  "completed_at_utc": "2026-10-16T17:02:07.541132+00:00",
+  "run_id": "38936467819",
+  "runtime": "github_session"
 }
