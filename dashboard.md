@@ -1,19 +1,19 @@
 # Stock Signals — Dashboard
 
-Snapshot UTC: 2026-10-16T20:17:08.462792+00:00
+Snapshot UTC: 2026-10-16T20:24:21.186835+00:00
 
 **Monitor as of this snapshot: ok**
-Last check UTC: 2026-10-16T20:17:07.581483+00:00.
+Last check UTC: 2026-10-16T20:21:09.330996+00:00.
 During the session, a last check older than 10 minutes means monitoring is unavailable, even if this saved snapshot says OK.
 Telegram: **configured** · Undelivered events: 0.
-Daily scan: ok · Last processed bar: 2026-10-15.
+Daily scan: ok · Last processed bar: 2026-10-16.
 
 Initial capital: C$ 100.00 · Invested cost: C$ 33.33 · Unallocated cash: C$ 66.67
 Realized P&L: C$ 0.00 · Closed trades: 0 · Wins: 0 · Losses: 0
 
 | Holding | Status | Entry USD | Last observed USD | Strategy stop USD | USD return since entry | Quote NY (status) |
 |---|---|---:|---:|---:|---:|---|
-| COST | active | 985.40 | 989.1900 | 946.7110 | +0.38% | 2026-10-16 15:59:00 (ok) |
+| COST | active | 985.40 | 989.1900 | 947.9740 | +0.38% | 2026-10-16 15:59:00 (ok) |
 
 EXIT is an alert, not a broker sale. Cash and realized P&L change only after confirmed execution.
 USD price return is not exact CAD P&L; share quantity, FX and fees are not yet recorded.
@@ -21,11 +21,14 @@ This chat is not continuously updating. Reload this GitHub page for the latest s
 
 ## Strategy signals without confirmed purchases
 
-- UNH: pending_entry; strategy stop USD 377.4134. No real holding confirmed.
-- WMT: pending_entry; strategy stop USD 111.5489. No real holding confirmed.
+- WMT: pending_entry; strategy stop USD 112.6691. No real holding confirmed.
+- XOM: pending_entry; strategy stop USD 169.9192. No real holding confirmed.
 
 ## Recent alerts
 
+- ENTRY XOM: 2026-10-16T20:24:19.213626+00:00 · delivery sent · ID ENTRY-XOM-2026-10-16.
+- ENTRY WMT: 2026-10-16T20:24:19.213569+00:00 · delivery sent · ID ENTRY-WMT-2026-10-16.
+- STOP_UPDATE COST: 2026-10-16T20:24:19.213491+00:00 · delivery sent · ID STOP_UPDATE-COST-2026-10-16.
 - ENTRY UNH: 2026-10-15T23:33:41.532260+00:00 · delivery sent · ID ENTRY-UNH-2026-10-15.
 - ENTRY WMT: 2026-10-15T23:33:41.532260+00:00 · delivery sent · ID ENTRY-WMT-2026-10-15.
 - STOP_UPDATE WMT: 2026-10-15T20:35:06.747285+00:00 · delivery sent · ID STOP_UPDATE-WMT-2026-10-15.
