@@ -1,9 +1,9 @@
 # Stock Signals — Dashboard
 
-Snapshot UTC: 2026-10-16T18:37:08.464800+00:00
+Snapshot UTC: 2026-10-16T18:42:08.337778+00:00
 
 **Monitor as of this snapshot: ok**
-Last check UTC: 2026-10-16T18:37:07.590947+00:00.
+Last check UTC: 2026-10-16T18:42:07.498669+00:00.
 During the session, a last check older than 10 minutes means monitoring is unavailable, even if this saved snapshot says OK.
 Telegram: **configured** · Undelivered events: 0.
 Daily scan: ok · Last processed bar: 2026-10-15.
@@ -13,7 +13,7 @@ Realized P&L: C$ 0.00 · Closed trades: 0 · Wins: 0 · Losses: 0
 
 | Holding | Status | Entry USD | Last observed USD | Strategy stop USD | USD return since entry | Quote NY (status) |
 |---|---|---:|---:|---:|---:|---|
-| COST | active | 985.40 | 991.9000 | 946.7110 | +0.66% | 2026-10-16 14:35:00 (ok) |
+| COST | active | 985.40 | 992.1000 | 946.7110 | +0.68% | 2026-10-16 14:40:00 (ok) |
 
 EXIT is an alert, not a broker sale. Cash and realized P&L change only after confirmed execution.
 USD price return is not exact CAD P&L; share quantity, FX and fees are not yet recorded.
