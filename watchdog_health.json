@@ -1,16 +1,12 @@
 {
-  "checked_at_utc": "2026-10-16T17:01:46.679467+00:00",
-  "status": "degraded",
+  "checked_at_utc": "2026-10-16T17:02:46.671959+00:00",
+  "status": "ok",
   "active_holdings": [
     "COST"
   ],
-  "problems": [
-    "monitor atrasado 106 min",
-    "COST: leitura atrasada ou ausente"
-  ],
+  "problems": [],
   "stale_after_seconds": 420,
   "last_alert_bucket": "20261016-13-0",
   "last_recovery_requested_at_utc": "2026-10-16T17:01:48.744581+00:00",
-  "last_alert_sent_at_utc": "2026-10-16T17:01:47.267861+00:00",
   "notifications_ok": true
 }
