@@ -41,7 +41,9 @@ def portfolio():
 
 def fresh_health():
     return {"completed_at_utc": (NOW - timedelta(minutes=4)).isoformat(), "status": "ok",
-            "symbols": {"COST": {"status": "ok", "holding_confirmed": True}}}
+            "notifications_ok": True,
+            "symbols": {"COST": {"status": "ok", "holding_confirmed": True,
+                                 "checked_at_utc": (NOW - timedelta(minutes=4)).isoformat()}}}
 
 
 class WatchdogTests(unittest.TestCase):
@@ -86,6 +88,24 @@ class WatchdogTests(unittest.TestCase):
         early = datetime(2026, 10, 16, 12, 0, tzinfo=timezone.utc)
         with patch.object(watchdog, "session_bounds", return_value=self.bounds()):
             self.assertEqual(watchdog.assess(early, {}, portfolio()), ("outside_session", []))
+
+    def test_fresh_heartbeat_does_not_hide_stale_symbol_reading(self):
+        health = fresh_health()
+        health["symbols"]["COST"]["checked_at_utc"] = (NOW - timedelta(minutes=8)).isoformat()
+        with patch.object(watchdog, "session_bounds", return_value=self.bounds()):
+            self.assertEqual(watchdog.assess(NOW, health, portfolio())[0], "degraded")
+
+    def test_fresh_heartbeat_does_not_hide_failed_notifications(self):
+        health = fresh_health()
+        health["notifications_ok"] = False
+        with patch.object(watchdog, "session_bounds", return_value=self.bounds()):
+            self.assertEqual(watchdog.assess(NOW, health, portfolio())[0], "degraded")
+
+    def test_invalid_heartbeat_timestamp_alerts_instead_of_crashing(self):
+        health = fresh_health()
+        health["completed_at_utc"] = "invalid"
+        with patch.object(watchdog, "session_bounds", return_value=self.bounds()):
+            self.assertEqual(watchdog.assess(NOW, health, portfolio())[0], "degraded")
 
 
 class MonitorScopeTests(unittest.TestCase):
@@ -147,35 +167,32 @@ class WorkflowConfigTests(unittest.TestCase):
     def workflow_text(self):
         return Path(".github/workflows/intraday-exits.yml").read_text(encoding="utf-8")
 
-    def test_intraday_schedule_uses_ten_minute_starts_and_new_york_timezone(self):
+    def test_schedules_are_recovery_triggers_with_new_york_timezone(self):
         text = self.workflow_text()
-        self.assertIn('cron: "27-57/10 9 * * 1-5"', text)
-        self.assertIn('cron: "7-57/10 10-15 * * 1-5"', text)
         self.assertEqual(text.count('timezone: "America/New_York"'), 2)
-        self.assertNotIn('/5 9-16', text)
+        self.assertIn("python action_runtime.py monitor", text)
+        self.assertNotIn("sleep 300", text)
 
-    def test_each_job_performs_two_scans_five_minutes_apart(self):
+    def test_monitor_and_daily_share_non_cancelling_queue(self):
         text = self.workflow_text()
-        self.assertEqual(text.count("run: python intraday_exit.py"), 2)
-        self.assertIn("run: sleep 300", text)
-        self.assertLess(text.index("Persist first scan immediately"),
-                        text.index("Wait five minutes before second scan"))
-        self.assertLess(text.index("Wait five minutes before second scan"),
-                        text.index("Second stop scan"))
+        daily = Path(".github/workflows/daily-signals.yml").read_text()
+        for config in (text, daily):
+            self.assertIn("group: stock-signal-state", config)
+            self.assertIn("cancel-in-progress: false", config)
+            self.assertIn("queue: max", config)
 
-    def test_first_scan_is_persisted_before_wait_to_prevent_duplicate_alerts(self):
-        text = self.workflow_text()
-        first_persist = text.index("Persist first scan immediately")
-        wait = text.index("Wait five minutes before second scan")
-        self.assertLess(first_persist, wait)
-        self.assertIn("signal_events.json", text[first_persist:wait])
-        self.assertIn("monitor_health.json", text[first_persist:wait])
-        self.assertIn("git push", text[first_persist:wait])
+    def test_watchdog_runs_without_the_trading_state_lock(self):
+        text = Path(".github/workflows/monitor-watchdog.yml").read_text()
+        self.assertIn("group: stock-monitor-watchdog", text)
+        self.assertNotIn("group: stock-signal-state", text)
+        self.assertIn("python action_runtime.py watchdog", text)
 
-    def test_intraday_ci_runs_all_regressions_and_has_room_for_sleep(self):
+    def test_intraday_ci_runs_all_regressions_and_has_room_for_handover(self):
         text = self.workflow_text()
         self.assertIn("python -m unittest -q", text)
-        self.assertIn("timeout-minutes: 20", text)
+        self.assertIn("timeout-minutes: 355", text)
+        self.assertIn("actions: write", text)
+        self.assertIn("actions/upload-artifact@v4", text)
 
 
 if __name__ == "__main__":

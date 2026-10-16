@@ -13,6 +13,7 @@ permissions:
 concurrency:
   group: stock-signal-state
   cancel-in-progress: false
+  queue: max
 jobs:
   scan:
     runs-on: ubuntu-latest

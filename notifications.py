@@ -56,7 +56,7 @@ def send(event):
     event["telegram_alert_status"] = "failed"
     return False
 
-def deliver(payload):
+def deliver(payload, on_update=None):
     now = now_utc()
     events = payload.get("events", [])
     for event in events:
@@ -84,6 +84,8 @@ def deliver(payload):
         if last_attempt and now - last_attempt < timedelta(minutes=2):
             continue
         send(event)
+        if on_update:
+            on_update(payload)
     payload["updated_at_utc"] = utc_now()
     return not any(e.get("telegram_alert_status") in {"failed", "not_configured", "pending"} for e in events
                    if e.get("type") in {"ENTRY", "STOP_UPDATE", "EXIT", "MONITOR_HEALTH"})

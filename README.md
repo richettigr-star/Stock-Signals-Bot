@@ -86,7 +86,13 @@ A Telegram `STOP UPDATE` alert is sent only when the stop actually increases.
 
 ## Intraday exit monitoring
 
-During the regular US session, the intraday workflow checks active signal stops approximately every 5 minutes.
+During the regular US session, one GitHub-hosted runner checks active signal stops every 300 seconds. Processing time is included in that interval rather than added to it. Failed readings do not cancel the next scan. Minute data older than three minutes is degraded.
+
+The worker runs for at most 330 minutes, below GitHub's six-hour job limit. Before that budget expires it requests a successor with the repository's temporary `GITHUB_TOKEN`. Both workers and the daily scanner share the same non-cancelling state queue. Recovery schedules provide additional starts; they are not the polling clock. A separate long-running watchdog checks the committed heartbeat every minute, retries Telegram alerts and requests recovery when readings stop.
+
+This improves continuity **after a runner starts**. GitHub can delay or drop scheduled starts, dispatches can fail, runners can be unavailable, and a platform-wide outage affects both monitor and watchdog. A GitHub-only design cannot guarantee unattended startup or five-minute availability. No server or external scheduler is used.
+
+See [GITHUB_RUNTIME.md](GITHUB_RUNTIME.md) for architecture, rollout and evidence requirements. `python verify_cadence.py` checks actual fresh, advancing quote observations recorded in `monitor_cadence.json`. A successful workflow or three configured cron entries is not cadence evidence.
 
 It uses 1-minute bars and creates an `EXIT` event when a bar trades at or below the stored stop.
 
@@ -131,6 +137,7 @@ The system maintains:
 - `report.md` — human-readable daily report
 - `signal_state.json` — strategy-only memory of pending/active signals and current stops
 - `signal_events.json` — ENTRY, STOP_UPDATE and EXIT event history
+- `monitor_cadence.json` — bounded history of actual quote observations, failures, run IDs and elapsed intervals
 
 ## Manual Wealthsimple execution
 

@@ -6,7 +6,7 @@ from notifications import deliver
 
 def main():
     events = load_json("signal_events.json", {"version": 1, "events": []})
-    ok = deliver(events)
+    ok = deliver(events, on_update=lambda payload: save_json("signal_events.json", payload))
     save_json("signal_events.json", events)
     return 0 if ok else 1
 

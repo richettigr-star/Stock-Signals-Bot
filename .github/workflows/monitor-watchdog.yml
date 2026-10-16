@@ -1,49 +1,53 @@
 name: Intraday Monitor Watchdog
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Intraday Exit Signals"]
+    types: [requested]
+    branches: [main]
   schedule:
-    # Run between the two-scan monitor jobs. The monitor starts every 10 min
-    # and performs scans about 5 min apart. This watchdog intentionally does
-    # not run on push, avoiding false stale alerts while a fresh monitor run
-    # is simultaneously starting and persisting its first heartbeat.
-    - cron: "35-55/10 9 * * 1-5"
+    - cron: "29,49 9 * * 1-5"
       timezone: "America/New_York"
-    - cron: "5-55/10 10-15 * * 1-5"
+    - cron: "3 10-16 * * 1-5"
       timezone: "America/New_York"
 permissions:
   contents: write
+  actions: write
 concurrency:
   group: stock-monitor-watchdog
   cancel-in-progress: false
 jobs:
   watchdog:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 355
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
       - name: Install dependencies
         run: pip install -r requirements.txt
-      - name: Run reliability regressions
-        run: python -m unittest -q test_reliability.py
-      - name: Check monitor heartbeat and alert
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python monitor_watchdog.py
-      - name: Persist watchdog health
-        if: always()
+      - name: Run offline regression tests
+        run: python -m unittest -q
+      - name: Configure checkpoint identity
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if [ -f watchdog_health.json ]; then git add watchdog_health.json; fi
-          if ! git diff --cached --quiet; then
-            git commit -m "Update monitor watchdog health"
-            git pull --rebase
-            git push
-          fi
+      - name: Supervise remote heartbeat each minute independently of monitor lock
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GH_TOKEN: ${{ github.token }}
+          PYTHONUNBUFFERED: "1"
+        run: python action_runtime.py watchdog
+      - name: Preserve watchdog evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: watchdog-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 7
+          path: watchdog_health.json

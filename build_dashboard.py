@@ -84,7 +84,7 @@ def main():
     if not events:
         lines.append("No recorded alerts.")
     lines += ["","## Operational limits","",
-              "Polling target: 5 minutes during the regular exchange session. GitHub schedules and upstream data can be delayed.",
+              "Polling target: 5 minutes inside an allocated GitHub session runner. Startup, handover and upstream data can fail or be delayed; inspect monitor_cadence.json for effective readings.",
               "Holidays and early closes use the XNYS calendar. Stops only rise from completed daily bars.",
               "Entry execution time is unknown for legacy fills; first-day monitoring assumes session open unless a precise execution timestamp is recorded.",
               "Corporate actions, trading halts and missing provider trades require reconciliation; a notification system is not a broker stop order.",""]

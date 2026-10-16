@@ -62,7 +62,7 @@ def applicable_stop(pos, stamp):
     history = [h for h in dated_stops(pos) if parse_time(h["effective_from_utc"]) <= stamp]
     return float(history[-1]["stop_usd"]) if history else None
 
-def main(catch_up=False):
+def main(catch_up=False, defer_notifications=False):
     now = now_utc()
     previous = load_json("monitor_health.json",{})
     HEALTH.clear()
@@ -146,7 +146,7 @@ def main(catch_up=False):
                 today_bars = [b for b in recent if bar_time(b).astimezone(NY).date() == now.astimezone(NY).date()]
                 if today_bars and start < bounds[0] and (bar_time(today_bars[0])-bounds[0]).total_seconds() > 600:
                     long_hole = True
-                quote_status = "ok" if 0 <= age <= 600 and not missing_start and not long_hole else "stale_or_gap"
+                quote_status = "ok" if 0 <= age <= 180 and not missing_start and not long_hole else "stale_or_gap"
                 HEALTH["symbols"][symbol] = {"status":quote_status,"checked_at_utc":utc_now(),
                     "bar_datetime_ny":latest["datetime"],"bar_age_seconds":round(age),
                     "last_price_usd":latest["close"],"stop_usd":float(pos["stop_usd"]),
@@ -197,11 +197,14 @@ def main(catch_up=False):
         append_event(events,{"id":"MONITOR-HEALTH-"+utc_now(),"type":"MONITOR_HEALTH",
                      "component":"monitor","detail":"Leitura incompleta ou atrasada: " + ", ".join(errors),
                      "created_at_utc":utc_now(),"telegram_alert_status":"pending"})
+    save_json("signal_events.json",events)
     if changed:
         state["updated_at_utc"] = utc_now()
         save_json("signal_state.json",state)
     # Retry ENTRY/STOP_UPDATE too; do not wait until the next daily run.
-    save_json("signal_events.json",events)
+    if defer_notifications:
+        HEALTH["notifications_ok"] = None
+        return 0 if not errors else 1
     delivered = deliver(events)
     save_json("signal_events.json",events)
     HEALTH["notifications_ok"] = delivered
@@ -209,10 +212,10 @@ def main(catch_up=False):
         HEALTH["status"] = "degraded"
     return 0 if not errors and delivered else 1
 
-def run(catch_up=False):
+def run(catch_up=False, defer_notifications=False):
     result = 1
     try:
-        result = main(catch_up=catch_up)
+        result = main(catch_up=catch_up, defer_notifications=defer_notifications)
     except Exception as exc:
         HEALTH.update(status="error",error=type(exc).__name__)
         print("Monitor failed: " + type(exc).__name__,file=sys.stderr)
@@ -222,4 +225,4 @@ def run(catch_up=False):
     return result
 
 if __name__ == "__main__":
-    raise SystemExit(run())
+    raise SystemExit(run(defer_notifications="--defer-notifications" in sys.argv))
