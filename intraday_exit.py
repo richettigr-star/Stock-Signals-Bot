@@ -67,7 +67,8 @@ def main(catch_up=False):
     previous = load_json("monitor_health.json",{})
     HEALTH.clear()
     HEALTH.update(started_at_utc=utc_now(),status="running",symbols={},
-                  telegram_configured=all(credentials()),target_interval_seconds=300)
+                  telegram_configured=all(credentials()),target_interval_seconds=300,
+                  active_holdings=[],unconfirmed_signals_skipped=[])
     state = load_json("signal_state.json",required=True)
     portfolio = load_json("portfolio_state.json",required=True)
     events = load_json("signal_events.json",{"version":1,"events":[]})
@@ -76,23 +77,41 @@ def main(catch_up=False):
     api_key = __import__("os").getenv("TWELVE_DATA_API_KEY","").strip()
     in_session = monitor_window(now) or (catch_up and completed_scan_day(now) is not None)
     errors = []
+
+    confirmed_symbols = []
     for symbol,holding in holdings.items():
-        if holding.get("status") not in {"closed","exit_alert_awaiting_manual_sale"} and symbol not in positions:
+        if holding.get("status") in {"closed","exit_alert_awaiting_manual_sale"}:
+            continue
+        confirmed_symbols.append(symbol)
+        pos = positions.get(symbol)
+        if not pos:
             errors.append(symbol + ":confirmed_holding_not_monitored")
+        elif pos.get("status") not in {"active","pending_entry"}:
+            errors.append(symbol + ":confirmed_holding_state_invalid")
+    HEALTH["active_holdings"] = sorted(confirmed_symbols)
+
     if in_session and not all(credentials()):
         errors.append("telegram_not_configured")
     changed = False
-    if in_session and not api_key:
+    if in_session and confirmed_symbols and not api_key:
         errors.append("market_data_key_missing")
     if in_session and api_key:
         checked_count = 0
         for symbol,pos in list(positions.items()):
-            holding = holdings.get(symbol)
-            confirmed = bool(holding and holding.get("status") not in {"closed","exit_alert_awaiting_manual_sale"})
-            # A strategy signal is not a holding. It may be monitored theoretically,
-            # but it must never become an active holding without user confirmation.
             if pos.get("status") not in {"active","pending_entry"}:
                 continue
+            holding = holdings.get(symbol)
+            confirmed = bool(holding and holding.get("status") not in {"closed","exit_alert_awaiting_manual_sale"})
+            # Pending strategy signals are not positions. Never fetch/trigger stop data for them
+            # until the user confirms the purchase in portfolio_state.json.
+            if not confirmed:
+                HEALTH["unconfirmed_signals_skipped"].append(symbol)
+                continue
+            if pos["status"] == "pending_entry":
+                pos.update(status="active",activated_date=holding.get("entry_date"),
+                           activated_at_utc=utc_now(),
+                           entry_note="User-confirmed holding; broker fill is tracked from portfolio_state.json.")
+                changed = True
             effective_open = next_open(pos["signal_date"])
             if now < effective_open:
                 continue
@@ -129,10 +148,6 @@ def main(catch_up=False):
                     "recovery_gap_detected":missing_start or long_hole}
                 if quote_status != "ok":
                     errors.append(symbol + ":stale_or_gap")
-                if pos["status"] == "pending_entry" and confirmed:
-                    pos.update(status="active",activated_date=holding.get("entry_date"),
-                               activated_at_utc=utc_now(),
-                               entry_note="User-confirmed holding; broker fill is tracked from portfolio_state.json.")
                 trigger = None
                 fill_time = parse_time(pos.get("actual_fill",{}).get("execution_time"))
                 for bar in recent:
@@ -151,7 +166,7 @@ def main(catch_up=False):
                     bar,stop = trigger
                     signal_id = pos.get("signal_id",f"ENTRY-{symbol}-{pos['signal_date']}")
                     event = {"id":f"EXIT-{signal_id}-{bar['datetime']}","type":"EXIT","symbol":symbol,
-                        "signal_id":signal_id,"holding_confirmed":confirmed,
+                        "signal_id":signal_id,"holding_confirmed":True,
                         "entry_time_known":fill_time is not None,"stop_usd":round(stop,4),
                         "trigger_bar_datetime_ny":bar["datetime"],"trigger_bar_low_usd":bar["low"],
                         "last_observed_close_usd":latest["close"],"original_signal_date":pos["signal_date"],
@@ -168,7 +183,8 @@ def main(catch_up=False):
                 HEALTH["symbols"][symbol] = {"status":"error","error":type(exc).__name__}
                 errors.append(symbol + ":data_error")
                 print(symbol + ": market data unavailable",file=sys.stderr)
-    status = ("degraded" if errors else ("ok" if positions or changed else "no_signals")) if in_session else "outside_session"
+    HEALTH["unconfirmed_signals_skipped"] = sorted(set(HEALTH["unconfirmed_signals_skipped"]))
+    status = ("degraded" if errors else ("ok" if confirmed_symbols else "no_active_holdings")) if in_session else "outside_session"
     HEALTH["status"] = status
     if errors and previous.get("status") != "degraded":
         append_event(events,{"id":"MONITOR-HEALTH-"+utc_now(),"type":"MONITOR_HEALTH",
