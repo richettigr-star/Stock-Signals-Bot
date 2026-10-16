@@ -1,9 +1,27 @@
 {
-  "started_at_utc": "2026-10-16T00:24:58.113996+00:00",
-  "status": "outside_session",
-  "symbols": {},
+  "started_at_utc": "2026-10-16T14:54:20.940721+00:00",
+  "status": "ok",
+  "symbols": {
+    "COST": {
+      "status": "ok",
+      "checked_at_utc": "2026-10-16T14:54:21.944634+00:00",
+      "bar_datetime_ny": "2026-10-16 10:52:00",
+      "bar_age_seconds": 141,
+      "last_price_usd": 984.93,
+      "stop_usd": 946.711,
+      "holding_confirmed": true,
+      "recovery_gap_detected": false
+    }
+  },
   "telegram_configured": true,
   "target_interval_seconds": 300,
+  "active_holdings": [
+    "COST"
+  ],
+  "unconfirmed_signals_skipped": [
+    "UNH",
+    "WMT"
+  ],
   "notifications_ok": true,
-  "completed_at_utc": "2026-10-16T00:24:58.697611+00:00"
+  "completed_at_utc": "2026-10-16T14:54:21.973190+00:00"
 }
