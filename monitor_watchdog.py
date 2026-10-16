@@ -20,6 +20,8 @@ def assess(now, health, portfolio):
     if not bounds:
         return "outside_session", []
     open_time, close_time = bounds
+    if now < open_time:
+        return "outside_session", []
     if now < open_time + timedelta(seconds=OPEN_GRACE_SECONDS):
         return "opening_grace", []
     if now > close_time + timedelta(seconds=POST_CLOSE_GRACE_SECONDS):
