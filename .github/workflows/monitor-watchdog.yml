@@ -1,0 +1,46 @@
+name: Intraday Monitor Watchdog
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["monitor_watchdog.py", "test_reliability.py", ".github/workflows/monitor-watchdog.yml"]
+  schedule:
+    - cron: "11-56/15 9-16 * * 1-5"
+      timezone: "America/New_York"
+permissions:
+  contents: write
+concurrency:
+  group: stock-monitor-watchdog
+  cancel-in-progress: false
+jobs:
+  watchdog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run reliability regressions
+        run: python -m unittest -q test_reliability.py
+      - name: Check monitor heartbeat and alert
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python monitor_watchdog.py
+      - name: Persist watchdog health
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -f watchdog_health.json ]; then git add watchdog_health.json; fi
+          if ! git diff --cached --quiet; then
+            git commit -m "Update monitor watchdog health"
+            git pull --rebase
+            git push
+          fi
