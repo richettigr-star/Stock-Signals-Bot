@@ -85,7 +85,7 @@ class WatchdogTests(unittest.TestCase):
     def test_outside_session_does_not_false_alarm(self):
         early = datetime(2026, 10, 16, 12, 0, tzinfo=timezone.utc)
         with patch.object(watchdog, "session_bounds", return_value=self.bounds()):
-            self.assertEqual(watchdog.assess(early, {}, portfolio()), ("opening_grace", []))
+            self.assertEqual(watchdog.assess(early, {}, portfolio()), ("outside_session", []))
 
 
 class MonitorScopeTests(unittest.TestCase):
