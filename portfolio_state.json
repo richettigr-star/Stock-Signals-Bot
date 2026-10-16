@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at_utc": "2026-10-16T14:54:47.033614+00:00",
+  "updated_at_utc": "2026-10-16T14:55:10.533487+00:00",
   "as_of_trade_date": "2026-10-15",
   "source": "User-confirmed transactions with observed provider quotes; no broker synchronization.",
   "account_currency": "CAD",
@@ -36,6 +36,6 @@
   ],
   "telegram_status": "configured",
   "exit_monitor_status": "ok",
-  "monitor_last_completed_at_utc": "2026-10-16T14:54:46.499608+00:00",
+  "monitor_last_completed_at_utc": "2026-10-16T14:55:09.863020+00:00",
   "last_telegram_delivery_at_utc": "2026-10-15T23:35:35.935582+00:00"
 }

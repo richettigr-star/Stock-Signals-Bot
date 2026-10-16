@@ -1,12 +1,12 @@
 {
-  "started_at_utc": "2026-10-16T14:54:45.767420+00:00",
+  "started_at_utc": "2026-10-16T14:55:08.856963+00:00",
   "status": "ok",
   "symbols": {
     "COST": {
       "status": "ok",
-      "checked_at_utc": "2026-10-16T14:54:46.479754+00:00",
+      "checked_at_utc": "2026-10-16T14:55:09.861808+00:00",
       "bar_datetime_ny": "2026-10-16 10:52:00",
-      "bar_age_seconds": 166,
+      "bar_age_seconds": 189,
       "last_price_usd": 984.93,
       "stop_usd": 946.711,
       "holding_confirmed": true,
@@ -23,5 +23,5 @@
     "WMT"
   ],
   "notifications_ok": true,
-  "completed_at_utc": "2026-10-16T14:54:46.499608+00:00"
+  "completed_at_utc": "2026-10-16T14:55:09.863020+00:00"
 }
