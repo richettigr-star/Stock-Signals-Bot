@@ -1,8 +1,8 @@
 # Stock Signals — Dashboard
 
-Snapshot UTC: 2026-10-16T01:38:05.764166+00:00
+Snapshot UTC: 2026-10-16T14:53:26.709855+00:00
 
-**Monitor as of this snapshot: outside_session**
+**Monitor as of this snapshot: STALE — monitoring unavailable**
 Last check UTC: 2026-10-16T00:24:58.697611+00:00.
 During the session, a last check older than 10 minutes means monitoring is unavailable, even if this saved snapshot says OK.
 Telegram: **configured** · Undelivered events: 0.
