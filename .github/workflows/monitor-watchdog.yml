@@ -1,11 +1,14 @@
 name: Intraday Monitor Watchdog
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: ["monitor_watchdog.py", "test_reliability.py", ".github/workflows/monitor-watchdog.yml"]
   schedule:
-    - cron: "11-56/15 9-16 * * 1-5"
+    # Run between the two-scan monitor jobs. The monitor starts every 10 min
+    # and performs scans about 5 min apart. This watchdog intentionally does
+    # not run on push, avoiding false stale alerts while a fresh monitor run
+    # is simultaneously starting and persisting its first heartbeat.
+    - cron: "35-55/10 9 * * 1-5"
+      timezone: "America/New_York"
+    - cron: "5-55/10 10-15 * * 1-5"
       timezone: "America/New_York"
 permissions:
   contents: write
