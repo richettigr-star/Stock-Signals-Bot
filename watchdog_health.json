@@ -1,0 +1,11 @@
+{
+  "checked_at_utc": "2026-10-16T14:57:00.551055+00:00",
+  "status": "ok",
+  "active_holdings": [
+    "COST"
+  ],
+  "problems": [],
+  "stale_after_seconds": 720,
+  "last_alert_bucket": null,
+  "notifications_ok": true
+}
