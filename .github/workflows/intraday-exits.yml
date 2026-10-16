@@ -5,7 +5,8 @@ on:
     branches: [main]
     paths: ["*.py", "requirements.txt", ".github/workflows/intraday-exits.yml"]
   schedule:
-    - cron: "3-58/5 13-22 * * 1-5"
+    - cron: "7-57/5 9-16 * * 1-5"
+      timezone: "America/New_York"
 permissions:
   contents: write
 concurrency:
@@ -26,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
       - name: Run offline regression tests
-        run: python -m unittest -q test_monitor.py
+        run: python -m unittest -q
       - name: Monitor stops and deliver pending alerts
         env:
           TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
