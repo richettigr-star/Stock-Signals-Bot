@@ -55,4 +55,4 @@ The cadence checker reports only its recorded window. It rejects repeated quotes
 
 ## Validation status
 
-Local offline tests passed during implementation. No real cadence, unattended bootstrap, Telegram delivery or runner handover is established by offline tests. Fill this section with actual GitHub run URLs and observation timestamps after rollout; do not replace missing evidence with an inferred PASS.
+Local and GitHub CI suites passed all 84 tests. Live observations at 13:02, 13:07 and 13:12 NY on 2026-10-16 passed the effective-cadence check for that approximately ten-minute window. The independent watchdog was healthy and a real stale-heartbeat Telegram health alert was accepted during startup. See [the validation report](INTRADAY_VALIDATION_2026-10-16.md) for run URLs and the retained evidence. Unattended bootstrap, live budget-expiry handover, platform-outage recovery and device delivery remain unverified.

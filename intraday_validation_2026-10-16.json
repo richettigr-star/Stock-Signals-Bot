@@ -1,0 +1,134 @@
+{
+  "implementation_commit": "50a9adbbcd430b3ea04948cbcd0a438287f3c6c8",
+  "ci": {
+    "run_id": 38936467896,
+    "tests_passed": 84,
+    "compilation": "passed",
+    "url": "https://github.com/richettigr-star/Stock-Signals-Bot/actions/runs/38936467896"
+  },
+  "observed_at_utc": "2026-10-16 17:13:05 UTC",
+  "cadence_assessment": {
+    "status": "observed_window_pass",
+    "date_ny": "2026-10-16",
+    "samples": 3,
+    "effective_streak": 3,
+    "longest_effective_streak": 3,
+    "effective_streak_span_seconds": 599.997,
+    "failed_or_repeated_readings": 0,
+    "gaps_over_target_seconds": [],
+    "last_observation_age_seconds": 57.346,
+    "scope": "Recorded window only; does not prove unattended session startup or future availability."
+  },
+  "monitor_cadence": {
+    "version": 1,
+    "samples": [
+      {
+        "started_at_utc": "2026-10-16T17:02:06.521644+00:00",
+        "completed_at_utc": "2026-10-16T17:02:07.541132+00:00",
+        "run_id": "38936467819",
+        "effective": true,
+        "symbols": {
+          "COST": {
+            "bar_at_utc": "2026-10-16T17:00:00+00:00",
+            "status": "ok",
+            "confirmed": true,
+            "bar_age_seconds": 127
+          }
+        }
+      },
+      {
+        "started_at_utc": "2026-10-16T17:07:06.617518+00:00",
+        "completed_at_utc": "2026-10-16T17:07:07.681126+00:00",
+        "run_id": "38936467819",
+        "effective": true,
+        "symbols": {
+          "COST": {
+            "bar_at_utc": "2026-10-16T17:05:00+00:00",
+            "status": "ok",
+            "confirmed": true,
+            "bar_age_seconds": 127
+          }
+        }
+      },
+      {
+        "started_at_utc": "2026-10-16T17:12:06.606340+00:00",
+        "completed_at_utc": "2026-10-16T17:12:07.538326+00:00",
+        "run_id": "38936467819",
+        "effective": true,
+        "symbols": {
+          "COST": {
+            "bar_at_utc": "2026-10-16T17:10:00+00:00",
+            "status": "ok",
+            "confirmed": true,
+            "bar_age_seconds": 127
+          }
+        }
+      }
+    ]
+  },
+  "monitor_health": {
+    "started_at_utc": "2026-10-16T17:12:06.606340+00:00",
+    "status": "ok",
+    "symbols": {
+      "COST": {
+        "status": "ok",
+        "checked_at_utc": "2026-10-16T17:12:07.536423+00:00",
+        "bar_datetime_ny": "2026-10-16 13:10:00",
+        "bar_age_seconds": 127,
+        "last_price_usd": 990.91,
+        "stop_usd": 946.711,
+        "holding_confirmed": true,
+        "recovery_gap_detected": false
+      }
+    },
+    "telegram_configured": true,
+    "target_interval_seconds": 300,
+    "active_holdings": [
+      "COST"
+    ],
+    "unconfirmed_signals_skipped": [
+      "UNH",
+      "WMT"
+    ],
+    "notifications_ok": true,
+    "completed_at_utc": "2026-10-16T17:12:07.538326+00:00",
+    "run_id": "38936467819",
+    "runtime": "github_session"
+  },
+  "watchdog_health": {
+    "checked_at_utc": "2026-10-16T17:11:46.553046+00:00",
+    "status": "ok",
+    "active_holdings": [
+      "COST"
+    ],
+    "problems": [],
+    "stale_after_seconds": 420,
+    "last_alert_bucket": "20261016-13-0",
+    "last_recovery_requested_at_utc": "2026-10-16T17:01:48.744581+00:00",
+    "notifications_ok": true
+  },
+  "positions": {
+    "COST": {
+      "status": "active",
+      "stop_usd": 946.711
+    },
+    "WMT": {
+      "status": "pending_entry",
+      "stop_usd": 111.5489
+    },
+    "UNH": {
+      "status": "pending_entry",
+      "stop_usd": 377.4134
+    }
+  },
+  "confirmed_holdings": [
+    "COST"
+  ],
+  "pending_notifications": 0,
+  "unverified": [
+    "unattended_next_session_start",
+    "live_budget_expiry_handover",
+    "platform_outage_recovery",
+    "device_delivery"
+  ]
+}
