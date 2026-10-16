@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Stock Signals — Dashboard</title>
+  <style>
+    :root { font-family: system-ui, sans-serif; color: #172d3d; background: #f3f6f8; }
+    body { margin: 0; padding: 32px 20px; }
+    main { max-width: 1120px; margin: auto; }
+    h1 { margin-bottom: 8px; font-size: clamp(26px, 5vw, 40px); }
+    h2 { font-size: 20px; }
+    p { line-height: 1.6; }
+    a { color: #096aaf; }
+    button { background: #155c55; color: white; border: 0; border-radius: 8px; padding: 12px 18px; cursor: pointer; font: inherit; }
+    button:disabled { opacity: .6; }
+    section, .card { background: white; border: 1px solid #dce4ea; border-radius: 12px; padding: 20px; margin: 18px 0; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    .card { margin: 0; }
+    .card strong { display: block; font-size: 27px; margin-top: 8px; }
+    .muted { color: #536777; font-size: 14px; }
+    .notice { padding: 16px; border-radius: 8px; background: #e6f3ed; border-left: 4px solid #247453; }
+    .warning { background: #fff0d6; border-color: #a25e00; }
+    .error { background: #ffe9e8; border-color: #b4312d; }
+    .table-wrap { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; text-align: left; }
+    th, td { padding: 12px 10px; border-bottom: 1px solid #dce4ea; white-space: nowrap; }
+    th { font-size: 13px; color: #536777; }
+    li { margin: 10px 0; line-height: 1.5; }
+    code { overflow-wrap: anywhere; }
+    @media (prefers-color-scheme: dark) {
+      :root { color: #e6eef3; background: #101b24; }
+      section, .card { background: #182833; border-color: #314652; }
+      .muted, th { color: #adc0cb; }
+      a { color: #80c6ff; }
+      td, th { border-color: #314652; }
+      .notice { background: #143f32; }
+      .warning { background: #493615; }
+      .error { background: #4c2525; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="muted">STOCK SIGNALS BOT · DADOS PÚBLICOS DO REPOSITÓRIO</p>
+    <h1>Carteira e monitor intraday</h1>
+    <p>Posições confirmadas, sinais e evidências de monitoramento.</p>
+    <button id="refresh" type="button">Atualizar dados</button>
+    <p id="loaded" class="muted">Consultando o estado atual do bot…</p>
+    <p id="fetch-status" class="notice" role="status">Carregando dados; saúde ainda não verificada.</p>
+  </header>
+  <div id="content" hidden>
+    <div class="cards">
+      <div class="card">Capital inicial<strong id="capital"></strong></div>
+      <div class="card">Custo investido<strong id="invested"></strong></div>
+      <div class="card">Capital não alocado<strong id="cash"></strong></div>
+      <div class="card">Resultado realizado<strong id="realized"></strong></div>
+    </div>
+    <section aria-labelledby="health-title">
+      <h2 id="health-title">Saúde operacional</h2>
+      <p id="heartbeat" class="notice"></p>
+      <p id="monitor"></p><p id="watchdog"></p><p id="telegram"></p><p id="cadence"></p><p id="daily"></p>
+      <p class="muted">“OK” descreve as leituras registradas. Não garante disponibilidade futura nem chegada da notificação ao aparelho. Heartbeats antigos recebem aviso; fora da sessão, fins de semana e feriados, uma pausa pode ser esperada.</p>
+    </section>
+    <section aria-labelledby="holdings-title">
+      <h2 id="holdings-title">Posições com compra confirmada</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Ativo</th><th>Estado</th><th>Entrada USD</th><th>Última cotação USD</th><th>Stop USD</th><th>Variação USD</th><th>Cotação NY</th></tr></thead>
+        <tbody id="holdings"></tbody>
+      </table></div>
+      <p class="muted">EXIT é um alerta; a venda precisa ser executada e confirmada manualmente. Variação em USD não equivale ao resultado líquido em CAD. Dados confirmados pelo usuário, sem sincronização com corretora.</p>
+    </section>
+    <section><h2>Sinais sem compra confirmada</h2><ul id="unconfirmed"></ul></section>
+    <section><h2>Alertas recentes</h2><p id="duplicates"></p><ul id="events"></ul></section>
+  </div>
+  <footer>
+    <p class="muted">Atualização automática a cada 2 minutos. O bot busca cotações a cada 5 minutos quando o runner está ativo. Todas as leituras de uma atualização usam o mesmo commit público; nenhum token é necessário.</p>
+    <p><a href="https://github.com/richettigr-star/Stock-Signals-Bot/actions">Execuções e testes</a> · <a id="source" href="https://github.com/richettigr-star/Stock-Signals-Bot/blob/main/dashboard.md">Snapshot no repositório</a></p>
+  </footer>
+</main>
+<script>
+  const repository = 'richettigr-star/Stock-Signals-Bot';
+  const files = ['portfolio_state', 'monitor_health', 'watchdog_health', 'signal_state', 'signal_events', 'monitor_cadence', 'daily_health'];
+  let snapshot = null;
+  let loading = false;
+  const element = id => document.getElementById(id);
+  const text = (id, value) => { element(id).textContent = value; };
+  const amount = value => Number.isFinite(value) ? value.toFixed(2) : 'indisponível';
+  const cad = value => Number.isFinite(value) ? new Intl.NumberFormat('pt-BR', {style: 'currency', currency: 'CAD'}).format(value) : 'indisponível';
+  const timestamp = value => value && Number.isFinite(Date.parse(value)) ? new Intl.DateTimeFormat('pt-BR', {dateStyle: 'short', timeStyle: 'medium', timeZone: 'America/Toronto'}).format(new Date(value)) + ' Toronto' : 'não registrado';
+  const age = value => value && Number.isFinite(Date.parse(value)) ? (Date.now() - Date.parse(value)) / 1000 : null;
+  const notice = (id, value, kind = '') => { text(id, value); element(id).className = 'notice ' + kind; };
+
+  function list(id, values) {
+    element(id).replaceChildren(...values.map(value => {
+      const item = document.createElement('li');
+      item.textContent = value;
+      return item;
+    }));
+  }
+
+  function render() {
+    const {portfolio_state: portfolio, monitor_health: health, watchdog_health: watchdog, signal_state: state, signal_events: outbox, monitor_cadence: cadence, daily_health: daily} = snapshot;
+    const holdings = Object.entries(portfolio.holdings).filter(([, holding]) => holding.status !== 'closed');
+    const events = outbox.events;
+    const pending = events.filter(event => !['sent', 'skipped_stale', 'skipped_superseded'].includes(event.telegram_alert_status));
+    text('capital', cad(portfolio.initial_capital_cad));
+    text('invested', cad(portfolio.invested_cost_cad));
+    text('cash', cad(portfolio.unallocated_capital_cad));
+    text('realized', cad(portfolio.realized_pnl_cad));
+    const heartbeatAge = age(health.completed_at_utc);
+    const watchdogAge = age(watchdog.checked_at_utc);
+    if (heartbeatAge === null || heartbeatAge < 0) {
+      notice('heartbeat', 'Heartbeat ausente ou inválido — monitoramento não comprovado.', 'error');
+    } else if (heartbeatAge > 420) {
+      notice('heartbeat', `Heartbeat antigo: ${Math.floor(heartbeatAge / 60)} min. A leitura salva não comprova proteção agora; verifique a sessão e as execuções.`, 'warning');
+    } else if (health.status !== 'ok' || health.notifications_ok !== true || watchdog.status !== 'ok' || watchdog.notifications_ok !== true || watchdogAge === null || watchdogAge < 0 || watchdogAge > 420) {
+      notice('heartbeat', 'Há dados degradados, não confirmados ou watchdog atrasado. Consulte os detalhes abaixo.', 'warning');
+    } else {
+      notice('heartbeat', `Leituras recentes OK · heartbeat há ${Math.floor(heartbeatAge)} s. Disponibilidade integral não comprovada.`);
+    }
+    text('monitor', `Monitor: ${health.status || 'não verificado'} · ${timestamp(health.completed_at_utc)} · Run ${health.run_id || 'não registrado'}.`);
+    text('watchdog', `Watchdog: ${watchdog.status || 'não verificado'} · ${timestamp(watchdog.checked_at_utc)} · Problemas: ${(watchdog.problems || []).join('; ') || 'nenhum registrado'}.`);
+    text('telegram', `Telegram: ${health.telegram_configured === true ? 'configurado' : 'não confirmado'} · Fila de sinais: ${pending.length} não entregues · Resultado da última verificação da fila: ${health.notifications_ok === true ? 'OK' : 'não confirmado'}. Último recibo na fila: ${timestamp(portfolio.last_telegram_delivery_at_utc)}. Watchdog tem canal de alerta separado.`);
+    const samples = cadence.samples;
+    const latest = samples.slice(-12);
+    const gaps = latest.slice(1).map((sample, index) => (Date.parse(sample.completed_at_utc) - Date.parse(latest[index].completed_at_utc)) / 1000);
+    const validGaps = gaps.filter(Number.isFinite);
+    const maxGap = validGaps.length ? Math.max(...validGaps).toFixed(1) + ' s' : 'não verificado';
+    const recentFailures = latest.filter(sample => sample.effective !== true).length;
+    text('cadence', `Cadência: ${samples.length} amostras retidas · Maior intervalo nas últimas ${latest.length}: ${maxGap} · Leituras inefetivas nesse trecho: ${recentFailures}. Alvo: 300 s. A janela registrada não prova uma sessão completa.`);
+    text('daily', `Scanner diário: ${daily.status || 'não verificado'} · Último candle processado: ${state.latest_processed_bar_date || 'não registrado'}.`);
+    element('holdings').replaceChildren(...holdings.map(([symbol, holding]) => {
+      const position = state.positions[symbol];
+      const quote = health.symbols?.[symbol];
+      const price = quote?.last_price_usd ?? holding.latest_price_usd;
+      const change = Number.isFinite(price) && Number.isFinite(holding.entry_price_usd) && holding.entry_price_usd > 0 ? (price / holding.entry_price_usd - 1) * 100 : null;
+      const row = document.createElement('tr');
+      [symbol, holding.status, amount(holding.entry_price_usd), amount(price), amount(position?.stop_usd ?? holding.strategy_stop_usd), change === null ? 'indisponível' : change.toFixed(2) + '%', `${quote?.bar_datetime_ny || holding.quote_datetime_ny || 'não registrada'} (${quote?.status || 'não verificado'})`].forEach(value => {
+        const cell = document.createElement('td');
+        cell.textContent = value;
+        row.append(cell);
+      });
+      return row;
+    }));
+    const confirmed = new Set(holdings.map(([symbol]) => symbol));
+    const unconfirmed = Object.entries(state.positions).filter(([symbol]) => !confirmed.has(symbol));
+    list('unconfirmed', unconfirmed.length ? unconfirmed.map(([symbol, position]) => `${symbol}: ${position.status}; stop USD ${amount(position.stop_usd)}. Nenhuma compra real confirmada.`) : ['Nenhum sinal sem compra confirmada.']);
+    const exits = events.filter(event => event.type === 'EXIT');
+    const exitKeys = exits.map(event => event.signal_id || event.id);
+    const duplicateCount = exitKeys.length - new Set(exitKeys).size;
+    text('duplicates', `EXIT registrados: ${exits.length} · Repetições por sinal/ID: ${duplicateCount}. Ausência de registros não comprova entrega futura nem histórico fora dos eventos retidos.`);
+    list('events', events.length ? events.slice(-15).reverse().map(event => `${event.type} ${event.symbol || ''} · ${timestamp(event.created_at_utc)} · Telegram: ${event.telegram_alert_status || 'não verificado'} · ID ${event.id || 'ausente'}`) : ['Nenhum alerta registrado.']);
+    element('content').hidden = false;
+  }
+
+  async function fetchJson(url) {
+    const response = await fetch(url, {cache: 'no-store', signal: AbortSignal.timeout(15000)});
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return response.json();
+  }
+
+  async function refresh() {
+    if (loading) return;
+    loading = true;
+    element('refresh').disabled = true;
+    try {
+      const ref = await fetchJson(`https://api.github.com/repos/${repository}/git/ref/heads/main`);
+      const sha = ref.object?.sha;
+      if (!/^[a-f0-9]{40}$/.test(sha || '')) throw new Error('Referência inválida');
+      const values = await Promise.all(files.map(file => fetchJson(`https://raw.githubusercontent.com/${repository}/${sha}/${file}.json`)));
+      const next = Object.fromEntries(files.map((file, index) => [file, values[index]]));
+      if (!next.portfolio_state.holdings || !next.signal_state.positions || !Array.isArray(next.signal_events.events) || !Array.isArray(next.monitor_cadence.samples)) throw new Error('Estado incompleto');
+      snapshot = next;
+      render();
+      text('loaded', `Consulta: ${timestamp(new Date().toISOString())} · Commit ${sha.slice(0, 7)} · Atualiza a cada 2 minutos.`);
+      element('source').href = `https://github.com/${repository}/blob/${sha}/dashboard.md`;
+      notice('fetch-status', 'Dados públicos carregados. Confira os horários das leituras abaixo.');
+    } catch (error) {
+      notice('fetch-status', `Não foi possível atualizar (${error.message}). ${snapshot ? 'Os dados anteriores continuam visíveis; confira os horários.' : 'Saúde e posições ainda não verificadas.'}`, 'error');
+    } finally {
+      loading = false;
+      element('refresh').disabled = false;
+    }
+  }
+  element('refresh').addEventListener('click', refresh);
+  refresh();
+  setInterval(refresh, 120000);
+  setInterval(() => { if (snapshot) render(); }, 10000);
+</script>
+</body>
+</html>
