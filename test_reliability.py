@@ -102,7 +102,8 @@ class MonitorScopeTests(unittest.TestCase):
         common.save_json("signal_state.json", {"positions": {
             "COST": {"symbol": "COST", "status": "active", "signal_id": "ENTRY-COST-2026-10-14",
                      "signal_date": "2026-10-14", "stop_usd": 946.711, "initial_stop_usd": 946.711,
-                     "last_stop_update_date": "2026-10-15"},
+                     "last_stop_update_date": "2026-10-15",
+                     "last_checked_bar_utc": "2026-10-16T13:30:00+00:00"},
             "WMT": {"symbol": "WMT", "status": "pending_entry", "signal_id": "ENTRY-WMT-2026-10-15",
                     "signal_date": "2026-10-15", "stop_usd": 111.5489, "initial_stop_usd": 111.5489,
                     "last_stop_update_date": "2026-10-15"},
