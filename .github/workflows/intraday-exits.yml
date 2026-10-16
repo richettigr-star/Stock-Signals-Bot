@@ -5,7 +5,9 @@ on:
     branches: [main]
     paths: ["*.py", "requirements.txt", ".github/workflows/intraday-exits.yml"]
   schedule:
-    - cron: "7-57/5 9-16 * * 1-5"
+    - cron: "27-57/10 9 * * 1-5"
+      timezone: "America/New_York"
+    - cron: "7-57/10 10-15 * * 1-5"
       timezone: "America/New_York"
 permissions:
   contents: write
@@ -15,7 +17,7 @@ concurrency:
 jobs:
   monitor:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -28,16 +30,18 @@ jobs:
         run: pip install -r requirements.txt
       - name: Run offline regression tests
         run: python -m unittest -q
-      - name: Monitor stops and deliver pending alerts
+      - name: First stop scan
+        id: first_scan
+        continue-on-error: true
         env:
           TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python intraday_exit.py
-      - name: Rebuild dashboard
+      - name: Rebuild dashboard after first scan
         if: always()
         run: python build_dashboard.py
-      - name: Persist state, delivery receipts and health
+      - name: Persist first scan immediately
         if: always()
         run: |
           git config user.name "github-actions[bot]"
@@ -46,7 +50,46 @@ jobs:
             if [ -f "$file" ]; then git add "$file"; fi
           done
           if ! git diff --cached --quiet; then
-            git commit -m "Update stop monitor and dashboard"
+            git commit -m "Update intraday monitor pass 1"
             git pull --rebase
             git push
+          fi
+      - name: Wait five minutes before second scan
+        if: steps.first_scan.outcome == 'success'
+        run: sleep 300
+      - name: Second stop scan
+        id: second_scan
+        if: steps.first_scan.outcome == 'success'
+        continue-on-error: true
+        env:
+          TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python intraday_exit.py
+      - name: Rebuild dashboard after second scan
+        if: steps.first_scan.outcome == 'success'
+        run: python build_dashboard.py
+      - name: Persist second scan immediately
+        if: steps.first_scan.outcome == 'success'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for file in signal_state.json signal_events.json portfolio_state.json dashboard.md monitor_health.json; do
+            if [ -f "$file" ]; then git add "$file"; fi
+          done
+          if ! git diff --cached --quiet; then
+            git commit -m "Update intraday monitor pass 2"
+            git pull --rebase
+            git push
+          fi
+      - name: Enforce both scan results
+        if: always()
+        run: |
+          if [ "${{ steps.first_scan.outcome }}" != "success" ]; then
+            echo "First intraday scan failed"
+            exit 1
+          fi
+          if [ "${{ steps.second_scan.outcome }}" != "success" ]; then
+            echo "Second intraday scan failed"
+            exit 1
           fi

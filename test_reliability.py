@@ -144,14 +144,38 @@ class MonitorScopeTests(unittest.TestCase):
 
 
 class WorkflowConfigTests(unittest.TestCase):
-    def test_intraday_schedule_is_dst_safe_and_away_from_top_of_hour(self):
-        text = Path(".github/workflows/intraday-exits.yml").read_text(encoding="utf-8")
-        self.assertIn('cron: "7-57/5 9-16 * * 1-5"', text)
-        self.assertIn('timezone: "America/New_York"', text)
+    def workflow_text(self):
+        return Path(".github/workflows/intraday-exits.yml").read_text(encoding="utf-8")
 
-    def test_intraday_ci_runs_all_regressions(self):
-        text = Path(".github/workflows/intraday-exits.yml").read_text(encoding="utf-8")
+    def test_intraday_schedule_uses_ten_minute_starts_and_new_york_timezone(self):
+        text = self.workflow_text()
+        self.assertIn('cron: "27-57/10 9 * * 1-5"', text)
+        self.assertIn('cron: "7-57/10 10-15 * * 1-5"', text)
+        self.assertEqual(text.count('timezone: "America/New_York"'), 2)
+        self.assertNotIn('/5 9-16', text)
+
+    def test_each_job_performs_two_scans_five_minutes_apart(self):
+        text = self.workflow_text()
+        self.assertEqual(text.count("run: python intraday_exit.py"), 2)
+        self.assertIn("run: sleep 300", text)
+        self.assertLess(text.index("Persist first scan immediately"),
+                        text.index("Wait five minutes before second scan"))
+        self.assertLess(text.index("Wait five minutes before second scan"),
+                        text.index("Second stop scan"))
+
+    def test_first_scan_is_persisted_before_wait_to_prevent_duplicate_alerts(self):
+        text = self.workflow_text()
+        first_persist = text.index("Persist first scan immediately")
+        wait = text.index("Wait five minutes before second scan")
+        self.assertLess(first_persist, wait)
+        self.assertIn("signal_events.json", text[first_persist:wait])
+        self.assertIn("monitor_health.json", text[first_persist:wait])
+        self.assertIn("git push", text[first_persist:wait])
+
+    def test_intraday_ci_runs_all_regressions_and_has_room_for_sleep(self):
+        text = self.workflow_text()
         self.assertIn("python -m unittest -q", text)
+        self.assertIn("timeout-minutes: 20", text)
 
 
 if __name__ == "__main__":
