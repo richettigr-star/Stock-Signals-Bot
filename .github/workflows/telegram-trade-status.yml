@@ -1,0 +1,95 @@
+name: Telegram Trade Status
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [".github/workflows/telegram-trade-status.yml"]
+permissions:
+  contents: read
+concurrency:
+  group: telegram-trade-status
+  cancel-in-progress: false
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Send requested trade and system status without changing positions
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python - <<'PY'
+          import requests
+          from common import NY, load_json, now_utc, parse_time
+          from notifications import credentials
+          from monitor_watchdog import assess as assess_watchdog
+          from verify_cadence import assess as assess_cadence
+
+          now = now_utc()
+          state = load_json("signal_state.json", required=True)
+          portfolio = load_json("portfolio_state.json", required=True)
+          health = load_json("monitor_health.json", required=True)
+          watchdog = load_json("watchdog_health.json", {})
+          cadence = assess_cadence(load_json("monitor_cadence.json", {"samples": []}), now)
+          monitor_status, problems = assess_watchdog(now, health, portfolio)
+          watched_at = parse_time(watchdog.get("checked_at_utc"))
+          watchdog_status = watchdog.get("status", "não verificado")
+          if watched_at is None or not 0 <= (now - watched_at).total_seconds() <= 180:
+              watchdog_status = "atrasado/não verificado"
+          lines = ["📊 STOCK SIGNALS — ATUALIZAÇÃO SOLICITADA",
+                   f"Consulta: {now.astimezone(NY):%d/%m/%Y %H:%M:%S} NY", ""]
+          holdings = portfolio.get("holdings", {})
+          for symbol, holding in holdings.items():
+              if holding.get("status") == "closed":
+                  continue
+              position = state.get("positions", {}).get(symbol, {})
+              quote = health.get("symbols", {}).get(symbol, {})
+              lines += [f"{symbol}: posição confirmada — {holding.get('status', 'não verificado')}",
+                        f"Entrada confirmada: US$ {holding['entry_price_usd']:.2f}"]
+              price = quote.get("last_price_usd")
+              if price is not None:
+                  change = 100 * (price / holding["entry_price_usd"] - 1)
+                  lines += [f"Última cotação: US$ {price:.2f} ({quote.get('bar_datetime_ny')} NY)",
+                            f"Variação do preço em USD: {change:+.2f}% (não é P&L exato em CAD)"]
+              stop = position.get("stop_usd", holding.get("strategy_stop_usd"))
+              if stop is not None:
+                  lines.append(f"Stop registrado: US$ {stop:.4f}")
+              lines += [f"Alerta de saída: {'registrado; verificar execução manual' if holding.get('exit_alert') else 'nenhum registrado'}", ""]
+          lines += [f"Capital investido: C$ {portfolio.get('invested_cost_cad', 0):.2f}",
+                    f"Capital não alocado: C$ {portfolio.get('unallocated_capital_cad', 0):.2f}", ""]
+          for symbol, position in state.get("positions", {}).items():
+              if symbol not in holdings:
+                  lines.append(f"{symbol}: {position.get('status')} — compra não confirmada")
+          lines += ["", f"Monitor: {monitor_status}; watchdog: {watchdog_status}",
+                    f"Cadência observada: {cadence['status']}; {cadence['samples']} leituras registradas hoje",
+                    "Scans a cada 300 segundos dentro do runner, com checkpoints e watchdog separado."]
+          if problems:
+              lines.append("Problemas observados: " + "; ".join(problems))
+          events = load_json("signal_events.json", {"events": []})
+          pending = sum(event.get("telegram_alert_status") in {"pending", "failed", "not_configured"}
+                        for event in events.get("events", []))
+          lines += [f"Notificações de estratégia pendentes/falhas: {pending}",
+                    "84 testes passaram na implantação. Abertura automática e troca real de runner ainda não validadas.",
+                    "Resumo informativo: nenhuma ordem foi executada e nenhum stop foi alterado por esta mensagem."]
+          token, chat = credentials()
+          if not token or not chat:
+              raise SystemExit("Telegram credentials missing")
+          try:
+              response = requests.post("https://api.telegram.org/bot" + token + "/sendMessage",
+                  data={"chat_id": chat, "text": "\n".join(lines), "disable_web_page_preview": True}, timeout=15)
+              body = response.json()
+              if response.status_code != 200 or not body.get("ok"):
+                  raise ValueError("Rejected")
+          except Exception:
+              raise SystemExit("Telegram status delivery failed; no automatic retry to avoid duplicate messages") from None
+          print("Telegram accepted status message; message_id=" + str(body.get("result", {}).get("message_id")))
+          PY
