@@ -5,12 +5,14 @@ import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import common
 import intraday_exit as monitor
 import monitor_watchdog as watchdog
 import notifications
+import action_runtime as runtime
+from test_action_runtime import Clock
 
 NOW = datetime(2026, 10, 16, 14, 20, tzinfo=timezone.utc)
 
@@ -106,6 +108,111 @@ class WatchdogTests(unittest.TestCase):
         health["completed_at_utc"] = "invalid"
         with patch.object(watchdog, "session_bounds", return_value=self.bounds()):
             self.assertEqual(watchdog.assess(NOW, health, portfolio())[0], "degraded")
+
+
+class WatchdogSessionTests(unittest.TestCase):
+    def test_recovery_keeps_failure_counts_and_timestamps(self):
+        failed_at = NOW.isoformat()
+        recovered_at = (NOW + timedelta(minutes=1)).isoformat()
+        first = watchdog.session_metrics({}, "run-1", failed_at, False)
+        recovered = watchdog.session_metrics({"session": first}, "run-1", recovered_at, True)
+        final = watchdog.session_metrics({"session": recovered}, "run-1",
+                                         (NOW + timedelta(minutes=2)).isoformat(), True)
+        self.assertEqual(final["status"], "recovered")
+        self.assertEqual(final["checks"], 3)
+        self.assertEqual(final["failed_checks"], 1)
+        self.assertEqual(final["recoveries"], 1)
+        self.assertEqual(final["last_failure_at_utc"], failed_at)
+        self.assertEqual(final["last_recovery_at_utc"], recovered_at)
+
+    def test_relapse_is_degraded_and_keeps_previous_recovery(self):
+        state = {}
+        for offset, healthy in enumerate((False, True, False)):
+            state = {"session": watchdog.session_metrics(state, "run-1",
+                     (NOW + timedelta(minutes=offset)).isoformat(), healthy)}
+        self.assertEqual(state["session"]["status"], "degraded")
+        self.assertEqual(state["session"]["failed_checks"], 2)
+        self.assertEqual(state["session"]["recoveries"], 1)
+        self.assertFalse(state["session"]["last_check_ok"])
+
+    def test_new_run_does_not_inherit_previous_run_counters(self):
+        previous = {"session": watchdog.session_metrics({}, "old-run", NOW.isoformat(), False)}
+        current = watchdog.session_metrics(previous, "new-run", NOW.isoformat(), True)
+        self.assertEqual(current["status"], "ok")
+        self.assertEqual(current["checks"], 1)
+        self.assertEqual(current["failed_checks"], 0)
+        self.assertEqual(current["recoveries"], 0)
+        self.assertIsNone(current["last_failure_at_utc"])
+
+    def test_old_health_without_session_metadata_is_supported(self):
+        result = watchdog.session_metrics({"status": "ok"}, "run-1", NOW.isoformat(), True)
+        self.assertEqual(result["status"], "ok")
+        self.assertTrue(result["last_check_ok"])
+
+    def test_real_watchdog_cycle_recovers_and_preserves_evidence_without_touching_positions(self):
+        with tempfile.TemporaryDirectory() as directory, contextlib.ExitStack() as stack:
+            previous_directory = os.getcwd()
+            os.chdir(directory)
+            stack.callback(os.chdir, previous_directory)
+            clock = Clock(NOW)
+            stack.enter_context(patch.dict(os.environ, {"GITHUB_RUN_ID": "run-1"}))
+            for module in (common, watchdog, runtime):
+                stack.enter_context(patch.object(module, "now_utc", side_effect=clock.now))
+            bounds = WatchdogTests().bounds()
+            for module in (watchdog, runtime):
+                stack.enter_context(patch.object(module, "session_bounds", return_value=bounds))
+            sender = stack.enter_context(patch.object(watchdog, "send", return_value=True))
+            recovery = stack.enter_context(patch.object(runtime, "dispatch", return_value=True))
+            stack.enter_context(patch.object(runtime, "command", side_effect=lambda *args, **kwargs: watchdog.main()))
+            common.save_json("portfolio_state.json", portfolio())
+            common.save_json("signal_state.json", {"positions": {
+                "COST": {"status": "active", "stop_usd": 946.711},
+                "WMT": {"status": "pending_entry"}, "UNH": {"status": "pending_entry"}}})
+            protected = {name: Path(name).read_bytes()
+                         for name in ("portfolio_state.json", "signal_state.json")}
+            store = Mock(sync=lambda: False)
+            def cycle(current_store):
+                health = fresh_health()
+                stamp = clock.now() - timedelta(minutes=106) if clock.elapsed == 0 else clock.now()
+                health["completed_at_utc"] = stamp.isoformat()
+                health["symbols"]["COST"]["checked_at_utc"] = stamp.isoformat()
+                common.save_json("monitor_health.json", health)
+                return runtime.watchdog_cycle(current_store)
+            result = runtime.run_session("watchdog", 181, clock=clock.now,
+                monotonic=clock.monotonic, sleep=clock.sleep, cycle=cycle, store=store,
+                handover=Mock(return_value=True))
+            self.assertEqual(result, 0)
+            health = common.load_json("watchdog_health.json")
+            self.assertEqual(health["status"], "ok")
+            self.assertEqual(health["session"]["status"], "recovered")
+            self.assertEqual(health["session"]["checks"], 4)
+            self.assertEqual(health["session"]["failed_checks"], 1)
+            self.assertEqual(health["session"]["recoveries"], 1)
+            sender.assert_called_once()
+            recovery.assert_called_once_with("intraday-exits.yml")
+            self.assertEqual(store.checkpoint.call_count, 4)
+            for name, original in protected.items():
+                self.assertEqual(Path(name).read_bytes(), original)
+
+    def test_telegram_rejection_remains_failed_and_retries_without_losing_incident(self):
+        with tempfile.TemporaryDirectory() as directory, contextlib.ExitStack() as stack:
+            previous_directory = os.getcwd()
+            os.chdir(directory)
+            stack.callback(os.chdir, previous_directory)
+            stack.enter_context(patch.dict(os.environ, {"GITHUB_RUN_ID": "run-1"}))
+            stack.enter_context(patch.object(watchdog, "now_utc", return_value=NOW))
+            stack.enter_context(patch.object(watchdog, "session_bounds", return_value=WatchdogTests().bounds()))
+            sender = stack.enter_context(patch.object(watchdog, "send", return_value=False))
+            common.save_json("portfolio_state.json", portfolio())
+            common.save_json("monitor_health.json", {})
+            self.assertEqual(watchdog.main(), 1)
+            self.assertEqual(watchdog.main(), 1)
+            health = common.load_json("watchdog_health.json")
+            self.assertFalse(health["notifications_ok"])
+            self.assertEqual(health["session"]["failed_checks"], 2)
+            self.assertEqual(health["session"]["status"], "degraded")
+            self.assertEqual(sender.call_count, 2)
+            self.assertIsNone(health["last_alert_bucket"])
 
 
 class MonitorScopeTests(unittest.TestCase):

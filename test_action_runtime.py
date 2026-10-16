@@ -100,6 +100,43 @@ class SessionTests(unittest.TestCase):
                          duration=181, mode="watchdog")
         self.assertEqual(observed, [0, 60, 120, 180])
 
+    def test_watchdog_recovered_failure_finishes_green_without_stopping_checks(self):
+        clock = Clock()
+        observed = []
+        def cycle(store):
+            observed.append(clock.elapsed)
+            return len(observed) != 1
+        self.assertEqual(self.run_session(clock, cycle, duration=181, mode="watchdog"), 0)
+        self.assertEqual(observed, [0, 60, 120, 180])
+
+    def test_watchdog_persistent_failure_finishes_red(self):
+        self.assertEqual(self.run_session(Clock(), lambda store: False,
+                         duration=181, mode="watchdog"), 1)
+
+    def test_watchdog_relapse_after_recovery_finishes_red(self):
+        cycle = Mock(side_effect=[False, True, True, False])
+        self.assertEqual(self.run_session(Clock(), cycle, duration=181, mode="watchdog"), 1)
+        self.assertEqual(cycle.call_count, 4)
+
+    def test_watchdog_healthy_then_final_failure_finishes_red(self):
+        cycle = Mock(side_effect=[True, True, True, False])
+        self.assertEqual(self.run_session(Clock(), cycle, duration=181, mode="watchdog"), 1)
+
+    def test_watchdog_recovery_cannot_hide_handover_failure(self):
+        cycle = Mock(side_effect=[False, True, True, True])
+        self.assertEqual(self.run_session(Clock(), cycle, duration=181, mode="watchdog",
+                         handover=Mock(return_value=False)), 1)
+
+    def test_watchdog_recovery_cannot_hide_checkpoint_failure(self):
+        cycle = Mock(side_effect=[False, True, RuntimeError("private-token")])
+        self.assertEqual(self.run_session(Clock(), cycle, duration=181, mode="watchdog"), 1)
+
+    def test_watchdog_no_checks_cannot_claim_recovery(self):
+        clock = Clock(BOUNDS[0] - timedelta(minutes=3))
+        cycle = Mock()
+        self.assertEqual(self.run_session(clock, cycle, duration=1, mode="watchdog"), 1)
+        cycle.assert_not_called()
+
     def test_opening_waits_for_first_minute_bar(self):
         clock = Clock(BOUNDS[0] - timedelta(minutes=3))
         observed = []

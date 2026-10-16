@@ -149,6 +149,8 @@ def run_session(mode, duration=330 * 60, *, clock=now_utc, monotonic=time.monoto
     next_tick = started
     handed_over = False
     had_failure = False
+    last_cycle_ok = None
+    handover_failed = False
     try:
         while monotonic() < deadline and clock() <= bounds[1] + timedelta(minutes=20):
             if deadline - monotonic() <= 600 and not handed_over:
@@ -165,7 +167,14 @@ def run_session(mode, duration=330 * 60, *, clock=now_utc, monotonic=time.monoto
                 handover(workflow)
                 print("Code changed; yielding to a fresh worker", flush=True)
                 return 1
-            had_failure = not cycle(store) or had_failure
+            cycle_ok = bool(cycle(store))
+            if mode == "watchdog":
+                if not cycle_ok and last_cycle_ok is not False:
+                    print("::warning::Watchdog detected degraded protection; checks continue", flush=True)
+                elif cycle_ok and last_cycle_ok is False:
+                    print("Watchdog recovered; prior failures remain in watchdog_health.json", flush=True)
+            last_cycle_ok = cycle_ok
+            had_failure = not cycle_ok or had_failure
             next_tick += interval
             if next_tick <= monotonic():
                 next_tick += (int((monotonic() - next_tick) // interval) + 1) * interval
@@ -176,7 +185,13 @@ def run_session(mode, duration=330 * 60, *, clock=now_utc, monotonic=time.monoto
         return 1
     if clock() < bounds[1] + timedelta(minutes=20) and not handed_over:
         handed_over = handover(workflow)
-        had_failure = not handed_over or had_failure
+        handover_failed = not handed_over
+    if mode == "watchdog":
+        failed = last_cycle_ok is not True or handover_failed
+        status = "failed" if failed else "recovered" if had_failure else "ok"
+        print("Watchdog session completed: " + status, flush=True)
+        return 1 if failed else 0
+    had_failure = handover_failed or had_failure
     return 1 if had_failure else 0
 
 

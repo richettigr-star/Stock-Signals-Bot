@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Detect a stale intraday monitor heartbeat and alert without mutating trading state."""
 from datetime import timedelta
+import os
 from common import NY, load_json, now_utc, parse_time, save_json, session_bounds, utc_now
 from notifications import send
 
@@ -73,6 +74,25 @@ def assess(now, health, portfolio):
     return ("degraded" if problems else "ok"), problems
 
 
+def session_metrics(previous, run_id, checked_at, healthy):
+    session = previous.get("session", {})
+    if session.get("run_id") != run_id:
+        session = {}
+    failed_checks = session.get("failed_checks", 0) + int(not healthy)
+    recovered = healthy and session.get("last_check_ok") is False
+    return {
+        "run_id": run_id,
+        "started_at_utc": session.get("started_at_utc", checked_at),
+        "checks": session.get("checks", 0) + 1,
+        "failed_checks": failed_checks,
+        "recoveries": session.get("recoveries", 0) + int(recovered),
+        "last_check_ok": healthy,
+        "status": "degraded" if not healthy else "recovered" if failed_checks else "ok",
+        "last_failure_at_utc": session.get("last_failure_at_utc") if healthy else checked_at,
+        "last_recovery_at_utc": checked_at if recovered else session.get("last_recovery_at_utc"),
+    }
+
+
 def main():
     now = now_utc()
     read_errors = []
@@ -125,8 +145,12 @@ def main():
                 watchdog["last_alert_error"] = "Telegram delivery failed"
 
     watchdog["notifications_ok"] = delivered
+    healthy = not problems and delivered
+    run_id = os.getenv("GITHUB_RUN_ID")
+    if run_id:
+        watchdog["session"] = session_metrics(previous, run_id, watchdog["checked_at_utc"], healthy)
     save_json("watchdog_health.json", watchdog)
-    return 0 if not problems and delivered else 1
+    return 0 if healthy else 1
 
 
 if __name__ == "__main__":
