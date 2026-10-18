@@ -1,0 +1,44 @@
+name: Research Candidate Backtest
+
+on:
+  push:
+    branches:
+      - research/quantum-backtest-20261018
+    paths:
+      - "research/quantum_backtest.py"
+      - ".github/workflows/research-quantum-backtest.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/quantum-backtest-20261018
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run 24-month research backtest
+        env:
+          TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
+        run: python research/quantum_backtest.py
+      - name: Commit research results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research/quantum_backtest_results.json research/quantum_backtest_results.md
+          if git diff --cached --quiet; then
+            echo "No result changes to commit"
+          else
+            git commit -m "Add 24-month candidate-stock backtest results"
+            git push origin HEAD:research/quantum-backtest-20261018
+          fi
