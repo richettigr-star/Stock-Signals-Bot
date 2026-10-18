@@ -1,0 +1,44 @@
+name: Research Candidate Robustness
+
+on:
+  push:
+    branches:
+      - research/quantum-backtest-20261018
+    paths:
+      - "research/robust_candidate_analysis.py"
+      - ".github/workflows/research-candidate-robustness.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  robustness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/quantum-backtest-20261018
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run attribution, multi-horizon, and walk-forward research
+        env:
+          TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
+        run: python research/robust_candidate_analysis.py
+      - name: Commit research results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research/robust_candidate_results.json research/robust_candidate_results.md
+          if git diff --cached --quiet; then
+            echo "No result changes to commit"
+          else
+            git commit -m "Add candidate robustness research results"
+            git push origin HEAD:research/quantum-backtest-20261018
+          fi
