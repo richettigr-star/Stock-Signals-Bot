@@ -6,6 +6,7 @@ on:
       - research/quantum-backtest-20261018
     paths:
       - "research/quantum_backtest.py"
+      - "research/quantum_backtest_exact.py"
       - ".github/workflows/research-quantum-backtest.yml"
   workflow_dispatch:
 
@@ -27,10 +28,10 @@ jobs:
           cache: pip
       - name: Install dependencies
         run: pip install -r requirements.txt
-      - name: Run 24-month research backtest
+      - name: Run 24-month research backtest with production-equivalent indicator windows
         env:
           TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
-        run: python research/quantum_backtest.py
+        run: python research/quantum_backtest_exact.py
       - name: Commit research results
         run: |
           git config user.name "github-actions[bot]"
@@ -39,6 +40,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No result changes to commit"
           else
-            git commit -m "Add 24-month candidate-stock backtest results"
+            git commit -m "Refresh candidate-stock backtest with exact production windows"
             git push origin HEAD:research/quantum-backtest-20261018
           fi
