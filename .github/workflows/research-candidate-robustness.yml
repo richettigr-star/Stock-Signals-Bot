@@ -6,6 +6,7 @@ on:
       - research/quantum-backtest-20261018
     paths:
       - "research/robust_candidate_analysis.py"
+      - "research/robust_candidate_analysis_gated.py"
       - ".github/workflows/research-candidate-robustness.yml"
   workflow_dispatch:
 
@@ -27,18 +28,18 @@ jobs:
           cache: pip
       - name: Install dependencies
         run: pip install -r requirements.txt
-      - name: Run attribution, multi-horizon, and walk-forward research
+      - name: Run listing-date-gated attribution, multi-horizon, and walk-forward research
         env:
           TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
-        run: python research/robust_candidate_analysis.py
-      - name: Commit research results
+        run: python research/robust_candidate_analysis_gated.py
+      - name: Commit canonical research results
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add research/robust_candidate_results.json research/robust_candidate_results.md
+          git add research/robust_candidate_results_gated.json research/robust_candidate_results_gated.md
           if git diff --cached --quiet; then
             echo "No result changes to commit"
           else
-            git commit -m "Add candidate robustness research results"
+            git commit -m "Add listing-date-gated candidate robustness results"
             git push origin HEAD:research/quantum-backtest-20261018
           fi
