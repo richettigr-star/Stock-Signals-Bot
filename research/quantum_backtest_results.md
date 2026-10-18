@@ -10,7 +10,7 @@ Data: Twelve Data daily OHLC, split-adjusted (same provider/adjustment style as 
 | QBTS | 19 | 47.37% | 195.57% | 1021.9% | -78.39% |
 | IONQ | 17 | 41.18% | 6.07% | 149.04% | -65.11% |
 | RGTI | 16 | 37.5% | 452.07% | 1104.08% | -81.61% |
-| MU | 20 | 35.0% | 122.57% | 686.43% | -50.31% |
+| MU | 20 | 35.0% | 116.01% | 686.43% | -50.31% |
 
 ## Portfolio comparison
 
