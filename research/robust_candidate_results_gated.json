@@ -1,0 +1,1039 @@
+{
+  "generated_at_utc": "2026-10-18T05:13:13.274427+00:00",
+  "canonical": true,
+  "data_source": "Twelve Data daily OHLC, adjust=splits",
+  "candidate_public_start_gates": {
+    "QBTS": "2022-08-08",
+    "IONQ": "2021-10-01",
+    "RGTI": "2022-03-02"
+  },
+  "method": {
+    "scanner_window": 180,
+    "momentum10_threshold_pct": 2.0,
+    "trend": "close > EMA100",
+    "ranking": "Momentum10 / (ATR14 / Close)",
+    "atr": "Wilder 14",
+    "stop": "2.5 x ATR14, never lowered",
+    "entry": "next regular-session open",
+    "max_slots": 3,
+    "risk_target_cad": 7.5,
+    "candidate_prelisting_history": "excluded before indicator calculation"
+  },
+  "coverage_new_symbols": {
+    "QBTS": {
+      "actual_public_start": "2022-08-08",
+      "first_used_bar": "2022-08-08",
+      "first_signalable": "2023-01-12",
+      "last_bar": "2026-10-16",
+      "bars": 1053
+    },
+    "IONQ": {
+      "actual_public_start": "2021-10-01",
+      "first_used_bar": "2021-10-01",
+      "first_signalable": "2022-03-09",
+      "last_bar": "2026-10-16",
+      "bars": 1266
+    },
+    "RGTI": {
+      "actual_public_start": "2022-03-02",
+      "first_used_bar": "2022-03-02",
+      "first_signalable": "2022-08-08",
+      "last_bar": "2026-10-16",
+      "bars": 1162
+    },
+    "MU": {
+      "actual_public_start": null,
+      "first_used_bar": "2020-12-01",
+      "first_signalable": "2021-05-10",
+      "last_bar": "2026-10-16",
+      "bars": 1476
+    }
+  },
+  "horizons": {
+    "2y": [
+      {
+        "name": "Baseline 20",
+        "start": "2024-10-18",
+        "end": "2026-10-16",
+        "universe_size": 20,
+        "final_equity_cad": 85.61,
+        "return_pct": -14.39,
+        "max_drawdown_pct": -40.12,
+        "closed_trades": 84,
+        "win_rate_pct": 35.71,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ QBTS",
+        "start": "2024-10-18",
+        "end": "2026-10-16",
+        "universe_size": 21,
+        "final_equity_cad": 142.17,
+        "return_pct": 42.17,
+        "max_drawdown_pct": -35.64,
+        "closed_trades": 80,
+        "win_rate_pct": 40.0,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ IONQ",
+        "start": "2024-10-18",
+        "end": "2026-10-16",
+        "universe_size": 21,
+        "final_equity_cad": 97.69,
+        "return_pct": -2.31,
+        "max_drawdown_pct": -41.26,
+        "closed_trades": 87,
+        "win_rate_pct": 37.93,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ RGTI",
+        "start": "2024-10-18",
+        "end": "2026-10-16",
+        "universe_size": 21,
+        "final_equity_cad": 137.46,
+        "return_pct": 37.46,
+        "max_drawdown_pct": -37.62,
+        "closed_trades": 83,
+        "win_rate_pct": 43.37,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ MU",
+        "start": "2024-10-18",
+        "end": "2026-10-16",
+        "universe_size": 21,
+        "final_equity_cad": 138.92,
+        "return_pct": 38.92,
+        "max_drawdown_pct": -45.23,
+        "closed_trades": 79,
+        "win_rate_pct": 40.51,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ QBTS + RGTI",
+        "start": "2024-10-18",
+        "end": "2026-10-16",
+        "universe_size": 22,
+        "final_equity_cad": 202.37,
+        "return_pct": 102.37,
+        "max_drawdown_pct": -38.57,
+        "closed_trades": 83,
+        "win_rate_pct": 43.37,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ QBTS + RGTI + MU",
+        "start": "2024-10-18",
+        "end": "2026-10-16",
+        "universe_size": 23,
+        "final_equity_cad": 244.76,
+        "return_pct": 144.76,
+        "max_drawdown_pct": -42.84,
+        "closed_trades": 82,
+        "win_rate_pct": 43.9,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ all 4",
+        "start": "2024-10-18",
+        "end": "2026-10-16",
+        "universe_size": 24,
+        "final_equity_cad": 249.17,
+        "return_pct": 149.17,
+        "max_drawdown_pct": -42.25,
+        "closed_trades": 82,
+        "win_rate_pct": 45.12,
+        "open_positions": [
+          "MSFT"
+        ]
+      }
+    ],
+    "3y": [
+      {
+        "name": "Baseline 20",
+        "start": "2023-10-18",
+        "end": "2026-10-16",
+        "universe_size": 20,
+        "final_equity_cad": 167.84,
+        "return_pct": 67.84,
+        "max_drawdown_pct": -34.08,
+        "closed_trades": 113,
+        "win_rate_pct": 43.36,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ QBTS",
+        "start": "2023-10-18",
+        "end": "2026-10-16",
+        "universe_size": 21,
+        "final_equity_cad": 283.94,
+        "return_pct": 183.94,
+        "max_drawdown_pct": -38.07,
+        "closed_trades": 114,
+        "win_rate_pct": 44.74,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ IONQ",
+        "start": "2023-10-18",
+        "end": "2026-10-16",
+        "universe_size": 21,
+        "final_equity_cad": 168.27,
+        "return_pct": 68.27,
+        "max_drawdown_pct": -33.96,
+        "closed_trades": 115,
+        "win_rate_pct": 44.35,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ RGTI",
+        "start": "2023-10-18",
+        "end": "2026-10-16",
+        "universe_size": 21,
+        "final_equity_cad": 229.9,
+        "return_pct": 129.9,
+        "max_drawdown_pct": -31.39,
+        "closed_trades": 113,
+        "win_rate_pct": 46.9,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ MU",
+        "start": "2023-10-18",
+        "end": "2026-10-16",
+        "universe_size": 21,
+        "final_equity_cad": 247.7,
+        "return_pct": 147.7,
+        "max_drawdown_pct": -37.59,
+        "closed_trades": 110,
+        "win_rate_pct": 46.36,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ QBTS + RGTI",
+        "start": "2023-10-18",
+        "end": "2026-10-16",
+        "universe_size": 22,
+        "final_equity_cad": 256.35,
+        "return_pct": 156.35,
+        "max_drawdown_pct": -33.48,
+        "closed_trades": 115,
+        "win_rate_pct": 45.22,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ QBTS + RGTI + MU",
+        "start": "2023-10-18",
+        "end": "2026-10-16",
+        "universe_size": 23,
+        "final_equity_cad": 289.3,
+        "return_pct": 189.3,
+        "max_drawdown_pct": -38.05,
+        "closed_trades": 114,
+        "win_rate_pct": 46.49,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ all 4",
+        "start": "2023-10-18",
+        "end": "2026-10-16",
+        "universe_size": 24,
+        "final_equity_cad": 293.51,
+        "return_pct": 193.51,
+        "max_drawdown_pct": -37.54,
+        "closed_trades": 115,
+        "win_rate_pct": 46.96,
+        "open_positions": [
+          "MSFT"
+        ]
+      }
+    ],
+    "4y": [
+      {
+        "name": "Baseline 20",
+        "start": "2022-10-18",
+        "end": "2026-10-16",
+        "universe_size": 20,
+        "final_equity_cad": 258.74,
+        "return_pct": 158.74,
+        "max_drawdown_pct": -27.62,
+        "closed_trades": 147,
+        "win_rate_pct": 43.54,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ QBTS",
+        "start": "2022-10-18",
+        "end": "2026-10-16",
+        "universe_size": 21,
+        "final_equity_cad": 364.41,
+        "return_pct": 264.41,
+        "max_drawdown_pct": -33.51,
+        "closed_trades": 148,
+        "win_rate_pct": 43.92,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ IONQ",
+        "start": "2022-10-18",
+        "end": "2026-10-16",
+        "universe_size": 21,
+        "final_equity_cad": 271.2,
+        "return_pct": 171.2,
+        "max_drawdown_pct": -28.37,
+        "closed_trades": 149,
+        "win_rate_pct": 44.3,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ RGTI",
+        "start": "2022-10-18",
+        "end": "2026-10-16",
+        "universe_size": 21,
+        "final_equity_cad": 327.78,
+        "return_pct": 227.78,
+        "max_drawdown_pct": -24.67,
+        "closed_trades": 148,
+        "win_rate_pct": 45.27,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ MU",
+        "start": "2022-10-18",
+        "end": "2026-10-16",
+        "universe_size": 21,
+        "final_equity_cad": 374.01,
+        "return_pct": 274.01,
+        "max_drawdown_pct": -30.96,
+        "closed_trades": 144,
+        "win_rate_pct": 45.83,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ QBTS + RGTI",
+        "start": "2022-10-18",
+        "end": "2026-10-16",
+        "universe_size": 22,
+        "final_equity_cad": 316.36,
+        "return_pct": 216.36,
+        "max_drawdown_pct": -30.28,
+        "closed_trades": 150,
+        "win_rate_pct": 44.0,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ QBTS + RGTI + MU",
+        "start": "2022-10-18",
+        "end": "2026-10-16",
+        "universe_size": 23,
+        "final_equity_cad": 398.92,
+        "return_pct": 298.92,
+        "max_drawdown_pct": -32.85,
+        "closed_trades": 149,
+        "win_rate_pct": 44.97,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ all 4",
+        "start": "2022-10-18",
+        "end": "2026-10-16",
+        "universe_size": 24,
+        "final_equity_cad": 400.72,
+        "return_pct": 300.72,
+        "max_drawdown_pct": -31.96,
+        "closed_trades": 149,
+        "win_rate_pct": 45.64,
+        "open_positions": [
+          "MSFT"
+        ]
+      }
+    ],
+    "5y": [
+      {
+        "name": "Baseline 20",
+        "start": "2021-10-18",
+        "end": "2026-10-16",
+        "universe_size": 20,
+        "final_equity_cad": 297.02,
+        "return_pct": 197.02,
+        "max_drawdown_pct": -25.75,
+        "closed_trades": 184,
+        "win_rate_pct": 42.39,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ QBTS",
+        "start": "2021-10-18",
+        "end": "2026-10-16",
+        "universe_size": 21,
+        "final_equity_cad": 396.76,
+        "return_pct": 296.76,
+        "max_drawdown_pct": -32.02,
+        "closed_trades": 185,
+        "win_rate_pct": 42.7,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ IONQ",
+        "start": "2021-10-18",
+        "end": "2026-10-16",
+        "universe_size": 21,
+        "final_equity_cad": 313.61,
+        "return_pct": 213.61,
+        "max_drawdown_pct": -24.47,
+        "closed_trades": 186,
+        "win_rate_pct": 43.01,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ RGTI",
+        "start": "2021-10-18",
+        "end": "2026-10-16",
+        "universe_size": 21,
+        "final_equity_cad": 354.82,
+        "return_pct": 254.82,
+        "max_drawdown_pct": -23.08,
+        "closed_trades": 185,
+        "win_rate_pct": 43.78,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ MU",
+        "start": "2021-10-18",
+        "end": "2026-10-16",
+        "universe_size": 21,
+        "final_equity_cad": 413.56,
+        "return_pct": 313.56,
+        "max_drawdown_pct": -28.59,
+        "closed_trades": 179,
+        "win_rate_pct": 45.25,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ QBTS + RGTI",
+        "start": "2021-10-18",
+        "end": "2026-10-16",
+        "universe_size": 22,
+        "final_equity_cad": 343.31,
+        "return_pct": 243.31,
+        "max_drawdown_pct": -28.9,
+        "closed_trades": 187,
+        "win_rate_pct": 42.78,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ QBTS + RGTI + MU",
+        "start": "2021-10-18",
+        "end": "2026-10-16",
+        "universe_size": 23,
+        "final_equity_cad": 430.66,
+        "return_pct": 330.66,
+        "max_drawdown_pct": -30.62,
+        "closed_trades": 184,
+        "win_rate_pct": 44.57,
+        "open_positions": [
+          "MSFT"
+        ]
+      },
+      {
+        "name": "+ all 4",
+        "start": "2021-10-18",
+        "end": "2026-10-16",
+        "universe_size": 24,
+        "final_equity_cad": 436.99,
+        "return_pct": 336.99,
+        "max_drawdown_pct": -29.49,
+        "closed_trades": 184,
+        "win_rate_pct": 45.11,
+        "open_positions": [
+          "MSFT"
+        ]
+      }
+    ]
+  },
+  "six_month_blocks": [
+    {
+      "start": "2024-10-18",
+      "end": "2025-04-17",
+      "variants": [
+        {
+          "name": "Baseline 20",
+          "start": "2024-10-18",
+          "end": "2025-04-17",
+          "universe_size": 20,
+          "final_equity_cad": 66.32,
+          "return_pct": -33.68,
+          "max_drawdown_pct": -38.97,
+          "closed_trades": 23,
+          "win_rate_pct": 26.09,
+          "open_positions": []
+        },
+        {
+          "name": "+ QBTS",
+          "start": "2024-10-18",
+          "end": "2025-04-17",
+          "universe_size": 21,
+          "final_equity_cad": 71.5,
+          "return_pct": -28.5,
+          "max_drawdown_pct": -34.51,
+          "closed_trades": 23,
+          "win_rate_pct": 30.43,
+          "open_positions": [
+            "QBTS"
+          ]
+        },
+        {
+          "name": "+ IONQ",
+          "start": "2024-10-18",
+          "end": "2025-04-17",
+          "universe_size": 21,
+          "final_equity_cad": 81.63,
+          "return_pct": -18.37,
+          "max_drawdown_pct": -35.7,
+          "closed_trades": 24,
+          "win_rate_pct": 33.33,
+          "open_positions": []
+        },
+        {
+          "name": "+ RGTI",
+          "start": "2024-10-18",
+          "end": "2025-04-17",
+          "universe_size": 21,
+          "final_equity_cad": 94.16,
+          "return_pct": -5.84,
+          "max_drawdown_pct": -37.01,
+          "closed_trades": 25,
+          "win_rate_pct": 40.0,
+          "open_positions": [
+            "COST",
+            "RGTI"
+          ]
+        },
+        {
+          "name": "+ MU",
+          "start": "2024-10-18",
+          "end": "2025-04-17",
+          "universe_size": 21,
+          "final_equity_cad": 60.66,
+          "return_pct": -39.34,
+          "max_drawdown_pct": -44.18,
+          "closed_trades": 24,
+          "win_rate_pct": 25.0,
+          "open_positions": []
+        },
+        {
+          "name": "+ QBTS + RGTI",
+          "start": "2024-10-18",
+          "end": "2025-04-17",
+          "universe_size": 22,
+          "final_equity_cad": 93.06,
+          "return_pct": -6.94,
+          "max_drawdown_pct": -37.55,
+          "closed_trades": 26,
+          "win_rate_pct": 38.46,
+          "open_positions": [
+            "QBTS"
+          ]
+        },
+        {
+          "name": "+ QBTS + RGTI + MU",
+          "start": "2024-10-18",
+          "end": "2025-04-17",
+          "universe_size": 23,
+          "final_equity_cad": 86.62,
+          "return_pct": -13.38,
+          "max_drawdown_pct": -41.87,
+          "closed_trades": 27,
+          "win_rate_pct": 37.04,
+          "open_positions": [
+            "QBTS"
+          ]
+        },
+        {
+          "name": "+ all 4",
+          "start": "2024-10-18",
+          "end": "2025-04-17",
+          "universe_size": 24,
+          "final_equity_cad": 93.83,
+          "return_pct": -6.17,
+          "max_drawdown_pct": -41.3,
+          "closed_trades": 27,
+          "win_rate_pct": 40.74,
+          "open_positions": [
+            "QBTS"
+          ]
+        }
+      ]
+    },
+    {
+      "start": "2025-04-18",
+      "end": "2025-10-17",
+      "variants": [
+        {
+          "name": "Baseline 20",
+          "start": "2025-04-18",
+          "end": "2025-10-17",
+          "universe_size": 20,
+          "final_equity_cad": 113.98,
+          "return_pct": 13.98,
+          "max_drawdown_pct": -11.84,
+          "closed_trades": 18,
+          "win_rate_pct": 44.44,
+          "open_positions": [
+            "AMD",
+            "AVGO"
+          ]
+        },
+        {
+          "name": "+ QBTS",
+          "start": "2025-04-18",
+          "end": "2025-10-17",
+          "universe_size": 21,
+          "final_equity_cad": 153.06,
+          "return_pct": 53.06,
+          "max_drawdown_pct": -10.88,
+          "closed_trades": 17,
+          "win_rate_pct": 47.06,
+          "open_positions": [
+            "AMD",
+            "QBTS"
+          ]
+        },
+        {
+          "name": "+ IONQ",
+          "start": "2025-04-18",
+          "end": "2025-10-17",
+          "universe_size": 21,
+          "final_equity_cad": 102.83,
+          "return_pct": 2.83,
+          "max_drawdown_pct": -19.44,
+          "closed_trades": 20,
+          "win_rate_pct": 40.0,
+          "open_positions": [
+            "AMD",
+            "WMT"
+          ]
+        },
+        {
+          "name": "+ RGTI",
+          "start": "2025-04-18",
+          "end": "2025-10-17",
+          "universe_size": 21,
+          "final_equity_cad": 136.33,
+          "return_pct": 36.33,
+          "max_drawdown_pct": -12.13,
+          "closed_trades": 17,
+          "win_rate_pct": 52.94,
+          "open_positions": [
+            "AMD"
+          ]
+        },
+        {
+          "name": "+ MU",
+          "start": "2025-04-18",
+          "end": "2025-10-17",
+          "universe_size": 21,
+          "final_equity_cad": 166.43,
+          "return_pct": 66.43,
+          "max_drawdown_pct": -7.54,
+          "closed_trades": 12,
+          "win_rate_pct": 75.0,
+          "open_positions": [
+            "AMD",
+            "MU"
+          ]
+        },
+        {
+          "name": "+ QBTS + RGTI",
+          "start": "2025-04-18",
+          "end": "2025-10-17",
+          "universe_size": 22,
+          "final_equity_cad": 176.69,
+          "return_pct": 76.69,
+          "max_drawdown_pct": -13.41,
+          "closed_trades": 16,
+          "win_rate_pct": 56.25,
+          "open_positions": [
+            "AMD",
+            "QBTS"
+          ]
+        },
+        {
+          "name": "+ QBTS + RGTI + MU",
+          "start": "2025-04-18",
+          "end": "2025-10-17",
+          "universe_size": 23,
+          "final_equity_cad": 204.7,
+          "return_pct": 104.7,
+          "max_drawdown_pct": -9.78,
+          "closed_trades": 14,
+          "win_rate_pct": 71.43,
+          "open_positions": [
+            "MU",
+            "QBTS"
+          ]
+        },
+        {
+          "name": "+ all 4",
+          "start": "2025-04-18",
+          "end": "2025-10-17",
+          "universe_size": 24,
+          "final_equity_cad": 204.7,
+          "return_pct": 104.7,
+          "max_drawdown_pct": -9.78,
+          "closed_trades": 14,
+          "win_rate_pct": 71.43,
+          "open_positions": [
+            "MU",
+            "QBTS"
+          ]
+        }
+      ]
+    },
+    {
+      "start": "2025-10-18",
+      "end": "2026-04-17",
+      "variants": [
+        {
+          "name": "Baseline 20",
+          "start": "2025-10-18",
+          "end": "2026-04-17",
+          "universe_size": 20,
+          "final_equity_cad": 104.31,
+          "return_pct": 4.31,
+          "max_drawdown_pct": -10.12,
+          "closed_trades": 23,
+          "win_rate_pct": 34.78,
+          "open_positions": [
+            "AMD",
+            "UNH",
+            "WMT"
+          ]
+        },
+        {
+          "name": "+ QBTS",
+          "start": "2025-10-18",
+          "end": "2026-04-17",
+          "universe_size": 21,
+          "final_equity_cad": 104.31,
+          "return_pct": 4.31,
+          "max_drawdown_pct": -10.12,
+          "closed_trades": 23,
+          "win_rate_pct": 34.78,
+          "open_positions": [
+            "AMD",
+            "UNH",
+            "WMT"
+          ]
+        },
+        {
+          "name": "+ IONQ",
+          "start": "2025-10-18",
+          "end": "2026-04-17",
+          "universe_size": 21,
+          "final_equity_cad": 104.31,
+          "return_pct": 4.31,
+          "max_drawdown_pct": -10.12,
+          "closed_trades": 23,
+          "win_rate_pct": 34.78,
+          "open_positions": [
+            "AMD",
+            "UNH",
+            "WMT"
+          ]
+        },
+        {
+          "name": "+ RGTI",
+          "start": "2025-10-18",
+          "end": "2026-04-17",
+          "universe_size": 21,
+          "final_equity_cad": 104.31,
+          "return_pct": 4.31,
+          "max_drawdown_pct": -10.12,
+          "closed_trades": 23,
+          "win_rate_pct": 34.78,
+          "open_positions": [
+            "AMD",
+            "UNH",
+            "WMT"
+          ]
+        },
+        {
+          "name": "+ MU",
+          "start": "2025-10-18",
+          "end": "2026-04-17",
+          "universe_size": 21,
+          "final_equity_cad": 106.44,
+          "return_pct": 6.44,
+          "max_drawdown_pct": -10.68,
+          "closed_trades": 24,
+          "win_rate_pct": 37.5,
+          "open_positions": [
+            "AMD",
+            "UNH",
+            "WMT"
+          ]
+        },
+        {
+          "name": "+ QBTS + RGTI",
+          "start": "2025-10-18",
+          "end": "2026-04-17",
+          "universe_size": 22,
+          "final_equity_cad": 104.31,
+          "return_pct": 4.31,
+          "max_drawdown_pct": -10.12,
+          "closed_trades": 23,
+          "win_rate_pct": 34.78,
+          "open_positions": [
+            "AMD",
+            "UNH",
+            "WMT"
+          ]
+        },
+        {
+          "name": "+ QBTS + RGTI + MU",
+          "start": "2025-10-18",
+          "end": "2026-04-17",
+          "universe_size": 23,
+          "final_equity_cad": 106.44,
+          "return_pct": 6.44,
+          "max_drawdown_pct": -10.68,
+          "closed_trades": 24,
+          "win_rate_pct": 37.5,
+          "open_positions": [
+            "AMD",
+            "UNH",
+            "WMT"
+          ]
+        },
+        {
+          "name": "+ all 4",
+          "start": "2025-10-18",
+          "end": "2026-04-17",
+          "universe_size": 24,
+          "final_equity_cad": 106.44,
+          "return_pct": 6.44,
+          "max_drawdown_pct": -10.68,
+          "closed_trades": 24,
+          "win_rate_pct": 37.5,
+          "open_positions": [
+            "AMD",
+            "UNH",
+            "WMT"
+          ]
+        }
+      ]
+    },
+    {
+      "start": "2026-04-18",
+      "end": "2026-10-16",
+      "variants": [
+        {
+          "name": "Baseline 20",
+          "start": "2026-04-18",
+          "end": "2026-10-16",
+          "universe_size": 20,
+          "final_equity_cad": 99.01,
+          "return_pct": -0.99,
+          "max_drawdown_pct": -12.15,
+          "closed_trades": 17,
+          "win_rate_pct": 47.06,
+          "open_positions": [
+            "MSFT"
+          ]
+        },
+        {
+          "name": "+ QBTS",
+          "start": "2026-04-18",
+          "end": "2026-10-16",
+          "universe_size": 21,
+          "final_equity_cad": 98.28,
+          "return_pct": -1.72,
+          "max_drawdown_pct": -18.76,
+          "closed_trades": 18,
+          "win_rate_pct": 44.44,
+          "open_positions": [
+            "MSFT"
+          ]
+        },
+        {
+          "name": "+ IONQ",
+          "start": "2026-04-18",
+          "end": "2026-10-16",
+          "universe_size": 21,
+          "final_equity_cad": 98.52,
+          "return_pct": -1.48,
+          "max_drawdown_pct": -14.09,
+          "closed_trades": 18,
+          "win_rate_pct": 44.44,
+          "open_positions": [
+            "MSFT"
+          ]
+        },
+        {
+          "name": "+ RGTI",
+          "start": "2026-04-18",
+          "end": "2026-10-16",
+          "universe_size": 21,
+          "final_equity_cad": 93.75,
+          "return_pct": -6.25,
+          "max_drawdown_pct": -18.11,
+          "closed_trades": 17,
+          "win_rate_pct": 47.06,
+          "open_positions": [
+            "MSFT"
+          ]
+        },
+        {
+          "name": "+ MU",
+          "start": "2026-04-18",
+          "end": "2026-10-16",
+          "universe_size": 21,
+          "final_equity_cad": 107.75,
+          "return_pct": 7.75,
+          "max_drawdown_pct": -10.46,
+          "closed_trades": 16,
+          "win_rate_pct": 56.25,
+          "open_positions": [
+            "MSFT"
+          ]
+        },
+        {
+          "name": "+ QBTS + RGTI",
+          "start": "2026-04-18",
+          "end": "2026-10-16",
+          "universe_size": 22,
+          "final_equity_cad": 98.28,
+          "return_pct": -1.72,
+          "max_drawdown_pct": -18.76,
+          "closed_trades": 18,
+          "win_rate_pct": 44.44,
+          "open_positions": [
+            "MSFT"
+          ]
+        },
+        {
+          "name": "+ QBTS + RGTI + MU",
+          "start": "2026-04-18",
+          "end": "2026-10-16",
+          "universe_size": 23,
+          "final_equity_cad": 112.25,
+          "return_pct": 12.25,
+          "max_drawdown_pct": -11.12,
+          "closed_trades": 17,
+          "win_rate_pct": 52.94,
+          "open_positions": [
+            "MSFT"
+          ]
+        },
+        {
+          "name": "+ all 4",
+          "start": "2026-04-18",
+          "end": "2026-10-16",
+          "universe_size": 24,
+          "final_equity_cad": 95.92,
+          "return_pct": -4.08,
+          "max_drawdown_pct": -13.37,
+          "closed_trades": 18,
+          "win_rate_pct": 44.44,
+          "open_positions": [
+            "MSFT"
+          ]
+        }
+      ]
+    }
+  ],
+  "walk_forward": [
+    {
+      "train": "2024-10-18..2025-04-17",
+      "test": "2025-04-18..2025-10-17",
+      "chosen_variant": "+ RGTI",
+      "train_return_pct": -5.84,
+      "test_return_pct": 36.33,
+      "test_baseline_return_pct": 13.98,
+      "test_all4_return_pct": 104.7
+    },
+    {
+      "train": "2025-04-18..2025-10-17",
+      "test": "2025-10-18..2026-04-17",
+      "chosen_variant": "+ QBTS + RGTI + MU",
+      "train_return_pct": 104.7,
+      "test_return_pct": 6.44,
+      "test_baseline_return_pct": 4.31,
+      "test_all4_return_pct": 6.44
+    },
+    {
+      "train": "2025-10-18..2026-04-17",
+      "test": "2026-04-18..2026-10-16",
+      "chosen_variant": "+ MU",
+      "train_return_pct": 6.44,
+      "test_return_pct": 7.75,
+      "test_baseline_return_pct": -0.99,
+      "test_all4_return_pct": -4.08
+    }
+  ],
+  "assumptions": [
+    "QBTS begins only on 2022-08-08; IONQ on 2021-10-01; RGTI on 2022-03-02.",
+    "A candidate only becomes signalable after enough post-listing bars exist for the production indicator minimum.",
+    "No commissions, slippage, spread, taxes, CAD/USD conversion or Wealthsimple FX costs.",
+    "Gap below stop exits at the open; otherwise stop fill is modeled at the stop.",
+    "Research branch only; production universe and LIVE state are unchanged."
+  ],
+  "errors": []
+}
