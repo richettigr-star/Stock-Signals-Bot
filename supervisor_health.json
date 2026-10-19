@@ -1,7 +1,7 @@
 {
-  "checked_at_utc": "2026-10-19T19:35:17.526401+00:00",
-  "run_id": "39265886662",
-  "origin_event": "push",
+  "checked_at_utc": "2026-10-19T19:36:43.754419+00:00",
+  "run_id": "39310979940",
+  "origin_event": "workflow_dispatch",
   "status": "ok",
   "last_requests": {},
   "last_alert_bucket": "20261019-10-0",
@@ -16,7 +16,5 @@
     }
   },
   "problems": [],
-  "monitor_assessment": "ok",
-  "handover_requested": true,
-  "handover_requested_at_utc": "2026-10-19T19:36:17.286881+00:00"
+  "monitor_assessment": "ok"
 }
