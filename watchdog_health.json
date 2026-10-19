@@ -1,27 +1,23 @@
 {
-  "checked_at_utc": "2026-10-19T14:06:17.620424+00:00",
-  "status": "degraded",
+  "checked_at_utc": "2026-10-19T14:07:17.731611+00:00",
+  "status": "ok",
   "active_holdings": [
     "COST"
   ],
-  "problems": [
-    "monitor atrasado 3945 min",
-    "COST: leitura atrasada ou ausente"
-  ],
+  "problems": [],
   "stale_after_seconds": 420,
   "last_alert_bucket": "20261019-10-0",
   "last_recovery_requested_at_utc": "2026-10-19T14:06:20.525487+00:00",
-  "last_alert_sent_at_utc": "2026-10-19T14:06:19.057387+00:00",
   "notifications_ok": true,
   "session": {
     "run_id": "39265893436",
     "started_at_utc": "2026-10-19T14:06:17.620424+00:00",
-    "checks": 1,
+    "checks": 2,
     "failed_checks": 1,
-    "recoveries": 0,
-    "last_check_ok": false,
-    "status": "degraded",
+    "recoveries": 1,
+    "last_check_ok": true,
+    "status": "recovered",
     "last_failure_at_utc": "2026-10-19T14:06:17.620424+00:00",
-    "last_recovery_at_utc": null
+    "last_recovery_at_utc": "2026-10-19T14:07:17.731611+00:00"
   }
 }
