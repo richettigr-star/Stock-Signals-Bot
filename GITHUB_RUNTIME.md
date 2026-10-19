@@ -17,6 +17,16 @@ Dispatch acceptance is not proof that its successor started. Neither the daily b
 
 ## Operation
 
+### Continuous startup supervisor (2026-10-19)
+
+The unattended opening failed on 2026-10-19: the workflows were enabled, but neither monitor nor watchdog had a run or a fresh committed observation after the 09:42 NY opening grace. No internal GitHub reason for the missing scheduled events was exposed; workflow enablement is not evidence that cron fired. The earlier watchdog-recovery patch addressed final exit status, not this daily bootstrap dependency.
+
+`Continuous Session Supervisor` now carries its own bounded runner chain through nights, weekends and holidays. It uses a separate concurrency group, requests its successor before 330 minutes and remains alive outside the trading window without fetching quotes or dispatching trading workers. Every five minutes in standby and every minute from XNYS open minus ten minutes through close plus twenty, it synchronizes current state. During that window it requests missing monitor/watchdog workers, checks for existing running/queued jobs to avoid duplicates, and retains per-workflow request timestamps with a fifteen-minute cooldown. Accepted dispatches are explicitly unverified until a runner and effective observations exist. Daily session workers, strategy and trading-state ownership remain unchanged.
+
+`supervisor_health.json` is separate operational evidence. No positions, stops, fills, outbox or cadence records are written by the supervisor. Real missing-watchdog incidents after the opening grace can send a deduplicated Telegram health alert; rejected alerts retry. Hourly UTC recovery schedules remain best-effort disaster recovery only, not the normal daily start. One initial assisted activation is required; it must not be described as an automatic opening PASS. The next unattended opening and a real supervisor handover still need observation.
+
+This removes the normal overnight-to-morning cron dependency only while the runner chain survives. It consumes continuous GitHub Actions runner time and still shares GitHub availability, dispatch/queue limits, credentials and possible platform outages with both workers. It does not provide guaranteed five-minute readings or an independent failure domain. A GitHub-only deployment cannot eliminate those limits.
+
 1. `Intraday Exit Signals` starts from a manual dispatch, code push or recovery schedule.
 2. The worker waits for 09:31 NY so a first regular minute bar can exist. Holidays, early closes and DST use the XNYS calendar.
 3. Scans start on a monotonic 300-second clock. Slow work skips missed slots instead of bursting requests; failed data or Telegram delivery does not cancel later scans.

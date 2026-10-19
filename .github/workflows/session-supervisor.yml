@@ -1,0 +1,49 @@
+name: Continuous Session Supervisor
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["session_supervisor.py", ".github/workflows/session-supervisor.yml"]
+  schedule:
+    - cron: "17,47 * * * *"
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: stock-session-supervisor
+  cancel-in-progress: false
+jobs:
+  supervise:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run offline regression tests
+        run: python -m unittest -q
+      - name: Configure supervisor checkpoint identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Supervise session startup and continue across nights and holidays
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          PYTHONUNBUFFERED: "1"
+        run: python session_supervisor.py
+      - name: Preserve supervision evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: supervisor-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 7
+          path: supervisor_health.json
