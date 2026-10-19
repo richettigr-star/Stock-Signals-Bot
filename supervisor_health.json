@@ -1,25 +1,20 @@
 {
-  "checked_at_utc": "2026-10-19T14:06:17.468675+00:00",
+  "checked_at_utc": "2026-10-19T14:07:17.556937+00:00",
   "run_id": "39265886662",
   "origin_event": "push",
-  "status": "degraded",
+  "status": "ok",
   "last_requests": {},
   "last_alert_bucket": "20261019-10-0",
   "workflows": {
     "intraday-exits.yml": {
-      "status": "in_progress",
-      "run_id": 39265886743
+      "status": "pending",
+      "run_id": 39265940859
     },
     "monitor-watchdog.yml": {
       "status": "in_progress",
       "run_id": 39265893436
     }
   },
-  "problems": [
-    "monitor atrasado 3945 min",
-    "COST: leitura atrasada ou ausente",
-    "watchdog sem supervisão recente comprovada"
-  ],
-  "monitor_assessment": "degraded",
-  "notifications_ok": true
+  "problems": [],
+  "monitor_assessment": "ok"
 }
