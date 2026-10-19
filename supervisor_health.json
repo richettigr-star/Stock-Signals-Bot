@@ -1,5 +1,5 @@
 {
-  "checked_at_utc": "2026-10-19T16:35:17.499749+00:00",
+  "checked_at_utc": "2026-10-19T16:36:17.494771+00:00",
   "run_id": "39265886662",
   "origin_event": "push",
   "status": "ok",
@@ -7,7 +7,7 @@
   "last_alert_bucket": "20261019-10-0",
   "workflows": {
     "intraday-exits.yml": {
-      "status": "queued",
+      "status": "pending",
       "run_id": 39284784878
     },
     "monitor-watchdog.yml": {
