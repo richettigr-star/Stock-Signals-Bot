@@ -1,0 +1,164 @@
+{
+  "classification": "ASSISTED_RECOVERY_NOT_AUTOMATIC_OPENING",
+  "captured_at_utc": "2026-10-19T14:17:07Z",
+  "release_commit": "3b3462129773c9d01bc705d9913c49944581f97c",
+  "source_snapshot_commit": "d395fc23f1e16ac5025a15dc3ee1893c771011fa",
+  "ci": {
+    "run_id": 39265886685,
+    "conclusion": "success",
+    "tests_passed": 115
+  },
+  "source_blobs": {
+    "watchdog_health.json": "60bc61aedb1fe6d488db30a80ad665f3a6004a25",
+    "signal_events.json": "552eed4eb4524f179812f130184c9f82719d24be",
+    "signal_state.json": "57c6d50f423eb66c4393810df52f22dfb9e8f0c3",
+    "portfolio_state.json": "0401268db70735db7da6ec1a8d303d1622cba4a1",
+    "monitor_health.json": "47ccde9959bfe7055506f807a73c7c68c121a195",
+    "monitor_cadence.json": "623b959a5dce5aeb37732799f0dbe9b24491db97",
+    "supervisor_health.json": "f265081dd185a8376002dd31c1031485924c88e0"
+  },
+  "cadence": {
+    "version": 1,
+    "samples": [
+      {
+        "started_at_utc": "2026-10-19T14:06:20.407710+00:00",
+        "completed_at_utc": "2026-10-19T14:06:21.203473+00:00",
+        "run_id": "39265886743",
+        "effective": true,
+        "symbols": {
+          "COST": {
+            "bar_at_utc": "2026-10-19T14:05:00+00:00",
+            "status": "ok",
+            "confirmed": true,
+            "bar_age_seconds": 80
+          }
+        }
+      },
+      {
+        "started_at_utc": "2026-10-19T14:11:20.500722+00:00",
+        "completed_at_utc": "2026-10-19T14:11:21.365082+00:00",
+        "run_id": "39265886743",
+        "effective": true,
+        "symbols": {
+          "COST": {
+            "bar_at_utc": "2026-10-19T14:10:00+00:00",
+            "status": "ok",
+            "confirmed": true,
+            "bar_age_seconds": 81
+          }
+        }
+      },
+      {
+        "started_at_utc": "2026-10-19T14:16:20.526131+00:00",
+        "completed_at_utc": "2026-10-19T14:16:21.312938+00:00",
+        "run_id": "39265886743",
+        "effective": true,
+        "symbols": {
+          "COST": {
+            "bar_at_utc": "2026-10-19T14:15:00+00:00",
+            "status": "ok",
+            "confirmed": true,
+            "bar_age_seconds": 81
+          }
+        }
+      }
+    ]
+  },
+  "monitor": {
+    "started_at_utc": "2026-10-19T14:16:20.526131+00:00",
+    "status": "ok",
+    "symbols": {
+      "COST": {
+        "status": "ok",
+        "checked_at_utc": "2026-10-19T14:16:21.310379+00:00",
+        "bar_datetime_ny": "2026-10-19 10:15:00",
+        "bar_age_seconds": 81,
+        "last_price_usd": 989.68,
+        "stop_usd": 947.974,
+        "holding_confirmed": true,
+        "recovery_gap_detected": false
+      }
+    },
+    "telegram_configured": true,
+    "target_interval_seconds": 300,
+    "active_holdings": [
+      "COST"
+    ],
+    "unconfirmed_signals_skipped": [
+      "WMT",
+      "XOM"
+    ],
+    "notifications_ok": true,
+    "completed_at_utc": "2026-10-19T14:16:21.312938+00:00",
+    "run_id": "39265886743",
+    "runtime": "github_session"
+  },
+  "watchdog": {
+    "checked_at_utc": "2026-10-19T14:16:17.723224+00:00",
+    "status": "ok",
+    "active_holdings": [
+      "COST"
+    ],
+    "problems": [],
+    "stale_after_seconds": 420,
+    "last_alert_bucket": "20261019-10-0",
+    "last_recovery_requested_at_utc": "2026-10-19T14:06:20.525487+00:00",
+    "notifications_ok": true,
+    "session": {
+      "run_id": "39265893436",
+      "started_at_utc": "2026-10-19T14:06:17.620424+00:00",
+      "checks": 11,
+      "failed_checks": 1,
+      "recoveries": 1,
+      "last_check_ok": true,
+      "status": "recovered",
+      "last_failure_at_utc": "2026-10-19T14:06:17.620424+00:00",
+      "last_recovery_at_utc": "2026-10-19T14:07:17.731611+00:00"
+    }
+  },
+  "supervisor": {
+    "checked_at_utc": "2026-10-19T14:16:17.496072+00:00",
+    "run_id": "39265886662",
+    "origin_event": "push",
+    "status": "ok",
+    "last_requests": {},
+    "last_alert_bucket": "20261019-10-0",
+    "workflows": {
+      "intraday-exits.yml": {
+        "status": "pending",
+        "run_id": 39265940859
+      },
+      "monitor-watchdog.yml": {
+        "status": "in_progress",
+        "run_id": 39265893436
+      }
+    },
+    "problems": [],
+    "monitor_assessment": "ok"
+  },
+  "positions": {
+    "confirmed": [
+      "COST"
+    ],
+    "cost_stop_usd": 947.974,
+    "stop_history": [
+      {
+        "stop_usd": 947.974,
+        "effective_from_utc": "2026-10-19T13:30:00+00:00",
+        "bar_date": "2026-10-16"
+      }
+    ],
+    "unconfirmed": [
+      "WMT",
+      "XOM"
+    ]
+  },
+  "pending_notifications": 0,
+  "exit_events": 0,
+  "limitations": [
+    "Opening on 2026-10-19 failed and remains failed; startup was assisted by an authorized push.",
+    "Observed recovery window only; no guarantee of future availability.",
+    "Real supervisor handover and next unattended opening remain unverified.",
+    "GitHub-only supervisor shares GitHub's availability and consumes runner time."
+  ]
+}
