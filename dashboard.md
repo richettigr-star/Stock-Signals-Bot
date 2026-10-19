@@ -1,19 +1,19 @@
 # Stock Signals — Dashboard
 
-Snapshot UTC: 2026-10-19T20:16:50.503724+00:00
+Snapshot UTC: 2026-10-19T21:47:45.980962+00:00
 
 **Monitor as of this snapshot: ok**
-Last check UTC: 2026-10-19T20:16:49.618130+00:00.
+Last check UTC: 2026-10-19T21:44:33.837016+00:00.
 During the session, a last check older than 10 minutes means monitoring is unavailable, even if this saved snapshot says OK.
 Telegram: **configured** · Undelivered events: 0.
-Daily scan: ok · Last processed bar: 2026-10-16.
+Daily scan: ok · Last processed bar: 2026-10-19.
 
 Initial capital: C$ 100.00 · Invested cost: C$ 33.33 · Unallocated cash: C$ 66.67
 Realized P&L: C$ 0.00 · Closed trades: 0 · Wins: 0 · Losses: 0
 
 | Holding | Status | Entry USD | Last observed USD | Strategy stop USD | USD return since entry | Quote NY (status) |
 |---|---|---:|---:|---:|---:|---|
-| COST | active | 985.40 | 995.6500 | 947.9740 | +1.04% | 2026-10-19 15:59:00 (ok) |
+| COST | active | 985.40 | 995.6500 | 955.0253 | +1.04% | 2026-10-19 15:59:00 (ok) |
 
 EXIT is an alert, not a broker sale. Cash and realized P&L change only after confirmed execution.
 USD price return is not exact CAD P&L; share quantity, FX and fees are not yet recorded.
@@ -21,11 +21,14 @@ This chat is not continuously updating. Reload this GitHub page for the latest s
 
 ## Strategy signals without confirmed purchases
 
-- WMT: pending_entry; strategy stop USD 112.6691. No real holding confirmed.
-- XOM: pending_entry; strategy stop USD 169.9192. No real holding confirmed.
+- CVX: pending_entry; strategy stop USD 213.3603. No real holding confirmed.
+- WMT: pending_entry; strategy stop USD 112.7883. No real holding confirmed.
 
 ## Recent alerts
 
+- ENTRY CVX: 2026-10-19T21:47:43.545663+00:00 · delivery sent · ID ENTRY-CVX-2026-10-19.
+- ENTRY WMT: 2026-10-19T21:47:43.545522+00:00 · delivery sent · ID ENTRY-WMT-2026-10-19.
+- STOP_UPDATE COST: 2026-10-19T21:47:43.545368+00:00 · delivery sent · ID STOP_UPDATE-COST-2026-10-19.
 - ENTRY XOM: 2026-10-16T20:24:19.213626+00:00 · delivery sent · ID ENTRY-XOM-2026-10-16.
 - ENTRY WMT: 2026-10-16T20:24:19.213569+00:00 · delivery sent · ID ENTRY-WMT-2026-10-16.
 - STOP_UPDATE COST: 2026-10-16T20:24:19.213491+00:00 · delivery sent · ID STOP_UPDATE-COST-2026-10-16.

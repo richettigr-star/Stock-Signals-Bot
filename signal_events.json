@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at_utc": "2026-10-19T20:16:49.816703+00:00",
+  "updated_at_utc": "2026-10-19T21:47:45.257222+00:00",
   "events": [
     {
       "id": "ENTRY-COST-2026-10-14",
@@ -146,6 +146,54 @@
       "telegram_last_attempt_at_utc": "2026-10-16T20:24:20.227213+00:00",
       "telegram_alert_sent_at_utc": "2026-10-16T20:24:20.738497+00:00",
       "telegram_message_id": 15
+    },
+    {
+      "id": "STOP_UPDATE-COST-2026-10-19",
+      "type": "STOP_UPDATE",
+      "symbol": "COST",
+      "bar_date": "2026-10-19",
+      "old_stop_usd": 947.974,
+      "new_stop_usd": 955.0253,
+      "close_usd": 995.53,
+      "atr14": 16.2019,
+      "holding_confirmed": true,
+      "created_at_utc": "2026-10-19T21:47:43.545368+00:00",
+      "telegram_alert_status": "sent",
+      "telegram_last_attempt_at_utc": "2026-10-19T21:47:43.546486+00:00",
+      "telegram_alert_sent_at_utc": "2026-10-19T21:47:44.156379+00:00",
+      "telegram_message_id": 18
+    },
+    {
+      "id": "ENTRY-WMT-2026-10-19",
+      "type": "ENTRY",
+      "symbol": "WMT",
+      "signal_date": "2026-10-19",
+      "signal_close_usd": 118.7,
+      "stop_usd": 112.7883,
+      "atr14": 2.3647,
+      "momentum10_pct": 12.972,
+      "recommended_position_cad": 33.33,
+      "created_at_utc": "2026-10-19T21:47:43.545522+00:00",
+      "telegram_alert_status": "sent",
+      "telegram_last_attempt_at_utc": "2026-10-19T21:47:44.157344+00:00",
+      "telegram_alert_sent_at_utc": "2026-10-19T21:47:44.704172+00:00",
+      "telegram_message_id": 19
+    },
+    {
+      "id": "ENTRY-CVX-2026-10-19",
+      "type": "ENTRY",
+      "symbol": "CVX",
+      "signal_date": "2026-10-19",
+      "signal_close_usd": 224.37,
+      "stop_usd": 213.3603,
+      "atr14": 4.4039,
+      "momentum10_pct": 8.67,
+      "recommended_position_cad": 33.33,
+      "created_at_utc": "2026-10-19T21:47:43.545663+00:00",
+      "telegram_alert_status": "sent",
+      "telegram_last_attempt_at_utc": "2026-10-19T21:47:44.704879+00:00",
+      "telegram_alert_sent_at_utc": "2026-10-19T21:47:45.256691+00:00",
+      "telegram_message_id": 20
     }
   ]
 }

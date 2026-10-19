@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updated_at_utc": "2026-10-19T20:16:49.617561+00:00",
-  "latest_processed_bar_date": "2026-10-16",
+  "updated_at_utc": "2026-10-19T21:47:43.545680+00:00",
+  "latest_processed_bar_date": "2026-10-19",
   "state_note": "Strategy signal state. A position is active only when the purchase is user-confirmed in portfolio_state.json.",
   "positions": {
     "COST": {
@@ -12,16 +12,16 @@
       "planned_entry": "next_market_open",
       "signal_close_usd": 982.0,
       "atr14_at_signal": 15.4756,
-      "atr14_latest": 16.4864,
-      "stop_usd": 947.974,
+      "atr14_latest": 16.2019,
+      "stop_usd": 955.0253,
       "initial_stop_usd": 946.711,
-      "last_stop_update_date": "2026-10-16",
+      "last_stop_update_date": "2026-10-19",
       "recommended_position_cad": 33.33,
       "score": 4.995013,
       "momentum10_pct": 7.872,
       "stop_rule": "max(previous_stop, completed_daily_close - 2.5 * ATR14)",
       "created_at_utc": "2026-10-14T22:05:00+00:00",
-      "updated_at_utc": "2026-10-19T20:16:49.616811+00:00",
+      "updated_at_utc": "2026-10-19T21:47:43.545233+00:00",
       "actual_fill": {
         "confirmed_by": "user",
         "trade_date": "2026-10-15",
@@ -32,64 +32,69 @@
         "note": "User-confirmed purchase; share quantity and exact execution time not supplied."
       },
       "last_checked_bar_utc": "2026-10-19T19:59:00+00:00",
-      "last_close_usd": 989.19,
+      "last_close_usd": 995.53,
       "stop_history": [
         {
           "stop_usd": 947.974,
           "effective_from_utc": "2026-10-19T13:30:00+00:00",
           "bar_date": "2026-10-16"
+        },
+        {
+          "stop_usd": 955.0253,
+          "effective_from_utc": "2026-10-20T13:30:00+00:00",
+          "bar_date": "2026-10-19"
         }
       ]
     },
     "WMT": {
       "symbol": "WMT",
-      "signal_id": "ENTRY-WMT-2026-10-16",
+      "signal_id": "ENTRY-WMT-2026-10-19",
       "status": "pending_entry",
-      "signal_date": "2026-10-16",
+      "signal_date": "2026-10-19",
       "planned_entry": "next_market_open",
-      "signal_close_usd": 118.8,
-      "atr14_at_signal": 2.4523,
-      "atr14_latest": 2.4523,
-      "stop_usd": 112.6691,
-      "initial_stop_usd": 112.6691,
-      "last_stop_update_date": "2026-10-16",
+      "signal_close_usd": 118.7,
+      "atr14_at_signal": 2.3647,
+      "atr14_latest": 2.3647,
+      "stop_usd": 112.7883,
+      "initial_stop_usd": 112.7883,
+      "last_stop_update_date": "2026-10-19",
       "recommended_position_cad": 33.33,
-      "score": 6.755881,
-      "momentum10_pct": 13.946,
-      "created_at_utc": "2026-10-16T20:24:19.213517+00:00",
-      "updated_at_utc": "2026-10-16T20:24:19.213519+00:00",
+      "score": 6.511729,
+      "momentum10_pct": 12.972,
+      "created_at_utc": "2026-10-19T21:47:43.545406+00:00",
+      "updated_at_utc": "2026-10-19T21:47:43.545409+00:00",
       "stop_rule": "max(previous_stop, completed_daily_close - 2.5 * ATR14)",
       "stop_history": [
         {
-          "stop_usd": 112.6691,
-          "effective_from_utc": "2026-10-19T13:30:00+00:00",
-          "bar_date": "2026-10-16"
+          "stop_usd": 112.7883,
+          "effective_from_utc": "2026-10-20T13:30:00+00:00",
+          "bar_date": "2026-10-19"
         }
       ]
     },
-    "XOM": {
-      "symbol": "XOM",
-      "signal_id": "ENTRY-XOM-2026-10-16",
+    "CVX": {
+      "symbol": "CVX",
+      "signal_id": "ENTRY-CVX-2026-10-19",
       "status": "pending_entry",
-      "signal_date": "2026-10-16",
+      "signal_date": "2026-10-19",
       "planned_entry": "next_market_open",
-      "signal_close_usd": 179.01,
-      "atr14_at_signal": 3.6363,
-      "atr14_latest": 3.6363,
-      "stop_usd": 169.9192,
-      "initial_stop_usd": 169.9192,
-      "last_stop_update_date": "2026-10-16",
+      "signal_close_usd": 224.37,
+      "atr14_at_signal": 4.4039,
+      "atr14_latest": 4.4039,
+      "stop_usd": 213.3603,
+      "initial_stop_usd": 213.3603,
+      "last_stop_update_date": "2026-10-19",
       "recommended_position_cad": 33.33,
-      "score": 4.502323,
-      "momentum10_pct": 9.146,
-      "created_at_utc": "2026-10-16T20:24:19.213581+00:00",
-      "updated_at_utc": "2026-10-16T20:24:19.213582+00:00",
+      "score": 4.416997,
+      "momentum10_pct": 8.67,
+      "created_at_utc": "2026-10-19T21:47:43.545546+00:00",
+      "updated_at_utc": "2026-10-19T21:47:43.545548+00:00",
       "stop_rule": "max(previous_stop, completed_daily_close - 2.5 * ATR14)",
       "stop_history": [
         {
-          "stop_usd": 169.9192,
-          "effective_from_utc": "2026-10-19T13:30:00+00:00",
-          "bar_date": "2026-10-16"
+          "stop_usd": 213.3603,
+          "effective_from_utc": "2026-10-20T13:30:00+00:00",
+          "bar_date": "2026-10-19"
         }
       ]
     }
