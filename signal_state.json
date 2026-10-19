@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at_utc": "2026-10-19T20:01:49.525412+00:00",
+  "updated_at_utc": "2026-10-19T20:06:49.611494+00:00",
   "latest_processed_bar_date": "2026-10-16",
   "state_note": "Strategy signal state. A position is active only when the purchase is user-confirmed in portfolio_state.json.",
   "positions": {
@@ -21,7 +21,7 @@
       "momentum10_pct": 7.872,
       "stop_rule": "max(previous_stop, completed_daily_close - 2.5 * ATR14)",
       "created_at_utc": "2026-10-14T22:05:00+00:00",
-      "updated_at_utc": "2026-10-19T20:01:49.524706+00:00",
+      "updated_at_utc": "2026-10-19T20:06:49.610806+00:00",
       "actual_fill": {
         "confirmed_by": "user",
         "trade_date": "2026-10-15",
