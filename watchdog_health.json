@@ -1,5 +1,5 @@
 {
-  "checked_at_utc": "2026-10-19T17:28:17.683622+00:00",
+  "checked_at_utc": "2026-10-19T17:29:58.014895+00:00",
   "status": "ok",
   "active_holdings": [
     "COST"
@@ -10,14 +10,14 @@
   "last_recovery_requested_at_utc": "2026-10-19T14:06:20.525487+00:00",
   "notifications_ok": true,
   "session": {
-    "run_id": "39265893436",
-    "started_at_utc": "2026-10-19T14:06:17.620424+00:00",
-    "checks": 203,
-    "failed_checks": 1,
-    "recoveries": 1,
+    "run_id": "39294553154",
+    "started_at_utc": "2026-10-19T17:29:58.014895+00:00",
+    "checks": 1,
+    "failed_checks": 0,
+    "recoveries": 0,
     "last_check_ok": true,
-    "status": "recovered",
-    "last_failure_at_utc": "2026-10-19T14:06:17.620424+00:00",
-    "last_recovery_at_utc": "2026-10-19T14:07:17.731611+00:00"
+    "status": "ok",
+    "last_failure_at_utc": null,
+    "last_recovery_at_utc": null
   }
 }
