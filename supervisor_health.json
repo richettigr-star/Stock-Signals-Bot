@@ -1,5 +1,5 @@
 {
-  "checked_at_utc": "2026-10-20T13:29:54.500970+00:00",
+  "checked_at_utc": "2026-10-20T13:30:54.499986+00:00",
   "run_id": "39418672284",
   "origin_event": "workflow_dispatch",
   "status": "opening_grace",
@@ -19,5 +19,5 @@
     }
   },
   "problems": [],
-  "monitor_assessment": "outside_session"
+  "monitor_assessment": "opening_grace"
 }
