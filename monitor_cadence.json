@@ -2394,6 +2394,20 @@
           "bar_age_seconds": 150
         }
       }
+    },
+    {
+      "started_at_utc": "2026-10-20T18:11:30.358836+00:00",
+      "completed_at_utc": "2026-10-20T18:11:31.386810+00:00",
+      "run_id": "39431065273",
+      "effective": true,
+      "symbols": {
+        "COST": {
+          "bar_at_utc": "2026-10-20T18:10:00+00:00",
+          "status": "ok",
+          "confirmed": true,
+          "bar_age_seconds": 90
+        }
+      }
     }
   ]
 }
