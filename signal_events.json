@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at_utc": "2026-10-20T20:16:54.705729+00:00",
+  "updated_at_utc": "2026-10-20T20:54:01.308424+00:00",
   "events": [
     {
       "id": "ENTRY-COST-2026-10-14",
@@ -194,6 +194,38 @@
       "telegram_last_attempt_at_utc": "2026-10-19T21:47:44.704879+00:00",
       "telegram_alert_sent_at_utc": "2026-10-19T21:47:45.256691+00:00",
       "telegram_message_id": 20
+    },
+    {
+      "id": "ENTRY-WMT-2026-10-20",
+      "type": "ENTRY",
+      "symbol": "WMT",
+      "signal_date": "2026-10-20",
+      "signal_close_usd": 117.9,
+      "stop_usd": 111.8615,
+      "atr14": 2.4154,
+      "momentum10_pct": 9.981,
+      "recommended_position_cad": 33.33,
+      "created_at_utc": "2026-10-20T20:54:00.259454+00:00",
+      "telegram_alert_status": "sent",
+      "telegram_last_attempt_at_utc": "2026-10-20T20:54:00.260345+00:00",
+      "telegram_alert_sent_at_utc": "2026-10-20T20:54:00.786907+00:00",
+      "telegram_message_id": 21
+    },
+    {
+      "id": "ENTRY-CVX-2026-10-20",
+      "type": "ENTRY",
+      "symbol": "CVX",
+      "signal_date": "2026-10-20",
+      "signal_close_usd": 225.78,
+      "stop_usd": 214.5344,
+      "atr14": 4.4982,
+      "momentum10_pct": 8.768,
+      "recommended_position_cad": 33.33,
+      "created_at_utc": "2026-10-20T20:54:00.259517+00:00",
+      "telegram_alert_status": "sent",
+      "telegram_last_attempt_at_utc": "2026-10-20T20:54:00.788093+00:00",
+      "telegram_alert_sent_at_utc": "2026-10-20T20:54:01.307579+00:00",
+      "telegram_message_id": 22
     }
   ]
 }

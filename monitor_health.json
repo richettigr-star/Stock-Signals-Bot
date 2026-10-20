@@ -1,10 +1,10 @@
 {
-  "started_at_utc": "2026-10-20T20:16:53.741403+00:00",
+  "started_at_utc": "2026-10-20T20:50:50.095601+00:00",
   "status": "ok",
   "symbols": {
     "COST": {
       "status": "ok",
-      "checked_at_utc": "2026-10-20T20:16:54.518039+00:00",
+      "checked_at_utc": "2026-10-20T20:50:50.372979+00:00",
       "bar_datetime_ny": "2026-10-20 15:59:00",
       "bar_age_seconds": 60,
       "last_price_usd": 994.62,
@@ -23,7 +23,5 @@
     "WMT"
   ],
   "notifications_ok": true,
-  "completed_at_utc": "2026-10-20T20:16:54.519438+00:00",
-  "run_id": "39442520684",
-  "runtime": "github_session"
+  "completed_at_utc": "2026-10-20T20:50:50.374163+00:00"
 }
