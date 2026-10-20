@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at_utc": "2026-10-20T19:16:55.550564+00:00",
+  "updated_at_utc": "2026-10-20T19:21:55.209543+00:00",
   "as_of_trade_date": "2026-10-15",
   "source": "User-confirmed transactions with observed provider quotes; no broker synchronization.",
   "account_currency": "CAD",
@@ -19,14 +19,14 @@
       "entry_price_usd": 985.4,
       "invested_cad": 33.33,
       "quantity": null,
-      "latest_price_usd": 993.295,
+      "latest_price_usd": 993.075,
       "strategy_stop_usd": 955.0253,
       "fill_based_reference_stop_usd": 946.711,
       "reference_note": "Active strategy stop initialized from the user-confirmed fill minus 2.5×ATR14.",
-      "quote_datetime_ny": "2026-10-20 15:15:00",
+      "quote_datetime_ny": "2026-10-20 15:20:00",
       "quote_status": "ok",
       "exit_alert": null,
-      "price_return_since_entry_pct": 0.8012,
+      "price_return_since_entry_pct": 0.7789,
       "signal_id": "ENTRY-COST-2026-10-14"
     }
   },
@@ -36,6 +36,6 @@
   ],
   "telegram_status": "configured",
   "exit_monitor_status": "ok",
-  "monitor_last_completed_at_utc": "2026-10-20T19:16:54.799324+00:00",
+  "monitor_last_completed_at_utc": "2026-10-20T19:21:54.550286+00:00",
   "last_telegram_delivery_at_utc": "2026-10-19T21:47:45.256691+00:00"
 }
