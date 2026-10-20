@@ -1,5 +1,5 @@
 {
-  "checked_at_utc": "2026-10-20T13:30:54.499986+00:00",
+  "checked_at_utc": "2026-10-20T13:31:54.820316+00:00",
   "run_id": "39418672284",
   "origin_event": "workflow_dispatch",
   "status": "opening_grace",
@@ -11,7 +11,7 @@
   "workflows": {
     "intraday-exits.yml": {
       "status": "in_progress",
-      "run_id": 39429900809
+      "run_id": 39431065273
     },
     "monitor-watchdog.yml": {
       "status": "in_progress",
