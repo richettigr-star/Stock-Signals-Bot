@@ -1,6 +1,6 @@
 {
-  "checked_at_utc": "2026-10-19T20:19:58.197718+00:00",
-  "status": "ok",
+  "checked_at_utc": "2026-10-20T13:31:00.934058+00:00",
+  "status": "opening_grace",
   "active_holdings": [
     "COST"
   ],
@@ -10,9 +10,9 @@
   "last_recovery_requested_at_utc": "2026-10-19T14:06:20.525487+00:00",
   "notifications_ok": true,
   "session": {
-    "run_id": "39294553154",
-    "started_at_utc": "2026-10-19T17:29:58.014895+00:00",
-    "checks": 171,
+    "run_id": "39429905950",
+    "started_at_utc": "2026-10-20T13:31:00.934058+00:00",
+    "checks": 1,
     "failed_checks": 0,
     "recoveries": 0,
     "last_check_ok": true,
