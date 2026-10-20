@@ -6,5 +6,7 @@
   "last_requests": {},
   "last_alert_bucket": "20261019-10-0",
   "workflows": {},
-  "problems": []
+  "problems": [],
+  "handover_requested": true,
+  "handover_requested_at_utc": "2026-10-20T12:07:29.802731+00:00"
 }
