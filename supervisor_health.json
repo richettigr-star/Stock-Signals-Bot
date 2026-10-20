@@ -1,10 +1,24 @@
 {
-  "checked_at_utc": "2026-10-20T13:17:54.570904+00:00",
+  "checked_at_utc": "2026-10-20T13:22:54.465989+00:00",
   "run_id": "39418672284",
   "origin_event": "workflow_dispatch",
-  "status": "standby",
-  "last_requests": {},
+  "status": "degraded",
+  "last_requests": {
+    "intraday-exits.yml": "2026-10-20T13:22:54.465989+00:00",
+    "monitor-watchdog.yml": "2026-10-20T13:22:54.465989+00:00"
+  },
   "last_alert_bucket": "20261019-10-0",
-  "workflows": {},
-  "problems": []
+  "workflows": {
+    "intraday-exits.yml": {
+      "status": "recovery_requested"
+    },
+    "monitor-watchdog.yml": {
+      "status": "recovery_requested"
+    }
+  },
+  "problems": [
+    "intraday-exits.yml: recuperação solicitada; início não comprovado",
+    "monitor-watchdog.yml: recuperação solicitada; início não comprovado"
+  ],
+  "monitor_assessment": "outside_session"
 }
