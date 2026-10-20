@@ -1,6 +1,6 @@
 {
-  "checked_at_utc": "2026-10-20T23:05:22.387504+00:00",
-  "run_id": "39466297358",
+  "checked_at_utc": "2026-10-20T23:08:40.615751+00:00",
+  "run_id": "39511853521",
   "origin_event": "workflow_dispatch",
   "status": "standby",
   "last_requests": {
@@ -9,7 +9,5 @@
   },
   "last_alert_bucket": "20261019-10-0",
   "workflows": {},
-  "problems": [],
-  "handover_requested": true,
-  "handover_requested_at_utc": "2026-10-20T23:08:22.150808+00:00"
+  "problems": []
 }
