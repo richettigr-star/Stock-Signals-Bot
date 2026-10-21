@@ -1,5 +1,5 @@
 {
-  "checked_at_utc": "2026-10-21T18:33:00.749177+00:00",
+  "checked_at_utc": "2026-10-21T18:34:00.724025+00:00",
   "run_id": "39626173951",
   "origin_event": "workflow_dispatch",
   "status": "ok",
@@ -11,11 +11,11 @@
   "workflows": {
     "intraday-exits.yml": {
       "status": "pending",
-      "run_id": 39650205078
+      "run_id": 39653780354
     },
     "monitor-watchdog.yml": {
       "status": "pending",
-      "run_id": 39651897451
+      "run_id": 39653784474
     }
   },
   "problems": [],
