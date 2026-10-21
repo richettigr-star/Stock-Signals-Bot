@@ -1,6 +1,6 @@
 {
-  "checked_at_utc": "2026-10-21T13:41:00.996625+00:00",
-  "status": "opening_grace",
+  "checked_at_utc": "2026-10-21T13:42:01.016267+00:00",
+  "status": "ok",
   "active_holdings": [
     "COST"
   ],
@@ -12,7 +12,7 @@
   "session": {
     "run_id": "39607736989",
     "started_at_utc": "2026-10-21T13:31:00.993866+00:00",
-    "checks": 11,
+    "checks": 12,
     "failed_checks": 0,
     "recoveries": 0,
     "last_check_ok": true,
