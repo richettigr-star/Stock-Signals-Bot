@@ -1,8 +1,8 @@
 {
-  "checked_at_utc": "2026-10-21T13:41:31.467833+00:00",
+  "checked_at_utc": "2026-10-21T13:42:31.411686+00:00",
   "run_id": "39581159376",
   "origin_event": "workflow_dispatch",
-  "status": "opening_grace",
+  "status": "ok",
   "last_requests": {
     "intraday-exits.yml": "2026-10-21T13:24:31.333586+00:00",
     "monitor-watchdog.yml": "2026-10-21T13:24:31.333586+00:00"
@@ -19,5 +19,5 @@
     }
   },
   "problems": [],
-  "monitor_assessment": "opening_grace"
+  "monitor_assessment": "ok"
 }
