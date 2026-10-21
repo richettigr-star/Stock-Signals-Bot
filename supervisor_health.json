@@ -9,5 +9,7 @@
   },
   "last_alert_bucket": "20261019-10-0",
   "workflows": {},
-  "problems": []
+  "problems": [],
+  "handover_requested": true,
+  "handover_requested_at_utc": "2026-10-21T21:10:00.383463+00:00"
 }
