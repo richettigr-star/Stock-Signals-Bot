@@ -19,5 +19,7 @@
     }
   },
   "problems": [],
-  "monitor_assessment": "ok"
+  "monitor_assessment": "ok",
+  "handover_requested": true,
+  "handover_requested_at_utc": "2026-10-21T15:39:31.040515+00:00"
 }
