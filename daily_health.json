@@ -1,8 +1,8 @@
 {
-  "completed_at_utc": "2026-10-20T20:54:01.309188+00:00",
+  "completed_at_utc": "2026-10-21T20:55:34.396076+00:00",
   "status": "ok",
   "scan_accepted": true,
-  "bar_date": "2026-10-20",
+  "bar_date": "2026-10-21",
   "reason": "complete closed-session scan",
   "notifications_ok": true
 }

@@ -1,19 +1,19 @@
 # Stock Signals — Dashboard
 
-Snapshot UTC: 2026-10-21T20:16:50.754839+00:00
+Snapshot UTC: 2026-10-21T20:55:34.857413+00:00
 
 **Monitor as of this snapshot: ok**
-Last check UTC: 2026-10-21T20:16:49.747945+00:00.
+Last check UTC: 2026-10-21T20:52:22.893265+00:00.
 During the session, a last check older than 10 minutes means monitoring is unavailable, even if this saved snapshot says OK.
 Telegram: **configured** · Undelivered events: 0.
-Daily scan: ok · Last processed bar: 2026-10-20.
+Daily scan: ok · Last processed bar: 2026-10-21.
 
 Initial capital: C$ 100.00 · Invested cost: C$ 33.33 · Unallocated cash: C$ 66.67
 Realized P&L: C$ 0.00 · Closed trades: 0 · Wins: 0 · Losses: 0
 
 | Holding | Status | Entry USD | Last observed USD | Strategy stop USD | USD return since entry | Quote NY (status) |
 |---|---|---:|---:|---:|---:|---|
-| COST | active | 985.40 | 998.1800 | 955.0253 | +1.30% | 2026-10-21 15:59:00 (ok) |
+| COST | active | 985.40 | 998.1800 | 959.1617 | +1.30% | 2026-10-21 15:59:00 (ok) |
 
 EXIT is an alert, not a broker sale. Cash and realized P&L change only after confirmed execution.
 USD price return is not exact CAD P&L; share quantity, FX and fees are not yet recorded.
@@ -21,11 +21,14 @@ This chat is not continuously updating. Reload this GitHub page for the latest s
 
 ## Strategy signals without confirmed purchases
 
-- CVX: pending_entry; strategy stop USD 214.5344. No real holding confirmed.
-- WMT: pending_entry; strategy stop USD 111.8615. No real holding confirmed.
+- CVX: pending_entry; strategy stop USD 215.5500. No real holding confirmed.
+- WMT: pending_entry; strategy stop USD 111.8563. No real holding confirmed.
 
 ## Recent alerts
 
+- ENTRY WMT: 2026-10-21T20:55:32.714461+00:00 · delivery sent · ID ENTRY-WMT-2026-10-21.
+- ENTRY CVX: 2026-10-21T20:55:32.714406+00:00 · delivery sent · ID ENTRY-CVX-2026-10-21.
+- STOP_UPDATE COST: 2026-10-21T20:55:32.714332+00:00 · delivery sent · ID STOP_UPDATE-COST-2026-10-21.
 - ENTRY CVX: 2026-10-20T20:54:00.259517+00:00 · delivery sent · ID ENTRY-CVX-2026-10-20.
 - ENTRY WMT: 2026-10-20T20:54:00.259454+00:00 · delivery sent · ID ENTRY-WMT-2026-10-20.
 - ENTRY CVX: 2026-10-19T21:47:43.545663+00:00 · delivery sent · ID ENTRY-CVX-2026-10-19.
@@ -38,8 +41,6 @@ This chat is not continuously updating. Reload this GitHub page for the latest s
 - ENTRY WMT: 2026-10-15T23:33:41.532260+00:00 · delivery sent · ID ENTRY-WMT-2026-10-15.
 - STOP_UPDATE WMT: 2026-10-15T20:35:06.747285+00:00 · delivery sent · ID STOP_UPDATE-WMT-2026-10-15.
 - ENTRY WMT: 2026-10-14T23:44:37.049099+00:00 · delivery skipped_stale · ID ENTRY-WMT-2026-10-14.
-- ENTRY XOM: 2026-10-14T22:05:00+00:00 · delivery skipped_stale · ID ENTRY-XOM-2026-10-14.
-- ENTRY COST: 2026-10-14T22:05:00+00:00 · delivery skipped_stale · ID ENTRY-COST-2026-10-14.
 
 ## Operational limits
 
