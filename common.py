@@ -32,8 +32,17 @@ def load_json(path, default=None, required=False):
 def save_json(path, data):
     path = Path(path)
     tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(json.dumps(data, indent=2, ensure_ascii=False, allow_nan=False) + "\n", encoding="utf-8")
+    with tmp.open("w", encoding="utf-8") as output:
+        output.write(json.dumps(data, indent=2, ensure_ascii=False, allow_nan=False) + "\n")
+        output.flush()
+        os.fsync(output.fileno())
     os.replace(tmp, path)
+    if hasattr(os, "O_DIRECTORY"):
+        directory = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
+        try:
+            os.fsync(directory)
+        finally:
+            os.close(directory)
 @lru_cache(maxsize=1)
 def calendar():
     import exchange_calendars

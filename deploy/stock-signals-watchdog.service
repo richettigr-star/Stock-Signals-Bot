@@ -1,0 +1,21 @@
+[Unit]
+Description=Independent Stock Signals heartbeat and Telegram watchdog
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=stocksignals
+Group=stocksignals
+WorkingDirectory=/var/lib/stock-signals
+EnvironmentFile=/etc/stock-signals/telegram.env
+Environment=PYTHONPATH=/opt/stock-signals PYTHONDONTWRITEBYTECODE=1
+ExecStart=/opt/stock-signals/.venv/bin/python /opt/stock-signals/monitor_watchdog.py
+TimeoutStartSec=90
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/stock-signals
+InaccessiblePaths=/etc/crypto-signals-v35 /var/lib/crypto-signals-v35
+MemoryMax=200M

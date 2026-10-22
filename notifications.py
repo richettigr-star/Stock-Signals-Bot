@@ -3,7 +3,7 @@ import os
 import time
 from datetime import datetime, timedelta
 import requests
-from common import NY, next_open, now_utc, parse_time, utc_now
+from common import NY, next_open, now_utc, parse_time, save_json, utc_now
 
 def credentials():
     return (os.getenv("TELEGRAM_BOT_TOKEN", "").strip(), os.getenv("TELEGRAM_CHAT_ID", "").strip())
@@ -57,6 +57,8 @@ def send(event):
     return False
 
 def deliver(payload, on_update=None):
+    if on_update is None and os.getenv("STOCK_DURABLE_OUTBOX") == "true":
+        on_update = lambda updated: save_json("signal_events.json", updated)
     now = now_utc()
     events = payload.get("events", [])
     for event in events:

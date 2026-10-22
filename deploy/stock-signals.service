@@ -1,0 +1,32 @@
+[Unit]
+Description=Stock Signals calendar-aware monitor and daily scanner
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=notify
+User=stocksignals
+Group=stocksignals
+WorkingDirectory=/var/lib/stock-signals
+StateDirectory=stock-signals
+StateDirectoryMode=0700
+EnvironmentFile=/etc/stock-signals/telegram.env
+Environment=PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/opt/stock-signals ACCOUNT_EQUITY_CAD=100 STOCK_DURABLE_OUTBOX=true
+ExecStart=/opt/stock-signals/.venv/bin/python /opt/stock-signals/deploy/server_runtime.py
+Restart=always
+RestartSec=15
+WatchdogSec=90
+TimeoutStopSec=30
+KillMode=control-group
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/stock-signals
+InaccessiblePaths=/etc/crypto-signals-v35 /var/lib/crypto-signals-v35
+MemoryMax=350M
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,11 @@
+[Unit]
+Description=Check Stock Signals independently every minute
+
+[Timer]
+OnBootSec=60
+OnUnitActiveSec=60
+AccuracySec=1
+Unit=stock-signals-watchdog.service
+
+[Install]
+WantedBy=timers.target
