@@ -2,6 +2,16 @@
 
 Signal-only stock scanner for a fixed universe of 20 US-listed stocks.
 
+## Runtime after the approved server migration
+
+Stock monitoring now uses the isolated server service described in
+[SERVER_RUNTIME.md](SERVER_RUNTIME.md), with a separate Telegram bot from crypto.
+Legacy GitHub stock executors are disabled. GitHub remains the code/test/history
+repository; its saved JSON and public dashboard are **not live server state**.
+Do not confirm purchases or overwrite server stops by editing an old GitHub
+snapshot. Reconcile manual transactions against `/var/lib/stock-signals` instead.
+No broker orders are sent by either the scanner or the server runtime.
+
 ## Strategy
 
 The bot evaluates:

@@ -12,6 +12,10 @@ Only import the final GitHub snapshot after disabling **and stopping** all legac
 stock writers. Keep a dated backup of that snapshot, its commit and its outbox.
 
 The monitor starts at 09:31 New York, then uses five-minute session-aligned slots.
+Stale provider snapshots are fetched again up to twice, 15 seconds apart, without
+relaxing the 180-second quote-age rule. Exhausted retries remain degraded; they
+are never relabelled as fresh. Earlier failures remain in the full cadence history
+even when the separately labelled recent three-reading window recovers.
 XNYS handles holidays, daylight saving and shortened sessions. The process stays
 resident between sessions; systemd restarts it after failures or a missed process
 heartbeat. Each market-data subprocess is bounded to 240 seconds. The independent
@@ -58,3 +62,9 @@ state/outbox, and reconcile it before enabling any GitHub writer. Never simply
 re-enable old workflows against stale GitHub positions. Both bots share one server
 and therefore a host outage remains a shared failure domain. This is a signal
 system, not a broker stop order, and cannot guarantee continuous availability.
+
+## Official operational references
+
+- [systemd service restart and watchdog behavior](https://www.freedesktop.org/software/systemd/man/256/systemd.service.html)
+- [GitHub workflow cancellation](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-cancellation)
+- [GitHub enabling and disabling workflows](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/disable-and-enable-workflows)

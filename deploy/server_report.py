@@ -21,6 +21,7 @@ def report():
             "watchdog": load_json("watchdog_health.json", {}),
             "daily": load_json("daily_health.json", {}),
             "server_cadence": assess({"samples": samples}, now_utc()),
+            "recent_server_window": assess({"samples": samples[-3:]}, now_utc()),
             "latest_server_samples": samples[-4:], "undelivered_event_ids": pending,
             "confirmed_holdings": {symbol: {"status": item.get("status"),
                                             "strategy_stop_usd": item.get("strategy_stop_usd")}
