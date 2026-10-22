@@ -1,9 +1,9 @@
 # Stock Signals — Dashboard
 
-Snapshot UTC: 2026-10-22T15:46:31.128207+00:00
+Snapshot UTC: 2026-10-22T15:51:32.986237+00:00
 
-**Monitor as of this snapshot: ok**
-Last check UTC: 2026-10-22T15:46:30.291484+00:00.
+**Monitor as of this snapshot: degraded**
+Last check UTC: 2026-10-22T15:51:30.265216+00:00.
 During the session, a last check older than 10 minutes means monitoring is unavailable, even if this saved snapshot says OK.
 Telegram: **configured** · Undelivered events: 0.
 Daily scan: ok · Last processed bar: 2026-10-21.
@@ -13,7 +13,7 @@ Realized P&L: C$ 0.00 · Closed trades: 0 · Wins: 0 · Losses: 0
 
 | Holding | Status | Entry USD | Last observed USD | Strategy stop USD | USD return since entry | Quote NY (status) |
 |---|---|---:|---:|---:|---:|---|
-| COST | active | 985.40 | 1010.9800 | 959.1617 | +2.60% | 2026-10-22 11:45:00 (ok) |
+| COST | active | 985.40 | 1010.8200 | 959.1617 | +2.58% | 2026-10-22 11:47:00 (stale_or_gap) |
 
 EXIT is an alert, not a broker sale. Cash and realized P&L change only after confirmed execution.
 USD price return is not exact CAD P&L; share quantity, FX and fees are not yet recorded.
@@ -26,6 +26,7 @@ This chat is not continuously updating. Reload this GitHub page for the latest s
 
 ## Recent alerts
 
+- MONITOR_HEALTH : 2026-10-22T15:51:30.263750+00:00 · delivery sent · ID MONITOR-HEALTH-2026-10-22T15:51:30.263746+00:00.
 - ENTRY WMT: 2026-10-21T20:55:32.714461+00:00 · delivery sent · ID ENTRY-WMT-2026-10-21.
 - ENTRY CVX: 2026-10-21T20:55:32.714406+00:00 · delivery sent · ID ENTRY-CVX-2026-10-21.
 - STOP_UPDATE COST: 2026-10-21T20:55:32.714332+00:00 · delivery sent · ID STOP_UPDATE-COST-2026-10-21.
@@ -40,7 +41,6 @@ This chat is not continuously updating. Reload this GitHub page for the latest s
 - ENTRY UNH: 2026-10-15T23:33:41.532260+00:00 · delivery sent · ID ENTRY-UNH-2026-10-15.
 - ENTRY WMT: 2026-10-15T23:33:41.532260+00:00 · delivery sent · ID ENTRY-WMT-2026-10-15.
 - STOP_UPDATE WMT: 2026-10-15T20:35:06.747285+00:00 · delivery sent · ID STOP_UPDATE-WMT-2026-10-15.
-- ENTRY WMT: 2026-10-14T23:44:37.049099+00:00 · delivery skipped_stale · ID ENTRY-WMT-2026-10-14.
 
 ## Operational limits
 

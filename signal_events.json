@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at_utc": "2026-10-22T15:51:30.263774+00:00",
+  "updated_at_utc": "2026-10-22T15:51:32.349421+00:00",
   "events": [
     {
       "id": "ENTRY-COST-2026-10-14",
@@ -281,7 +281,10 @@
       "component": "monitor",
       "detail": "Leitura incompleta ou atrasada: COST:stale_or_gap",
       "created_at_utc": "2026-10-22T15:51:30.263750+00:00",
-      "telegram_alert_status": "pending"
+      "telegram_alert_status": "sent",
+      "telegram_last_attempt_at_utc": "2026-10-22T15:51:31.705298+00:00",
+      "telegram_alert_sent_at_utc": "2026-10-22T15:51:32.347449+00:00",
+      "telegram_message_id": 26
     }
   ]
 }
