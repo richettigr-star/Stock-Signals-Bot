@@ -1,40 +1,24 @@
 name: Test Emergency Telegram
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: [".github/workflows/test-emergency-telegram.yml"]
 permissions:
   contents: read
 jobs:
-  test:
+  approved_migration_only:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: pip
-      - run: pip install -r requirements.txt
-      - name: Verify the production Telegram sender
+      - name: Encrypt approved stock credentials without sending Telegram messages
         env:
+          TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: |
-          python - <<'PY'
-          from common import utc_now
-          from notifications import send
-          event = {
-              "id": "AUDIT-TEST-" + utc_now(),
-              "type": "MONITOR_HEALTH",
-              "component": "TESTE CONTROLADO DA AUDITORIA",
-              "detail": "Teste do mesmo código que envia entradas, stops e saídas. Esta mensagem não é um sinal de trade.",
-              "created_at_utc": utc_now(),
-          }
-          if not send(event):
-              raise SystemExit("Production Telegram sender test failed.")
-          print("Production sender: Telegram accepted the audit test message.")
-          PY
+        run: python deploy/secret_envelope.py encrypt deploy/migration-public.pem stock-secrets.encrypted.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stock-secrets-encrypted
+          retention-days: 1
+          path: stock-secrets.encrypted.json
