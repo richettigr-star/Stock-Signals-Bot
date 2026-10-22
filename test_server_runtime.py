@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import tarfile
 import tempfile
 import unittest
 from datetime import datetime, timezone
@@ -11,6 +12,7 @@ from unittest.mock import patch
 
 from deploy import secret_envelope, server_runtime
 from deploy import cutover_actions
+from deploy import import_state
 from test_monitor import Base, FakeCalendar
 import common
 import notifications
@@ -72,7 +74,39 @@ class EnvelopeTests(unittest.TestCase):
                 secret_envelope.env_text(values)
 
 
+class StateMigrationTests(unittest.TestCase):
+    def payload(self):
+        values = {name: "{}" for name in import_state.FILES}
+        values["signal_state.json"] = json.dumps({"positions": {
+            "COST": {"status": "active", "stop_usd": 959.1617}, "WMT": {"status": "pending_entry"}}})
+        values["portfolio_state.json"] = json.dumps({"holdings": {"COST": {"status": "active"}}})
+        return values
+
+    def test_frozen_state_keeps_stop_and_pending_signal(self):
+        self.assertEqual(import_state.validate(self.payload()), 959.1617)
+
+    def test_stale_stop_and_unconfirmed_holding_are_rejected(self):
+        values = self.payload()
+        values["signal_state.json"] = values["signal_state.json"].replace("959.1617", "946.711")
+        with self.assertRaises(ValueError):
+            import_state.validate(values)
+        values = self.payload()
+        values["portfolio_state.json"] = json.dumps({"holdings": {"COST": {}, "WMT": {}}})
+        with self.assertRaises(ValueError):
+            import_state.validate(values)
+
+
 class ServerReceiptTests(Base):
+    def test_backup_contains_state_not_credentials(self):
+        Path("telegram.env").write_text("do-not-back-up-this-test-secret")
+        server_runtime.backup_state()
+        archive_path = next(Path("backups").glob("*.tar.gz"))
+        with tarfile.open(archive_path) as archive:
+            self.assertNotIn("telegram.env", archive.getnames())
+            self.assertIn("signal_events.json", archive.getnames())
+            state = json.load(archive.extractfile("signal_state.json"))
+            self.assertEqual(state, common.load_json("signal_state.json"))
+
     def test_server_persists_receipt_immediately(self):
         event = {"id": "health-test", "type": "MONITOR_HEALTH", "component": "test",
                  "detail": "offline only", "telegram_alert_status": "pending", "created_at_utc": common.utc_now()}
@@ -123,6 +157,26 @@ class CutoverTests(unittest.TestCase):
                 cutover_actions.main()
         self.assertEqual(api.call_count, 1)
         self.assertFalse(Path("stock-cutover.json").exists())
+
+    def test_completed_jobs_are_not_treated_as_running_writers(self):
+        catalog = [{"id": number, "path": name} for number, name in enumerate(sorted(cutover_actions.WORKFLOWS))]
+
+        def api(method, path):
+            if path.startswith("actions/workflows?"):
+                return {"workflows": catalog}
+            if path.startswith("actions/runs?status=in_progress"):
+                return {"workflow_runs": [{"id": 888, "workflow_id": 0, "status": "in_progress"}]}
+            if path.startswith("actions/runs?"):
+                return {"workflow_runs": []}
+            if "/jobs?" in path:
+                return {"jobs": [{"status": "completed"}]}
+            if path == "branches/main":
+                return {"commit": {"sha": "frozen-state"}}
+
+        with patch.object(cutover_actions, "request", side_effect=api), patch.object(cutover_actions.time, "sleep"):
+            cutover_actions.main()
+        manifest = json.loads(Path("stock-cutover.json").read_text())
+        self.assertEqual(manifest["completed_jobs_with_lagging_run_metadata"], [888])
 
     def test_moving_state_does_not_allow_takeover(self):
         catalog = [{"id": number, "path": name} for number, name in enumerate(sorted(cutover_actions.WORKFLOWS))]

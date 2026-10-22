@@ -1,0 +1,16 @@
+{
+  "source_commit": "e11e14aac65761ce2def353a537d9d5654aeb562",
+  "mode": "assisted migration, not automatic opening proof",
+  "legacy_workflows_disabled": ["daily-signals.yml", "intraday-exits.yml", "monitor-watchdog.yml", "session-supervisor.yml", "telegram-trade-status.yml", "test-emergency-telegram.yml"],
+  "legacy_trading_and_supervision_runs_in_progress_or_queued_at_audit": 0,
+  "verified_cancelled_jobs_runs": [39802827076, 39819120483, 39819171896],
+  "encrypted_export_run": 39818607951,
+  "cutover_attempt_run": 39819289392,
+  "cutover_attempt_result": "script failed closed at timeout because encrypted-export run metadata remained in_progress although its only job had completed successfully",
+  "followup": "Public API audit checked in_progress, queued, pending, waiting and requested collections. Only the two migration runs remained listed; no stock market monitor, daily, supervisor, watchdog or status writer was runnable. The last active legacy jobs were completed/cancelled. Main remained at the source commit from 17:04:38 UTC through the audit after 17:08 UTC. No server stock service was started before this audit.",
+  "current_confirmed_holding": "COST",
+  "minimum_preserved_stop_usd": 959.1617,
+  "telegram_identities_verified_distinct": ["Richettisignalsbot", "Crypytosignalsbot1996G_Bot"],
+  "credentials_transferred": "Only existing stock Telegram token/chat and Twelve Data key; hybrid RSA-OAEP/AES plus HMAC envelope. Private key generated and retained on destination only. No GitHub write credential installed on server.",
+  "server_cadence_validation": "pending; do not infer PASS from installation"
+}

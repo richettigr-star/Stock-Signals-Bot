@@ -2,6 +2,7 @@
 """Build a dated dashboard from actual holdings, signal state and delivery receipts."""
 from datetime import timedelta
 from pathlib import Path
+import os
 from common import NY, load_json, monitor_window, now_utc, parse_time, save_json, utc_now
 
 def main():
@@ -84,7 +85,7 @@ def main():
     if not events:
         lines.append("No recorded alerts.")
     lines += ["","## Operational limits","",
-              "Polling target: 5 minutes inside an allocated GitHub session runner. Startup, handover and upstream data can fail or be delayed; inspect monitor_cadence.json for effective readings.",
+              ("Polling target: 5 minutes in the isolated server service. Inspect local monitor_cadence.json and watchdog health; the GitHub snapshot is not live." if os.getenv("STOCK_DURABLE_OUTBOX") == "true" else "Polling target: 5 minutes inside an allocated GitHub session runner. Startup, handover and upstream data can fail or be delayed; inspect monitor_cadence.json for effective readings."),
               "Holidays and early closes use the XNYS calendar. Stops only rise from completed daily bars.",
               "Entry execution time is unknown for legacy fills; first-day monitoring assumes session open unless a precise execution timestamp is recorded.",
               "Corporate actions, trading halts and missing provider trades require reconciliation; a notification system is not a broker stop order.",""]

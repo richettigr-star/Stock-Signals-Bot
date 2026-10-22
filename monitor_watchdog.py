@@ -5,7 +5,7 @@ import os
 from common import NY, load_json, now_utc, parse_time, save_json, session_bounds, utc_now
 from notifications import send
 
-STALE_AFTER_SECONDS = 7 * 60
+STALE_AFTER_SECONDS = int(os.getenv("MONITOR_STALE_SECONDS", str(7 * 60)))
 OPEN_GRACE_SECONDS = 12 * 60
 POST_CLOSE_GRACE_SECONDS = 20 * 60
 

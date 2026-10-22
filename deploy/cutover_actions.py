@@ -30,13 +30,21 @@ def main():
         request("PUT", f"actions/workflows/{item['id']}/disable")
     deadline = time.monotonic() + 240
     cancelled = set()
+    completed_jobs_runs = set()
     while True:
         active = []
         for status in ("in_progress", "queued", "pending", "waiting", "requested"):
             for page in range(1, 21):
                 batch = request("GET", f"actions/runs?status={status}&per_page=100&page={page}")["workflow_runs"]
-                active.extend(item for item in batch if item["workflow_id"] in ids
-                              and str(item["id"]) != os.environ["GITHUB_RUN_ID"])
+                for item in batch:
+                    if item["workflow_id"] not in ids or str(item["id"]) == os.environ["GITHUB_RUN_ID"]:
+                        continue
+                    if item["status"] == "in_progress":
+                        jobs = request("GET", f"actions/runs/{item['id']}/jobs?per_page=100")["jobs"]
+                        if jobs and len(jobs) < 100 and all(job["status"] == "completed" for job in jobs):
+                            completed_jobs_runs.add(item["id"])
+                            continue
+                    active.append(item)
                 if len(batch) < 100:
                     break
             else:
@@ -60,6 +68,7 @@ def main():
         raise RuntimeError("Repository still changing; do not import state")
     Path("stock-cutover.json").write_text(json.dumps({"source_commit": sha,
         "disabled_workflows": sorted(WORKFLOWS), "cancelled_runs": sorted(cancelled),
+        "completed_jobs_with_lagging_run_metadata": sorted(completed_jobs_runs),
         "current_run": os.environ["GITHUB_RUN_ID"], "status": "legacy_writers_stopped"}, indent=2))
     print("All legacy stock workflows disabled and stopped; state commit=" + sha)
 

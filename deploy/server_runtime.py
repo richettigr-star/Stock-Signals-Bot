@@ -5,6 +5,7 @@ import signal
 import socket
 import subprocess
 import sys
+import tarfile
 import time
 import uuid
 from datetime import timedelta
@@ -35,6 +36,20 @@ def notify(message):
         with socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM) as connection:
             connection.connect("\0" + address[1:] if address.startswith("@") else address)
             connection.sendall(message.encode())
+
+
+def backup_state():
+    directory = Path("backups")
+    directory.mkdir(mode=0o700, exist_ok=True)
+    target = directory / (now_utc().strftime("%Y%m%dT%H%M%S") + "-" + uuid.uuid4().hex[:8] + ".tar.gz")
+    with tarfile.open(str(target) + ".tmp", "w:gz") as archive:
+        for name in ("signal_state.json", "portfolio_state.json", "signal_events.json", "monitor_health.json",
+                     "monitor_cadence.json", "daily_health.json", "watchdog_health.json", "supervisor_health.json"):
+            if Path(name).exists():
+                archive.add(name, arcname=name)
+    os.replace(str(target) + ".tmp", target)
+    for old in sorted(directory.glob("*.tar.gz"))[:-200]:
+        old.unlink()
 
 
 def worker(kind):
@@ -104,10 +119,12 @@ def main():
             last_slot = slot
             last_result = {"kind": "monitor", "code": run_child("monitor", 240, heartbeat),
                            "completed_at_utc": utc_now()}
+            backup_state()
         elif slot is None and time.monotonic() >= next_daily and daily_due(
                 now, load_json("daily_health.json", {})):
             last_result = {"kind": "daily", "code": run_child("daily", 1200, heartbeat),
                            "completed_at_utc": utc_now()}
+            backup_state()
             next_daily = time.monotonic() + 900
         elif time.monotonic() >= next_outbox:
             last_result = {"kind": "outbox", "code": run_child("outbox", 180, heartbeat),

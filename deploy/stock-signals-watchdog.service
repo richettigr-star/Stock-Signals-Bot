@@ -8,7 +8,7 @@ User=stocksignals
 Group=stocksignals
 WorkingDirectory=/var/lib/stock-signals
 EnvironmentFile=/etc/stock-signals/telegram.env
-Environment=PYTHONPATH=/opt/stock-signals PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONPATH=/opt/stock-signals PYTHONDONTWRITEBYTECODE=1 MONITOR_STALE_SECONDS=360 GITHUB_RUN_ID=server-watchdog
 ExecStart=/opt/stock-signals/.venv/bin/python /opt/stock-signals/monitor_watchdog.py
 TimeoutStartSec=90
 UMask=0077
