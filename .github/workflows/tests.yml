@@ -1,5 +1,6 @@
 name: Signal Regression Tests
 on:
+  workflow_dispatch:
   push:
     paths: ["*.py", "requirements.txt", ".github/workflows/*.yml"]
   pull_request:
