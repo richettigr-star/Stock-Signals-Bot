@@ -12,5 +12,50 @@
   "minimum_preserved_stop_usd": 959.1617,
   "telegram_identities_verified_distinct": ["Richettisignalsbot", "Crypytosignalsbot1996G_Bot"],
   "credentials_transferred": "Only existing stock Telegram token/chat and Twelve Data key; hybrid RSA-OAEP/AES plus HMAC envelope. Private key generated and retained on destination only. No GitHub write credential installed on server.",
-  "server_cadence_validation": "pending; do not infer PASS from installation"
+  "server_cadence_validation": {
+    "status": "observed_window_pass",
+    "observed_at_utc": "2026-10-22T17:31:53.760230+00:00",
+    "scope": "Recovered recent window only, not an incident-free day, unattended opening or future guarantee",
+    "completed_at_utc": ["2026-10-22T17:21:05.307337+00:00", "2026-10-22T17:26:06.451755+00:00", "2026-10-22T17:31:07.631740+00:00"],
+    "quote_bar_at_utc": ["2026-10-22T17:19:00+00:00", "2026-10-22T17:24:00+00:00", "2026-10-22T17:29:00+00:00"],
+    "quote_age_seconds": [122, 123, 124],
+    "interval_seconds": [301.144418, 301.179985],
+    "span_seconds": 602.324,
+    "runtime_run_id": "server-61ce431119ee4a29ae730c83ef0bc45a",
+    "all_three_effective": true
+  },
+  "watchdog_at_final_observation": {
+    "checked_at_utc": "2026-10-22T17:31:06.888055+00:00",
+    "status": "ok",
+    "stale_after_seconds": 360,
+    "session_status": "recovered",
+    "failed_checks_retained": 5,
+    "recoveries": 1,
+    "recovered_at_utc": "2026-10-22T17:22:02.998598+00:00"
+  },
+  "prior_provider_incident_retained": {
+    "completed_at_utc": "2026-10-22T17:16:06.699448+00:00",
+    "status": "degraded",
+    "quote_age_seconds": 185,
+    "quote_bar_ny": "2026-10-22 13:13:00",
+    "real_operational_telegram_event": "MONITOR-HEALTH-2026-10-22T17:16:06.678390+00:00",
+    "telegram_alert_status": "sent",
+    "telegram_message_id": 28,
+    "followup": "Added at most two 15-second stale-snapshot refetches. The 180-second freshness limit remains unchanged. Exhausted refetches remain degraded. No artificial test signal was sent."
+  },
+  "final_undelivered_events": 0,
+  "local_state_backups": 6,
+  "stock_main_pid": 64998,
+  "stock_restart_counter": 5,
+  "stock_restart_counter_explanation": "Four initial execution-permission failures under restrictive root umask, corrected with public-code read/traverse permissions and service-user preflight; one deliberate stock-only SIGKILL recovery test. No state or credential directory permissions were widened.",
+  "crypto_main_pid_before_and_after": 63360,
+  "crypto_restart_counter_before_and_after": 0,
+  "stock_service_and_watchdog_enabled_at_boot": true,
+  "credential_read_isolation_verified_both_directions": true,
+  "regression_tests": 131,
+  "final_ci_run": 39822632417,
+  "final_ci_result": "success; 131 tests and compileall passed",
+  "public_dashboard_notice_run": 39821566661,
+  "public_dashboard": "Historical GitHub snapshot, with a deployed migration warning; not a live server dashboard",
+  "remaining_unobserved": ["Next unattended opening on server", "First after-close daily scan on server", "Whole-host outage/reboot recovery", "Off-host availability and backups"]
 }
