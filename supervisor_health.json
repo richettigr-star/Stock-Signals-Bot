@@ -1,8 +1,8 @@
 {
-  "checked_at_utc": "2026-10-22T16:09:45.109126+00:00",
+  "checked_at_utc": "2026-10-22T16:10:45.074208+00:00",
   "run_id": "39787576146",
   "origin_event": "workflow_dispatch",
-  "status": "degraded",
+  "status": "ok",
   "last_requests": {
     "intraday-exits.yml": "2026-10-22T16:02:45.017654+00:00",
     "monitor-watchdog.yml": "2026-10-22T16:09:45.109126+00:00"
@@ -14,11 +14,10 @@
       "run_id": 39810506339
     },
     "monitor-watchdog.yml": {
-      "status": "recovery_requested"
+      "status": "pending",
+      "run_id": 39811596905
     }
   },
-  "problems": [
-    "monitor-watchdog.yml: recuperação solicitada; início não comprovado"
-  ],
+  "problems": [],
   "monitor_assessment": "ok"
 }
