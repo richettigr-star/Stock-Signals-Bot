@@ -2,20 +2,6 @@
   "version": 1,
   "samples": [
     {
-      "started_at_utc": "2026-10-19T19:11:48.528482+00:00",
-      "completed_at_utc": "2026-10-19T19:11:49.504291+00:00",
-      "run_id": "39265940859",
-      "effective": true,
-      "symbols": {
-        "COST": {
-          "bar_at_utc": "2026-10-19T19:10:00+00:00",
-          "status": "ok",
-          "confirmed": true,
-          "bar_age_seconds": 109
-        }
-      }
-    },
-    {
       "started_at_utc": "2026-10-19T19:16:48.495686+00:00",
       "completed_at_utc": "2026-10-19T19:16:49.553366+00:00",
       "run_id": "39265940859",
@@ -2795,6 +2781,20 @@
       "symbols": {
         "COST": {
           "bar_at_utc": "2026-10-22T15:15:00+00:00",
+          "status": "ok",
+          "confirmed": true,
+          "bar_age_seconds": 89
+        }
+      }
+    },
+    {
+      "started_at_utc": "2026-10-22T15:21:29.247887+00:00",
+      "completed_at_utc": "2026-10-22T15:21:30.164646+00:00",
+      "run_id": "39787530784",
+      "effective": true,
+      "symbols": {
+        "COST": {
+          "bar_at_utc": "2026-10-22T15:20:00+00:00",
           "status": "ok",
           "confirmed": true,
           "bar_age_seconds": 89
