@@ -1,10 +1,18 @@
 name: Test Emergency Telegram
 on:
   workflow_dispatch:
+    inputs:
+      phase:
+        description: Approved migration phase (never sends test alerts)
+        type: choice
+        default: export
+        options: [export, cutover]
 permissions:
   contents: read
+  actions: write
 jobs:
   approved_migration_only:
+    if: inputs.phase != 'cutover'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -22,3 +30,20 @@ jobs:
           name: stock-secrets-encrypted
           retention-days: 1
           path: stock-secrets.encrypted.json
+  stop_legacy_stock_writers:
+    if: inputs.phase == 'cutover'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Disable stock workflows and wait for all legacy writers to stop
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python deploy/cutover_actions.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stock-cutover-evidence
+          retention-days: 7
+          path: stock-cutover.json

@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from unittest.mock import patch
 
 from deploy import secret_envelope, server_runtime
+from deploy import cutover_actions
 from test_monitor import Base, FakeCalendar
 import common
 import notifications
@@ -81,3 +82,61 @@ class ServerReceiptTests(Base):
         self.assertEqual(common.load_json("signal_events.json")["events"][0]["telegram_alert_status"], "sent")
         self.assertTrue(notifications.deliver(payload))
         self.assertEqual(self.post.call_count, 1)
+
+
+class CutoverTests(unittest.TestCase):
+    def setUp(self):
+        environment = patch.dict(os.environ, {"GITHUB_RUN_ID": "777"})
+        environment.start()
+        self.addCleanup(environment.stop)
+        self.temporary = tempfile.TemporaryDirectory()
+        self.previous = os.getcwd()
+        os.chdir(self.temporary.name)
+
+    def tearDown(self):
+        os.chdir(self.previous)
+        self.temporary.cleanup()
+
+    def test_all_legacy_workers_stopped_before_manifest(self):
+        catalog = [{"id": number, "path": name} for number, name in enumerate(sorted(cutover_actions.WORKFLOWS))]
+        requests = []
+
+        def api(method, path):
+            requests.append((method, path))
+            if path.startswith("actions/workflows?"):
+                return {"workflows": catalog}
+            if path.startswith("actions/runs?"):
+                return {"workflow_runs": [{"id": 888, "workflow_id": 999}]}
+            if path == "branches/main":
+                return {"commit": {"sha": "frozen-state"}}
+
+        with patch.object(cutover_actions, "request", side_effect=api), patch.object(cutover_actions.time, "sleep"):
+            cutover_actions.main()
+        manifest = json.loads(Path("stock-cutover.json").read_text())
+        self.assertEqual(manifest["source_commit"], "frozen-state")
+        self.assertEqual(len([item for item in requests if item[0] == "PUT"]), 6)
+        self.assertFalse(any("888/cancel" in path for method, path in requests))
+
+    def test_missing_workflow_fails_before_disabling_anything(self):
+        with patch.object(cutover_actions, "request", return_value={"workflows": []}) as api:
+            with self.assertRaises(RuntimeError):
+                cutover_actions.main()
+        self.assertEqual(api.call_count, 1)
+        self.assertFalse(Path("stock-cutover.json").exists())
+
+    def test_moving_state_does_not_allow_takeover(self):
+        catalog = [{"id": number, "path": name} for number, name in enumerate(sorted(cutover_actions.WORKFLOWS))]
+        heads = iter(["first", "second"])
+
+        def api(method, path):
+            if path.startswith("actions/workflows?"):
+                return {"workflows": catalog}
+            if path.startswith("actions/runs?"):
+                return {"workflow_runs": []}
+            if path == "branches/main":
+                return {"commit": {"sha": next(heads)}}
+
+        with patch.object(cutover_actions, "request", side_effect=api), patch.object(cutover_actions.time, "sleep"):
+            with self.assertRaises(RuntimeError):
+                cutover_actions.main()
+        self.assertFalse(Path("stock-cutover.json").exists())
