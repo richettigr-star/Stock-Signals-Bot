@@ -7,6 +7,8 @@ install -d -m 700 -o stocksignals -g stocksignals /var/lib/stock-signals
 install -d -m 700 /etc/stock-signals
 python3 -m venv /opt/stock-signals/.venv
 /opt/stock-signals/.venv/bin/pip install -r /opt/stock-signals/requirements.txt
+chmod -R go+rX /opt/stock-signals
+runuser -u stocksignals -- sh -c 'cd /opt/stock-signals && .venv/bin/python -c "import common, requests"'
 install -m 644 /opt/stock-signals/deploy/stock-signals.service /etc/systemd/system/
 install -m 644 /opt/stock-signals/deploy/stock-signals-watchdog.service /etc/systemd/system/
 install -m 644 /opt/stock-signals/deploy/stock-signals-watchdog.timer /etc/systemd/system/
