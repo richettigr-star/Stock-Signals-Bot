@@ -1,5 +1,5 @@
 {
-  "checked_at_utc": "2026-10-22T15:08:45.078361+00:00",
+  "checked_at_utc": "2026-10-22T15:09:45.060668+00:00",
   "run_id": "39787576146",
   "origin_event": "workflow_dispatch",
   "status": "degraded",
@@ -10,15 +10,15 @@
   "last_alert_bucket": "20261019-10-0",
   "workflows": {
     "intraday-exits.yml": {
-      "status": "pending",
-      "run_id": 39800341833
+      "status": "awaiting_requested_runner"
     },
     "monitor-watchdog.yml": {
-      "status": "awaiting_requested_runner"
+      "status": "pending",
+      "run_id": 39800043655
     }
   },
   "problems": [
-    "monitor-watchdog.yml: runner solicitado ainda não observado"
+    "intraday-exits.yml: runner solicitado ainda não observado"
   ],
   "monitor_assessment": "ok"
 }
