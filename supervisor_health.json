@@ -1,5 +1,5 @@
 {
-  "checked_at_utc": "2026-10-22T16:57:09.951166+00:00",
+  "checked_at_utc": "2026-10-22T16:58:09.926868+00:00",
   "run_id": "39818048765",
   "origin_event": "workflow_dispatch",
   "status": "degraded",
@@ -13,12 +13,12 @@
       "status": "awaiting_requested_runner"
     },
     "monitor-watchdog.yml": {
-      "status": "recovery_requested"
+      "status": "awaiting_requested_runner"
     }
   },
   "problems": [
     "intraday-exits.yml: runner solicitado ainda não observado",
-    "monitor-watchdog.yml: recuperação solicitada; início não comprovado"
+    "monitor-watchdog.yml: runner solicitado ainda não observado"
   ],
   "monitor_assessment": "ok"
 }
