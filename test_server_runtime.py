@@ -8,7 +8,7 @@ import tarfile
 import tempfile
 import unittest
 from datetime import datetime, timezone
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from deploy import secret_envelope, server_runtime
 from deploy import cutover_actions
@@ -47,6 +47,26 @@ class ServerSchedulingTests(unittest.TestCase):
         with patch.object(common, "calendar", return_value=FakeCalendar()):
             self.assertEqual(server_runtime.monitor_slot(datetime(2026, 10, 22, 13, 31, tzinfo=timezone.utc))[1], 0)
             self.assertEqual(server_runtime.monitor_slot(datetime(2026, 11, 2, 14, 31, tzinfo=timezone.utc))[1], 0)
+
+    def test_stale_provider_result_retries_without_relaxing_freshness(self):
+        now = self.stamp("2026-10-22T13:16:06")
+        stale = [{"datetime": "2026-10-22 13:13:00"}]
+        fresh = [{"datetime": "2026-10-22 13:15:00"}]
+        fetch = Mock(side_effect=[stale, fresh])
+        with patch.object(common, "calendar", return_value=FakeCalendar()), \
+             patch.object(server_runtime, "now_utc", return_value=now), patch.object(server_runtime.time, "sleep") as sleep:
+            self.assertEqual(server_runtime.fresh_minute_bars("COST", "fake", fetch), fresh)
+        self.assertEqual(fetch.call_count, 2)
+        sleep.assert_called_once_with(15)
+
+    def test_permanently_stale_result_is_not_relabelled_fresh(self):
+        stale = [{"datetime": "2026-10-22 13:13:00"}]
+        fetch = Mock(return_value=stale)
+        with patch.object(common, "calendar", return_value=FakeCalendar()), \
+             patch.object(server_runtime, "now_utc", return_value=self.stamp("2026-10-22T13:16:06")), \
+             patch.object(server_runtime.time, "sleep"):
+            self.assertEqual(server_runtime.fresh_minute_bars("COST", "fake", fetch), stale)
+        self.assertEqual(fetch.call_count, 3)
 
 
 class EnvelopeTests(unittest.TestCase):

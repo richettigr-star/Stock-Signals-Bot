@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from common import NY, load_json, now_utc, save_json, session_bounds, utc_now
+from common import NY, load_json, monitor_window, now_utc, regular_bar, save_json, session_bounds, utc_now
 
 
 def monitor_slot(now):
@@ -52,12 +52,32 @@ def backup_state():
         old.unlink()
 
 
+def fresh_minute_bars(symbol, api_key, fetch):
+    import intraday_exit
+    for attempt in range(3):
+        bars = fetch(symbol, api_key)
+        now = now_utc()
+        if not monitor_window(now):
+            return bars
+        latest = next((bar for bar in reversed(bars) if regular_bar(bar["datetime"])
+                       and intraday_exit.bar_time(bar) <= now), None)
+        bounds = session_bounds(now.astimezone(NY).date())
+        age = (min(now, bounds[1]) - intraday_exit.bar_time(latest)).total_seconds() if latest else None
+        if age is not None and 0 <= age <= 180:
+            return bars
+        if attempt < 2:
+            time.sleep(15)
+    return bars
+
+
 def worker(kind):
     import build_dashboard
     import deliver_pending
     if kind == "monitor":
         import intraday_exit
         from verify_cadence import record_sample
+        fetch = intraday_exit.fetch_today_minute_bars
+        intraday_exit.fetch_today_minute_bars = lambda symbol, api_key: fresh_minute_bars(symbol, api_key, fetch)
         result = intraday_exit.run(defer_notifications=True)
         delivered = deliver_pending.main() == 0
         health = load_json("monitor_health.json", required=True)
