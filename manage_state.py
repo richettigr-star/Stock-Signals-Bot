@@ -68,6 +68,9 @@ def main():
         positions = state.setdefault("positions", {})
         rows = {r["symbol"]:r for r in signals["all_symbols"]}
         holdings = confirmed_holdings(portfolio)
+        previous_pending = {symbol:pos.get("signal_date") for symbol,pos in positions.items()
+                            if symbol not in holdings and pos.get("status") == "pending_entry"
+                            and str(pos.get("signal_date", "")) < str(day)}
 
         # A signal does not become a holding by itself. Old unconfirmed signals
         # must release their slot before today's Top 3 is allocated.
@@ -110,6 +113,7 @@ def main():
         slot = math.floor(available * 100 / len(selected) + 1e-8) / 100 if selected else 0
         for candidate in selected:
             symbol = candidate["symbol"]
+            candidate_kind = "revalidated" if symbol in previous_pending else "new"
             allocation = min(slot, candidate["sizing_cad"]["LIVE Small"]["risk_based_position_cad"])
             if allocation < .01:
                 continue
@@ -118,6 +122,7 @@ def main():
                 continue
             stop = candidate["reference_stop_usd"]
             pos = {"symbol":symbol,"signal_id":event_id,"status":"pending_entry","signal_date":day,
+                   "candidate_kind":candidate_kind,"previous_signal_date":previous_pending.get(symbol),
                    "planned_entry":"next_market_open","signal_close_usd":candidate["close_usd"],
                    "atr14_at_signal":candidate["atr14"],"atr14_latest":candidate["atr14"],
                    "stop_usd":stop,"initial_stop_usd":stop,"last_stop_update_date":day,
@@ -128,6 +133,7 @@ def main():
                    "stop_history":[{"stop_usd":stop,"effective_from_utc":next_open(day).isoformat(),"bar_date":day}]}
             positions[symbol] = pos
             append_event(events, {"id":event_id,"type":"ENTRY","symbol":symbol,"signal_date":day,
+                "candidate_kind":candidate_kind,"previous_signal_date":previous_pending.get(symbol),
                 "signal_close_usd":candidate["close_usd"],"stop_usd":stop,"atr14":candidate["atr14"],
                 "momentum10_pct":candidate["momentum10_pct"],"recommended_position_cad":round(allocation,2),
                 "created_at_utc":utc_now(),"telegram_alert_status":"pending"})

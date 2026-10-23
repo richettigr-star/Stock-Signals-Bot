@@ -10,7 +10,11 @@ def credentials():
 def message(event):
     kind, symbol = event.get("type"), event.get("symbol", "")
     if kind == "ENTRY":
-        return (f"🟢 ENTRADA — STOCK SIGNALS\n{symbol}\nSinal: {event['signal_date']}\n"
+        labels = {"new":"CANDIDATO NOVO", "revalidated":"CANDIDATO REVALIDADO"}
+        label = labels.get(event.get("candidate_kind"), "CANDIDATO — HISTÓRICO SEM CLASSIFICAÇÃO")
+        previous = (f"Recomendação anterior não comprada: {event['previous_signal_date']}\n"
+                    if event.get("candidate_kind") == "revalidated" and event.get("previous_signal_date") else "")
+        return (f"🟢 {label} — STOCK SIGNALS\n{symbol}\nSinal: {event['signal_date']}\n" + previous +
                 f"Próxima abertura regular. Valor sugerido: C$ {event['recommended_position_cad']:.2f}\n"
                 f"Stop do sinal: US$ {event['stop_usd']:.4f}\nID: {event['id']}\nCompra manual; confirme preço e execução.")
     if kind == "STOP_UPDATE":
