@@ -1,0 +1,31 @@
+name: Temporary Donchian v2 Leverage 50pct
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/tmp-donchian-v2-leverage-50pct.yml'
+jobs:
+  calc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/donchian-v2-repo-inspired-20261028
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check pandas numpy requests
+      - name: Run leverage scenarios
+        run: |
+          set -o pipefail
+          python research/donchian_v2_leverage_50pct.py | tee leverage_50pct.log
+      - uses: actions/upload-artifact@v4
+        with:
+          name: donchian-v2-leverage-50pct-20261028
+          path: |
+            donchian_v2_leverage_50pct.csv
+            leverage_50pct.log
+          retention-days: 7
