@@ -52,8 +52,8 @@ def daily_oct(sym):
     bars=[]; funds=[]
     with ThreadPoolExecutor(max_workers=16) as ex:
         fs=[ex.submit(one_day,sym,d) for d in dates]
-        for f in as_completed(fs):
-            _,b,fr=f.result()
+        for future in as_completed(fs):
+            _,b,fr=future.result()
             if not b.empty: bars.append(b)
             if not fr.empty: funds.append(fr)
     b=pd.concat(bars).sort_index() if bars else pd.DataFrame(columns=['open','high','low','close','volume'])
@@ -64,9 +64,14 @@ raw_map={}; fund_map={}; daily_map={}
 for sym in SYMS:
     print('LOAD',sym,flush=True)
     raw,_=eng.loadbars(sym); f,_=eng.loadfund(sym); rb,rf=daily_oct(sym)
-    print(' OCT',sym,'bars',len(rb),'fund',len(rf),flush=True)
+    print(' OCT',sym,'bars',len(rb),'daily_fund',len(rf),flush=True)
     raw=pd.concat([raw,rb]).sort_index(); raw=raw[~raw.index.duplicated(keep='last')]; raw=raw[raw.index<END]
-    f=pd.concat([f,rf],ignore_index=True).drop_duplicates('time').sort_values('time'); f=f[f.time<END]
+    # Binance daily archive path currently has no funding files for October. Keep
+    # official monthly funding through Sep and append daily rows only if present.
+    if not rf.empty: f=pd.concat([f,rf],ignore_index=True)
+    f=f.drop_duplicates('time').copy()
+    f['time']=pd.to_datetime(f['time'],utc=True,errors='coerce')
+    f=f.dropna(subset=['time']).sort_values('time'); f=f[f.time<END]
     raw_map[sym]=raw; fund_map[sym]=f; daily_map[sym]=eng.full_daily_features(raw)
 
 v=eng.V('ATRBUF_025',atrbuf=0.25); pools=[]
@@ -78,7 +83,7 @@ t=pd.concat(pools,ignore_index=True) if pools else pd.DataFrame()
 if t.empty: raise SystemExit('no trades')
 t['entry_time']=pd.to_datetime(t.entry_time,utc=True); t['exit_time']=pd.to_datetime(t.exit_time,utc=True)
 t=t[(t.entry_time>=OCT)&(t.entry_time<END)].copy(); t['net']=t.raw_ret+t.funding_ret-BASE_COST
-print('OCT CLOSED TRADES',len(t),'first',t.entry_time.min(),'last',t.entry_time.max())
+print('OCT CLOSED TRADES',len(t),'first',t.entry_time.min(),'last',t.entry_time.max(),'funding_sum',float(t.funding_ret.sum()))
 configs=[('SAFE12P5',0.125,1,8,1.0),('BAL15',0.075,2,8,1.5),('MID17P5',0.0875,2,8,1.5),('AGG20_CAP150',0.10,2,8,1.5),('AGG22P5_CAP175',0.1125,2,8,1.75),('AGG25_FULL',0.125,2,8,2.0)]
 
 def sim(z,m,lev,mp,gcap):
