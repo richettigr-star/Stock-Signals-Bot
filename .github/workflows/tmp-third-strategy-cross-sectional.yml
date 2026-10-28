@@ -30,3 +30,4 @@ jobs:
             third_strategy_cross_sectional_output/
             third_strategy_cross_sectional.log
           retention-days: 7
+# triggered
