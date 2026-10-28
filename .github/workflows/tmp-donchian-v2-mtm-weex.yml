@@ -21,7 +21,7 @@ jobs:
       - name: Run optimized mark-to-market WEEX stress test
         run: |
           set -o pipefail
-          python research/donchian_v2_mtm_weex_stress_fast.py | tee mtm_weex_stress_fast.log
+          python research/donchian_v2_mtm_weex_stress_fastfix.py | tee mtm_weex_stress_fast.log
       - uses: actions/upload-artifact@v4
         with:
           name: donchian-v2-mtm-weex-stress-fast-20261028
