@@ -21,7 +21,7 @@ jobs:
       - name: Run October forward check
         run: |
           set -o pipefail
-          # Parallel collection of the same official daily archives; parameters unchanged.
+          # Official daily price archives through Oct 27; parameters unchanged.
           python research/donchian_v2_october_forward.py | tee october_forward.log
       - uses: actions/upload-artifact@v4
         with:
