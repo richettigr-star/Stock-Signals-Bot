@@ -18,15 +18,15 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install --disable-pip-version-check pandas numpy requests
-      - name: Run exact-pipeline preregistered Donchian v2 research
+      - name: Run preregistered ATR-buffer sensitivity diagnostics
         run: |
           set -o pipefail
-          python research/donchian_v2_repo_inspired_exact.py | tee donchian_v2_repo_inspired_exact.log
+          python research/donchian_v2_atr_sensitivity.py | tee donchian_v2_atr_sensitivity.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: donchian-v2-repo-inspired-exact-20261028
+          name: donchian-v2-atr-sensitivity-20261028
           path: |
-            donchian_v2_repo_inspired_exact_output/
-            donchian_v2_repo_inspired_exact.log
+            donchian_v2_atr_sensitivity_output/
+            donchian_v2_atr_sensitivity.log
           retention-days: 7
