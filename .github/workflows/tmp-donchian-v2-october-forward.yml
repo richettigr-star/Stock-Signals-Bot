@@ -21,7 +21,7 @@ jobs:
       - name: Run October forward check
         run: |
           set -o pipefail
-          # Rerun after import-path fix; strategy parameters unchanged.
+          # Official Binance daily archive source; strategy parameters unchanged.
           python research/donchian_v2_october_forward.py | tee october_forward.log
       - uses: actions/upload-artifact@v4
         with:
