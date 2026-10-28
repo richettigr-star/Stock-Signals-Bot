@@ -21,10 +21,10 @@ jobs:
       - name: Run combined portfolio
         run: |
           set -o pipefail
-          python research/combined_portfolio_4strategies.py | tee combined_portfolio.log
+          python research/combined_portfolio_4strategies_highlow.py | tee combined_portfolio.log
       - uses: actions/upload-artifact@v4
         with:
-          name: combined-portfolio-4strategies-20261028
+          name: combined-portfolio-4strategies-highlow-20261028
           path: |
             combined_portfolio_output/
             combined_portfolio.log
