@@ -1,7 +1,7 @@
 from __future__ import annotations
 import io, requests, pandas as pd, numpy as np
 from pathlib import Path
-import research.donchian_v2_repo_inspired_exact as eng
+import donchian_v2_repo_inspired_exact as eng
 
 END=pd.Timestamp('2026-10-28 16:00:00',tz='UTC')
 OCT=pd.Timestamp('2026-10-01',tz='UTC')
