@@ -1,4 +1,4 @@
-name: Temporary Third Strategy Cross Sectional
+name: Temporary Third Strategy Donchian 4H
 on:
   push:
     branches: [ main ]
@@ -18,16 +18,15 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install --disable-pip-version-check pandas numpy requests
-      - name: Run blinded cross-sectional research
+      - name: Run blinded multi-pair 4H Donchian research
         run: |
           set -o pipefail
-          python research/third_strategy_cross_sectional.py | tee third_strategy_cross_sectional.log
+          python research/third_strategy_donchian_4h.py | tee third_strategy_donchian_4h.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: third-strategy-cross-sectional-20261028
+          name: third-strategy-donchian-4h-20261028
           path: |
-            third_strategy_cross_sectional_output/
-            third_strategy_cross_sectional.log
+            third_strategy_donchian_4h_output/
+            third_strategy_donchian_4h.log
           retention-days: 7
-# triggered
