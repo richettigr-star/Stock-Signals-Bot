@@ -1,0 +1,32 @@
+name: Temporary Third Strategy Cross Sectional
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/tmp-third-strategy-cross-sectional.yml'
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/third-strategy-20261028
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check pandas numpy requests
+      - name: Run blinded cross-sectional research
+        run: |
+          set -o pipefail
+          python research/third_strategy_cross_sectional.py | tee third_strategy_cross_sectional.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: third-strategy-cross-sectional-20261028
+          path: |
+            third_strategy_cross_sectional_output/
+            third_strategy_cross_sectional.log
+          retention-days: 7
