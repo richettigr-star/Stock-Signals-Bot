@@ -18,13 +18,13 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install --disable-pip-version-check pandas numpy requests
-      - name: Run combined portfolio
+      - name: Run exact three-strategy portfolio
         run: |
           set -o pipefail
-          python research/combined_portfolio_4strategies_momreversal.py | tee combined_portfolio.log
+          python research/combined_portfolio_3exact.py | tee combined_portfolio.log
       - uses: actions/upload-artifact@v4
         with:
-          name: combined-portfolio-4strategies-momreversal-20261028
+          name: combined-portfolio-3exact-20261028
           path: |
             combined_portfolio_output/
             combined_portfolio.log
