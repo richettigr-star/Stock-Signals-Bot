@@ -21,11 +21,11 @@ jobs:
       - name: Run blinded multi-pair liquidity sweep research
         run: |
           set -o pipefail
-          python research/third_strategy_liquidity_sweep.py | tee third_strategy_liquidity_sweep.log
+          python research/third_strategy_liquidity_sweep_fast.py | tee third_strategy_liquidity_sweep.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: third-strategy-liquidity-sweep-20261028
+          name: third-strategy-liquidity-sweep-fast-20261028
           path: |
             third_strategy_liquidity_sweep_output/
             third_strategy_liquidity_sweep.log
