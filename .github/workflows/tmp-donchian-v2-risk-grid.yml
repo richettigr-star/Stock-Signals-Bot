@@ -1,0 +1,32 @@
+name: Temporary Donchian v2 Risk Grid
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/tmp-donchian-v2-risk-grid.yml'
+jobs:
+  calc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/donchian-v2-repo-inspired-20261028
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check pandas numpy requests
+      - name: Run exhaustive risk grid
+        run: |
+          set -o pipefail
+          python research/donchian_v2_risk_grid.py | tee risk_grid.log
+      - uses: actions/upload-artifact@v4
+        with:
+          name: donchian-v2-risk-grid-20261028
+          path: |
+            donchian_v2_risk_grid_all.csv
+            donchian_v2_risk_grid_finalists.csv
+            risk_grid.log
+          retention-days: 7
