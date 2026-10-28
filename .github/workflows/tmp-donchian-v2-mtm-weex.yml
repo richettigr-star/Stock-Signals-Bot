@@ -18,15 +18,16 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install --disable-pip-version-check pandas numpy requests
-      - name: Run mark-to-market WEEX stress test
+      - name: Run optimized mark-to-market WEEX stress test
         run: |
           set -o pipefail
-          python research/donchian_v2_mtm_weex_stress.py | tee mtm_weex_stress.log
+          python research/donchian_v2_mtm_weex_stress_fast.py | tee mtm_weex_stress_fast.log
       - uses: actions/upload-artifact@v4
         with:
-          name: donchian-v2-mtm-weex-stress-20261028
+          name: donchian-v2-mtm-weex-stress-fast-20261028
           path: |
-            donchian_v2_mtm_weex_stress.csv
-            donchian_v2_mtm_templates.csv
-            mtm_weex_stress.log
+            donchian_v2_mtm_weex_stress_fast.csv
+            donchian_v2_mtm_templates_fast.csv
+            weex_live_risk_config_20261028.json
+            mtm_weex_stress_fast.log
           retention-days: 7
