@@ -18,15 +18,15 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install --disable-pip-version-check pandas numpy requests
-      - name: Run preregistered Donchian v2 research
+      - name: Run exact-pipeline preregistered Donchian v2 research
         run: |
           set -o pipefail
-          python research/donchian_v2_repo_inspired.py | tee donchian_v2_repo_inspired.log
+          python research/donchian_v2_repo_inspired_exact.py | tee donchian_v2_repo_inspired_exact.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: donchian-v2-repo-inspired-20261028
+          name: donchian-v2-repo-inspired-exact-20261028
           path: |
-            donchian_v2_repo_inspired_output/
-            donchian_v2_repo_inspired.log
+            donchian_v2_repo_inspired_exact_output/
+            donchian_v2_repo_inspired_exact.log
           retention-days: 7
