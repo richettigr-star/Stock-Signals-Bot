@@ -18,15 +18,15 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install --disable-pip-version-check pandas numpy requests
-      - name: Run preregistered ATR-buffer sensitivity diagnostics
+      - name: Run preregistered Binance Spot domain replication
         run: |
           set -o pipefail
-          python research/donchian_v2_atr_sensitivity.py | tee donchian_v2_atr_sensitivity.log
+          python research/donchian_v2_spot_replication.py | tee donchian_v2_spot_replication.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: donchian-v2-atr-sensitivity-20261028
+          name: donchian-v2-spot-replication-20261028
           path: |
-            donchian_v2_atr_sensitivity_output/
-            donchian_v2_atr_sensitivity.log
+            donchian_v2_spot_replication_output/
+            donchian_v2_spot_replication.log
           retention-days: 7
